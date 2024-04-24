@@ -1,0 +1,33 @@
+.breadcum a {
+  text-decoration: none;
+}
+
+.nonactive-breadcum {
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.active-breadcum {
+  color: var(--color-primary);
+  cursor: default;
+}
+
+.underline-on-hover:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--color-text-secondary);
+}
+
+.section-graph {
+  display: flex;
+}
+
+.graph-attendance {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+}
+
+.bar-chart {
+  background-color: aqua;
+}/*# sourceMappingURL=Dashboard.css.map */

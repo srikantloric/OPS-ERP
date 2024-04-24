@@ -1,0 +1,14 @@
+.dashboard_graph_container {
+  display: flex;
+  margin: 30px 20px;
+}
+.dashboard_graph_container .left_panel {
+  flex: 1.2;
+  text-align: center;
+}
+.dashboard_graph_container .left_panel h5 {
+  margin-bottom: 12px;
+}
+.dashboard_graph_container .right_panel {
+  flex: 0.8;
+}/*# sourceMappingURL=Dashboard.module.css.map */
