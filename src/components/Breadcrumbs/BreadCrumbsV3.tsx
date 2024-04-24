@@ -40,7 +40,7 @@ function BreadCrumbsV3({Icon,Path,ActionBtn}:BreadcrumProps) {
                     </Typography>
                     </Link>
                   )
-                }else if(key == breadCrumbPath.length-1){
+                }else if(key === breadCrumbPath.length-1){
                   return(
                   <Typography
                   sx={{ display: "flex", alignItems: "center" }}
