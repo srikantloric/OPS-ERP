@@ -52,7 +52,7 @@ function ManualAttendance() {
   const fetchstudent = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (selectedClass === null) {
-      enqueueSnackbar("Please selectt class", { variant: "error" });
+      enqueueSnackbar("Please select class", { variant: "error" });
     } else {
       setLoading(true);
       setStudentData([]);
