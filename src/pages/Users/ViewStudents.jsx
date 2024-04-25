@@ -1,4 +1,3 @@
-import React from "react";
 import PageContainer from "../../components/Utils/PageContainer";
 import Navbar from "../../components/Navbar/Navbar";
 import LSPage from "../../components/Utils/LSPage";
@@ -11,9 +10,6 @@ import {
   LinearProgress,
   ListItemIcon,
   Menu,
-  Modal,
-  Tab,
-  Tabs,
   Typography,
 } from "@mui/material";
 
@@ -24,7 +20,6 @@ import BadgeIcon from "@mui/icons-material/Badge";
 import GrainIcon from "@mui/icons-material/Grain";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
-import CheckIcon from "@mui/icons-material/Check";
 import BlockIcon from "@mui/icons-material/Block";
 
 import {
@@ -45,8 +40,7 @@ import { MoreVert } from "@mui/icons-material";
 
 import { useSnackbar } from "notistack";
 import ConfirmationModal from "../../components/Modals/ConfirmationModal";
-import { db } from "../../firebase";
-import { Card, Table } from "@mui/joy";
+
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 
@@ -80,8 +74,8 @@ function ViewStudents() {
   const [selectedStudentUID, setSelectedStudentUID] = useState();
   const [deleteLoading, setDeleteLoading] = useState(false);
   //payment
-  const [feeDetail, setFeeDetails] = useState([]);
-  const [loading, setLoading] = useState(false);
+  // const [feeDetail, setFeeDetails] = useState([]);
+  // const [loading, setLoading] = useState(false);
   ///menu state
   const [anchorEl, setAnchorEl] = useState(null);
   const menuOpen = Boolean(anchorEl);

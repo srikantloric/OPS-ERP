@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import  {useState } from "react";
 import Styles from "./Cards.module.scss";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import LOGO from "../../assets/logotransparent.png";
-import { Skeleton } from "@mui/joy";
 
 function Card({ facultyData }) {
   const navigate = useNavigate();
@@ -16,7 +15,6 @@ function Card({ facultyData }) {
   // console.log(facultyData);
   const handleImageOnLoad = () => {
     setImageLoaded(true);
-    console.log("loaded");
   };
 
   return (

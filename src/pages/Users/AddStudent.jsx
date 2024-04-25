@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import PageContainer from "../../components/Utils/PageContainer";
 import Navbar from "../../components/Navbar/Navbar";
 import LSPage from "../../components/Utils/LSPage";
@@ -29,8 +29,7 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GrainIcon from "@mui/icons-material/Grain";
 import { useSnackbar } from "notistack";
 import { db } from "../../firebase";
-import { FormHelperText, FormLabel, Switch } from "@mui/joy";
-import { color } from "framer-motion";
+import { FormHelperText, FormLabel} from "@mui/joy";
 import { Link } from "react-router-dom";
 import { SCHOOL_CLASSES, SCHOOL_SECTIONS } from "../../config/schoolConfig";
 
@@ -820,7 +819,7 @@ function AddStudent() {
                 {selectedImage && (
                   <img
                     src={URL.createObjectURL(selectedImage)}
-                    alt="Selected Profile"
+                    alt="hinchik dhinchik"
                     style={{
                       width: "50px",
                       height: "50px",
