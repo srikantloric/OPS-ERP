@@ -12,45 +12,29 @@ import {
   SCHOOL_EMAIL,
   SCHOOL_NAME,
 } from "config/schoolConfig";
-import { StudentAttendanceGlobalSchema } from "../../types/attendance";
 import { jsPDF } from "jspdf";
-import autoTable, { CellInput } from "jspdf-autotable";
+import autoTable from "jspdf-autotable";
 
-type AttendanceHeaderDataType = {
-  totalStudent: number;
-  totalAbsent: number;
-  totalPresent: number;
-  totalLeave: number;
-  totalHoliday: number;
-};
+const DailyAttendanceReport = async ():Promise<string> => {
+  let DailyAttClassHeader = [
+    "Class",
+    "Present",
+    "P/Late",
+    "Half Day",
+    "Leave",
+    "Absent",
+    "Not Marked",
+    "Total",
+  ];
 
-const AttendanceHeader = [
-  "totalStudent",
-  "totalAbsent",
-  "totalPresent",
-  "totalLeave",
-  "totalHoliday",
-];
-const AttStudentDataHeader = [
-  "Student Name",
-  "Father's Name",
-  "Contact",
-  "Status",
-  "Comment",
-  "Time Stamp",
-];
-
-export const AttendanceReportGenerator = async (
-  AttReportHeader: AttendanceHeaderDataType,
-  AttReportArray: StudentAttendanceGlobalSchema[]
-): Promise<string> => {
-  
-  const AttReportBody = [
-    AttReportHeader.totalStudent,
-    AttReportHeader.totalAbsent,
-    AttReportHeader.totalPresent,
-    AttReportHeader.totalLeave,
-    AttReportHeader.totalHoliday,
+  let DailyAttClassBody = [
+    ["Nursary", "4", "0", "0", "0", "0", "0", "4"],
+    ["Class 1", "0", "0", "0", "0", "0", "0", "0"],
+    ["Class 2", "0", "0", "0", "0", "0", "0", "0"],
+    ["Class 3", "0", "0", "0", "0", "0", "0", "0"],
+    ["Class 4", "0", "0", "0", "0", "0", "0", "0"],
+    ["Class 5", "0", "0", "0", "0", "0", "0", "0"],
+    ["Class 6", "0", "0", "0", "0", "0", "0", "0"],
   ];
 
   return new Promise((resolve, reject) => {
@@ -158,72 +142,41 @@ export const AttendanceReportGenerator = async (
       doc.setFont("Poppins", "semibold");
       doc.setFontSize(9);
       doc.setTextColor("#fff");
-      doc.text("BALANCE SHEET", cardWidth / 2, y + 30);
+      doc.text("Daily Attendance Report", cardWidth / 2 - 8, y + 30);
 
-      let tableX = x + 5;
+      let tableX = x - 3;
       let tableY = y + 43.5;
 
       autoTable(doc, {
-        head: [AttendanceHeader],
-        body: [AttReportBody],
+        head: [DailyAttClassHeader],
+        body: DailyAttClassBody,
         startY: tableY,
         theme: "grid",
         styles: {
           textColor: "#000",
           fontSize: 8,
-          valign: "middle",
         },
         margin: { left: tableX + 20 },
         headStyles: {
-          cellWidth: 30,
+          cellWidth: 20,
           fillColor: "#fff",
           textColor: "#000",
           minCellHeight: 4,
         },
       });
 
-      autoTable(doc, {
-        head: [AttStudentDataHeader],
-        body: AttReportArray.map((item) => {
-          var tempArr: CellInput[] = [];
-          const stringArr: string[] = [];
-          stringArr.push(item.studentName);
-          stringArr.push(item.studentFatherName);
-          stringArr.push(item.studentContact);
-          stringArr.push(item.attendanceStatus);
-          stringArr.push(item.comment);
-          // stringArr.push(item.createdAt)
-          tempArr.push(stringArr);
-          return tempArr;
-        }),
-        startY: tableY + 20,
-        theme: "grid",
-        styles: {
-          textColor: "#000",
-          fontSize: 8,
-          valign: "middle",
-        },
-        margin: { left: tableX },
-        headStyles: {
-          cellWidth: 30,
-          fillColor: "#fff",
-          textColor: "#000",
-          minCellHeight: 4,
-        },
-      });
-
-      AttReportArray.forEach((data, index) => {
+      DailyAttClassBody.forEach((data, index) => {
         // Draw border around content
         doc.setDrawColor("#949494");
         doc.rect(x, y, cardWidth, cardHeight);
 
-        if (index === AttReportArray.length - 1) {
+        if (index === DailyAttClassBody.length - 1) {
           // Save PDF and update state with URL
 
           // Convert PDF to Blob
           const blob = doc.output("blob");
           const url = URL.createObjectURL(blob);
-  
+
           resolve(url);
         }
       });
@@ -232,3 +185,5 @@ export const AttendanceReportGenerator = async (
     }
   });
 };
+
+export default DailyAttendanceReport;

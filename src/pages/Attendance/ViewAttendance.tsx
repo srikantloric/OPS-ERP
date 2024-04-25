@@ -21,6 +21,8 @@ import {
   Box,
   Input,
   LinearProgress,
+  Stack,
+  Grid,
 } from "@mui/joy";
 import { useState } from "react";
 import { SCHOOL_CLASSES } from "config/schoolConfig";
@@ -36,6 +38,8 @@ import { Paper } from "@mui/material";
 import { Print } from "@mui/icons-material";
 import OverViewTab from "./viewAttendanceTabs/OverViewTab";
 import { AttendanceReportGenerator } from "components/AttendanceReport/AttendanceReportGenerator";
+import Search from "@mui/icons-material/Search";
+// import { StudentDetailsType } from "types/student";
 
 type AttendanceHeaderDataType = {
   totalStudent: number;
@@ -46,17 +50,38 @@ type AttendanceHeaderDataType = {
 };
 
 function ViewAttendance() {
-  const [pdfUrl, setPdfUrl] = useState<string>("");
-
   const [selectedDate, setSelectedDate] = useState<string>(getCurrentDate());
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [individualAttendanceData, setIndividualAttendanceData] = useState<
     StudentAttendanceGlobalSchema[]
   >([]);
+  const [searchInput, setSearchInput] = useState<string>("");
+  const [filterdata, setfilterdata] = useState<StudentAttendanceGlobalSchema[]>(
+    []
+  );
 
   const [loading, setLoading] = useState<boolean>(false);
   const [attendanceHeaderData, setAttendanceHeaderData] =
     useState<AttendanceHeaderDataType | null>(null);
+
+  function handlesearch(): void {
+    // setfilterdata(undefined)
+    if (searchInput) {
+      console.log(searchInput);
+      db.collection("STUDENTS")
+        .where("admission_no", "==", searchInput)
+        .get()
+        .then((snapshot) => {
+          const studentdata = snapshot.docs[0].data() as any;
+          setfilterdata(studentdata);
+          console.log(filterdata);
+          // const data_id = data.id;
+          // console.log(data_id);
+        });
+    } else {
+      enqueueSnackbar("Please enter Student Id", { variant: "error" });
+    }
+  }
 
   const fetchStudentAtt = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -113,20 +138,15 @@ function ViewAttendance() {
     }
   };
 
-  const getPdfUrl = async () => {
+  const handleNewWindowOpen = async () => {
     const attendanceHeaderDataa = attendanceHeaderData!;
     const pdfRes = await AttendanceReportGenerator(
       attendanceHeaderDataa,
       individualAttendanceData
     );
-    setPdfUrl(pdfRes);
-  };
-
-  const handleNewWindowOpen = async () => {
-    await getPdfUrl();
     const features =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
-    window.open(pdfUrl, "_blank", features);
+    window.open(pdfRes, "_blank", features);
   };
 
   return (
@@ -148,7 +168,38 @@ function ViewAttendance() {
             <OverViewTab />
           </TabPanel>
           <TabPanel value={2}>
-            <b>Second</b> tab panel
+            <Grid container spacing={2} marginTop={2}>
+              <Paper
+                sx={{
+                  padding: "8px",
+                  height: "100%",
+                  width: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Stack
+                  direction={"row"}
+                  spacing={2}
+                  marginBottom={1.5}
+                  marginTop={1}
+                  marginLeft={0.5}
+                  marginRight={0.5}
+                >
+                  <Input
+                    placeholder="Student ID"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                  <Button
+                    startDecorator={<Search />}
+                    variant="soft"
+                    onClick={handlesearch}
+                  />
+                </Stack>
+              </Paper>
+            </Grid>
           </TabPanel>
           <TabPanel value={1}>
             {/* <b>Third</b> tab panel */}

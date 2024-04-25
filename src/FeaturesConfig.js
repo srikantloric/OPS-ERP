@@ -1,6 +1,6 @@
 const FeaturesConfig = {
   PAYMENT_FEATURE: true,
-  ATTENDANCE_FEATURE: false,
+  ATTENDANCE_FEATURE: true,
   FACULTY_FEATURE: true,
 };
 

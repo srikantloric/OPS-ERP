@@ -14,7 +14,7 @@ import {
   SCHOOL_NAME,
 } from "config/schoolConfig";
 
-import jsPDF from "jspdf";
+import {jsPDF} from "jspdf";
 import autoTable from "jspdf-autotable";
 import { BalanceSheetType } from "types/student";
 
@@ -371,6 +371,11 @@ export const BalanceSheet = async (
         body: data5,
         startY: tableY,
         margin: {left: tableX},
+        theme: 'grid',
+        styles: {
+          textColor: '#000',
+          fontSize: 6,
+        },
         headStyles:{
           cellWidth:30,
           fillColor:'#fff',
