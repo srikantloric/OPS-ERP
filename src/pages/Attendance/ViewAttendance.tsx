@@ -41,6 +41,7 @@ import { AttendanceReportGenerator } from "components/AttendanceReport/Attendanc
 import Search from "@mui/icons-material/Search";
 import { StudentDetailsType } from "types/student";
 import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
+import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
 // import { StudentDetailsType } from "types/student";
 
 type AttendanceHeaderDataType = {
@@ -86,7 +87,7 @@ function ViewAttendance() {
             });
             db.collection("STUDENTS")
               .doc(filterdata[0].id)
-              .collection("ATTENDANCE").where("attendanceDate","==",selectedDate)
+              .collection("ATTENDANCE").where("attendanceDate", "==", selectedDate)
               .get()
               .then((document) => {
                 if (document.size > 0) {
@@ -184,6 +185,41 @@ function ViewAttendance() {
     window.open(pdfRes, "_blank", features);
   };
 
+
+
+  const GetFullAttendance = async () => {
+    const [SelectedStuAttendance, setSelectedStuAttendance] = useState<
+      StudentAttendanceGlobalSchema[]
+    >([]);
+
+
+    try {
+      db.collection("STUDENTS")
+        .doc(filterdata[0].id)
+        .collection("ATTENDANCE")
+        .get()
+        .then((document) => {
+          if (document.size > 0) {
+            let arrAttendance2: StudentAttendanceGlobalSchema[] = [];
+            document.forEach((doc) => {
+              const data = doc.data() as StudentAttendanceGlobalSchema;
+              arrAttendance2.push(data);
+              setSelectedStuAttendance(arrAttendance2);
+            });
+          }
+        });
+    }
+    catch {
+      console.log("Error while feaching");
+    }
+    
+    const pdfRes2 = await FullAttendanceReport(filterdata, SelectedStuAttendance);
+    const window1 =
+      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+
+    window.open(pdfRes2, "_blank", window1);
+  };
+
   return (
     <PageContainer>
       <Navbar />
@@ -201,7 +237,7 @@ function ViewAttendance() {
           </TabList>
           <TabPanel value={0}>
             <OverViewTab />
-            <AttendanceIndex/>
+            <AttendanceIndex />
           </TabPanel>
           <TabPanel value={2}>
             <Grid container spacing={2} marginTop={2}>
@@ -228,22 +264,30 @@ function ViewAttendance() {
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
-                  
-                    <FormLabel>Select Date</FormLabel>
-                    <Input
-                      required
-                      placeholder="Placeholder"
-                      type="date"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                    />
-                    {/* <FormHelperText>This is a helper text.</FormHelperText> */}
-                  
+
+                  <FormLabel>Select Date</FormLabel>
+                  <Input
+                    required
+                    placeholder="Placeholder"
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                  />
+                  {/* <FormHelperText>This is a helper text.</FormHelperText> */}
+
                   <Button
                     startDecorator={<Search />}
                     variant="soft"
                     onClick={handlesearch}
                   />
+
+                  <Button
+                    sx={{ height: 20 }}
+                    type="submit"
+                    onClick={GetFullAttendance}
+                  >Get Full Attendance
+                  </Button>
+
                 </Stack>
                 {loading ? <LinearProgress /> : null}
                 <Table
@@ -257,7 +301,7 @@ function ViewAttendance() {
                       <th>STUDENT</th>
                       <th>FATHER</th>
                       <th>CONTACT</th>
-                      
+
                       <th>STATUS</th>
                       <th>COMMENT</th>
                     </tr>
@@ -284,13 +328,13 @@ function ViewAttendance() {
                             {attendancedata &&
                               attendancedata.map((student, i) => {
                                 return (
-                                  
-                                <tr
-                                >
-                                <td>{student.attendanceStatus}</td>
-                                <td>{student.comment}</td>
-                                </tr>
-                                
+
+                                  <tr
+                                  >
+                                    <td>{student.attendanceStatus}</td>
+                                    <td>{student.comment}</td>
+                                  </tr>
+
                                 )
                               })}
                           </tr>
