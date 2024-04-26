@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Butto
 // import RoundIconCard from "components/Card/RoundIconCard";
 import DailyAttendance from "components/AttendanceReport/DailyAttendanceReport";
 import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegister";
+import {AttendanceReportGenerator} from "components/AttendanceReport/AttendanceReportGenerator";
 
 interface Indexdata {
     column1: string;
@@ -34,6 +35,7 @@ function AttendanceIndex() {
     const rowData: Indexdata[] = [
         { column1: '1', column2: 'Daily Attendance Report', buttonText: 'Button 1', clickHandler: () => handleDailyAttendance() },
         { column1: '2', column2: 'Attendance Register', buttonText: 'Button 2', clickHandler: () => handleAttendanceRegister() },
+        { column1: '3', column2: 'Attendance By Class', buttonText: 'Button 3', clickHandler: () => AttendanceReportGenerator },
     ];
 
     return (
