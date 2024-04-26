@@ -1,5 +1,5 @@
 import { Grid } from "@mui/joy";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 // import RoundIconCard from "components/Card/RoundIconCard";
 import DailyAttendance from "components/AttendanceReport/DailyAttendanceReport";
 import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegister";
@@ -7,7 +7,6 @@ import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegi
 interface Indexdata {
     column1: string;
     column2: string;
-    buttonText: string;
     clickHandler: () => void;
 }
 
@@ -32,8 +31,8 @@ function AttendanceIndex() {
 
 
     const rowData: Indexdata[] = [
-        { column1: '1', column2: 'Daily Attendance Report', buttonText: 'Button 1', clickHandler: () => handleDailyAttendance() },
-        { column1: '2', column2: 'Attendance Register', buttonText: 'Button 2', clickHandler: () => handleAttendanceRegister() },
+        { column1: '1', column2: 'Daily Attendance Report' ,clickHandler: () => handleDailyAttendance() },
+        { column1: '2', column2: 'Attendance Register',clickHandler: () => handleAttendanceRegister() },
     ];
 
     return (
@@ -64,7 +63,7 @@ function AttendanceIndex() {
                                         <TableCell>{row.column1}</TableCell>
                                         <TableCell>{row.column2}</TableCell>
                                         <TableCell>
-                                            <Button variant="contained" color="primary" onClick={row.clickHandler}>{row.buttonText}</Button>
+                                            <a onClick={row.clickHandler} style={{textDecoration:"underline",color:"var(--bs-primary)",cursor:"pointer"}}>Open Report</a>
                                         </TableCell>
                                     </TableRow>
                                 ))}
