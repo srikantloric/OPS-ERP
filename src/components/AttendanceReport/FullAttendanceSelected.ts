@@ -129,6 +129,8 @@ let FullAttendanceReport=async (StudentFilter:StudentDetailsType[],FullAttArray:
         //   let tableX = x + 5;
         //   let tableY = y + 43.5;
         console.log("FullArray->"+FullAttArray);
+        console.log("Filter Student->"+StudentFilter);
+        
         
     
           
