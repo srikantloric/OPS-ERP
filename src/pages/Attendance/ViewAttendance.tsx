@@ -40,6 +40,7 @@ import OverViewTab from "./viewAttendanceTabs/OverViewTab";
 import { AttendanceReportGenerator } from "components/AttendanceReport/AttendanceReportGenerator";
 import Search from "@mui/icons-material/Search";
 import { StudentDetailsType } from "types/student";
+import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
 // import { StudentDetailsType } from "types/student";
 
 type AttendanceHeaderDataType = {
@@ -200,6 +201,7 @@ function ViewAttendance() {
           </TabList>
           <TabPanel value={0}>
             <OverViewTab />
+            <AttendanceIndex/>
           </TabPanel>
           <TabPanel value={2}>
             <Grid container spacing={2} marginTop={2}>
