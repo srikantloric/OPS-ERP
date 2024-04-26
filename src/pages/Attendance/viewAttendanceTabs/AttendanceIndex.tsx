@@ -4,7 +4,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import DailyAttendance from "components/AttendanceReport/DailyAttendanceReport";
 import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegister";
 import {AttendanceReportGenerator} from "components/AttendanceReport/AttendanceReportGenerator";
-import { Link } from "react-router-dom";
 
 interface Indexdata {
     column1: string;
@@ -35,7 +34,7 @@ function AttendanceIndex() {
     const rowData: Indexdata[] = [
         { column1: '1', column2: 'Daily Attendance Report', clickHandler: () => handleDailyAttendance() },
         { column1: '2', column2: 'Attendance Register', clickHandler: () => handleAttendanceRegister() },
-        { column1: '3', column2: 'Attendance By Class', clickHandler: () => AttendanceReportGenerator },
+        // { column1: '3', column2: 'Attendance By Class', clickHandler: () => AttendanceReportGenerator },
     ];
 
     return (
@@ -67,7 +66,6 @@ function AttendanceIndex() {
                                         <TableCell>{row.column2}</TableCell>
                                         <TableCell>
                                             <a onClick={row.clickHandler} style={{textDecoration:"underline",color:"var(--bs-primary)",cursor:"pointer"}}>Open Report</a>
-                                            <Link to={row.clickHandler} style={{textDecoration:"underline",color:"var(--bs-primary)",cursor:"pointer"}}>Open Report</Link>
                                         </TableCell>
                                     </TableRow>
                                 ))}
