@@ -3,7 +3,6 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 // import RoundIconCard from "components/Card/RoundIconCard";
 import DailyAttendance from "components/AttendanceReport/DailyAttendanceReport";
 import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegister";
-import {AttendanceReportGenerator} from "components/AttendanceReport/AttendanceReportGenerator";
 
 interface Indexdata {
     column1: string;
