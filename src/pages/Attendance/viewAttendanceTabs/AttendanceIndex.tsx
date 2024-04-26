@@ -32,9 +32,9 @@ function AttendanceIndex() {
 
 
     const rowData: Indexdata[] = [
-        { column1: '1', column2: 'Daily Attendance Report', buttonText: 'Button 1', clickHandler: () => handleDailyAttendance() },
-        { column1: '2', column2: 'Attendance Register', buttonText: 'Button 2', clickHandler: () => handleAttendanceRegister() },
-        { column1: '3', column2: 'Attendance By Class', buttonText: 'Button 3', clickHandler: () => AttendanceReportGenerator },
+        { column1: '1', column2: 'Daily Attendance Report', clickHandler: () => handleDailyAttendance() },
+        { column1: '2', column2: 'Attendance Register', clickHandler: () => handleAttendanceRegister() },
+        { column1: '3', column2: 'Attendance By Class', clickHandler: () => AttendanceReportGenerator },
     ];
 
     return (
