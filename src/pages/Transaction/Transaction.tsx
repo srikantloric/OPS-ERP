@@ -51,7 +51,6 @@ function Transaction() {
     const res = await AttendanceRegisterReport();
     const window2 =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
-
     window.open(res, "_blank", window2);
   };
 

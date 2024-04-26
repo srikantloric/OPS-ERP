@@ -1,5 +1,5 @@
 import { Grid } from "@mui/joy";
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 // import RoundIconCard from "components/Card/RoundIconCard";
 import DailyAttendance from "components/AttendanceReport/DailyAttendanceReport";
 import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegister";
@@ -8,7 +8,6 @@ import {AttendanceReportGenerator} from "components/AttendanceReport/AttendanceR
 interface Indexdata {
     column1: string;
     column2: string;
-    buttonText: string;
     clickHandler: () => void;
 }
 
@@ -66,7 +65,7 @@ function AttendanceIndex() {
                                         <TableCell>{row.column1}</TableCell>
                                         <TableCell>{row.column2}</TableCell>
                                         <TableCell>
-                                            <Button variant="contained" color="primary" onClick={row.clickHandler}>{row.buttonText}</Button>
+                                            <a onClick={row.clickHandler} style={{textDecoration:"underline",color:"var(--bs-primary)",cursor:"pointer"}}>Open Report</a>
                                         </TableCell>
                                     </TableRow>
                                 ))}

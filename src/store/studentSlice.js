@@ -24,7 +24,6 @@ export const addstudent = createAsyncThunk(
     console.log(prevAdmissionNumber.data());
 
     if (prevAdmissionNumber.exists) {
-      const nextAdmissionSerial = prevAdmissionNumber.data();
 
       const formatedCountValue = String(
         prevAdmissionNumber.data().total_count + 1
@@ -55,7 +54,10 @@ export const addstudent = createAsyncThunk(
             .runTransaction((trx) => {
               return trx.get(admissionNumberTrackerRef).then((countData) => {
                 if (!countData.exists) {
-                  throw "Document does not exisit";
+                  throw Object.assign(
+                    new Error("Document does not exisit"),
+                    { code: 402 }
+                 );
                 }
 
                 var newSerialNumber = countData.data().total_count + 1;
