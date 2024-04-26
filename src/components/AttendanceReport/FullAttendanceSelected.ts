@@ -124,7 +124,7 @@ let FullAttendanceReport=async (StudentFilter:StudentDetailsType[],FullAttArray:
           doc.setFont("Poppins", "semibold");
           doc.setFontSize(9);
           doc.setTextColor("#fff");
-          doc.text("BALANCE SHEET", cardWidth / 2, y + 30);
+          doc.text("Full Attendance Report", cardWidth / 2, y + 30);
     
         //   let tableX = x + 5;
         //   let tableY = y + 43.5;
