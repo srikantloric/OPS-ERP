@@ -38,7 +38,6 @@ import { Paper } from "@mui/material";
 import { Print } from "@mui/icons-material";
 import OverViewTab from "./viewAttendanceTabs/OverViewTab";
 import { AttendanceReportGenerator } from "components/AttendanceReport/AttendanceReportGenerator";
-import Search from "@mui/icons-material/Search";
 import { StudentDetailsType } from "types/student";
 import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
@@ -99,8 +98,8 @@ function ViewAttendance() {
                 }
               });
             setLoading(false)
-            console.log("1=>"+filterdata);
-            console.log("2=>"+attendancedata);
+            console.log("1=>" + filterdata);
+            console.log("2=>" + attendancedata);
 
           } else {
             setLoading(false);
@@ -188,7 +187,7 @@ function ViewAttendance() {
 
 
   const GetFullAttendance = async () => {
-    const pdfRes4 = await FullAttendanceReport(filterdata,attendancedata);
+    const pdfRes4 = await FullAttendanceReport(filterdata, attendancedata);
     const window4 =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
 
@@ -251,13 +250,15 @@ function ViewAttendance() {
                   {/* <FormHelperText>This is a helper text.</FormHelperText> */}
 
                   <Button
-                    startDecorator={<Search />}
-                    variant="soft"
+                    sx={{ height: 20 }}
+                    type="submit"
                     onClick={handlesearch}
-                  />
+                  >
+                    Search
+                  </Button>
 
                   <Button
-                    sx={{ height: 20 }}
+                    sx={{ height: 20, marginLeft: '30px' }}
                     type="submit"
                     onClick={GetFullAttendance}
                   >Get Full Attendance
