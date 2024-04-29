@@ -16,7 +16,33 @@ import { jsPDF } from "jspdf";
 //   import autoTable, { CellInput } from "jspdf-autotable";
 import { StudentAttendanceGlobalSchema } from "types/attendance";
 import { StudentDetailsType } from "types/student";
+import autoTable from "jspdf-autotable";
 
+let StudentDailyAttHeader=[
+  "#",
+  "Month",
+  "1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20",
+  "21","22","23","24","25","26","27","28","29","30","31",
+  "Total",
+  "HF-D",
+  "Leave",
+  "Absent",
+];
+
+let StudentDailyAttBody=[
+  ["1","JAN","4","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","3", "4"],
+  ["2","FEB","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["3","MAR","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["4","APR","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["5","MAY","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["6","JUN","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["7","JUL","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["8","AUG","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["9","SEP","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["10","OCT","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["11","NOV","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+  ["12","DEC","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0", "4"],
+];
 
 let FullAttendanceReport = async (FilterStudentData: StudentDetailsType[], FullAttArray: StudentAttendanceGlobalSchema[]): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -126,9 +152,7 @@ let FullAttendanceReport = async (FilterStudentData: StudentDetailsType[], FullA
       doc.setTextColor("#fff");
       doc.text("Full Attendance Report", cardWidth / 2, y + 30);
 
-      //   let tableX = x + 5;
-      //   let tableY = y + 43.5;
-      console.log("FullArray->" + FullAttArray);
+
 
 
       //Student Details
@@ -139,37 +163,37 @@ let FullAttendanceReport = async (FilterStudentData: StudentDetailsType[], FullA
       doc.setFont("Poppins", "normal");
 
       let studentDetailsStartY = y + 37;
-      let studentDetailsStartX=x+3;
+      let studentDetailsStartX = x + 3;
 
       doc.text("Name: " + FilterStudentData[0].student_name, studentDetailsStartX, studentDetailsStartY);
 
       doc.text(
         "Class : " + FilterStudentData[0].class,
-        studentDetailsStartX+ cardWidth/3,
+        studentDetailsStartX + cardWidth / 3,
         studentDetailsStartY
       );
 
       doc.text(
         "Father Name: " + FilterStudentData[0].father_name,
-        studentDetailsStartX + 2*(cardWidth/3) ,
+        studentDetailsStartX + 2 * (cardWidth / 3),
         studentDetailsStartY,
       );
 
       doc.text(
         "DOB : " + FilterStudentData[0].dob,
         studentDetailsStartX,
-        studentDetailsStartY+5,
+        studentDetailsStartY + 5,
       );
 
       doc.text(
         "Phone No: " + FilterStudentData[0].contact_number,
-        studentDetailsStartX + cardWidth/3,
-        studentDetailsStartY +5
+        studentDetailsStartX + cardWidth / 3,
+        studentDetailsStartY + 5
       );
 
       doc.text(
         "Roll No: " + FilterStudentData[0].class_roll,
-        studentDetailsStartX + 2*(cardWidth/3),
+        studentDetailsStartX + 2 * (cardWidth / 3),
         studentDetailsStartY + 5,
       );
 
@@ -181,11 +205,41 @@ let FullAttendanceReport = async (FilterStudentData: StudentDetailsType[], FullA
 
       doc.text(
         "Reg. No : " + FilterStudentData[0].admission_no,
-        studentDetailsStartX + cardWidth/3,
+        studentDetailsStartX + cardWidth / 3,
         studentDetailsStartY + 10
       );
 
 
+
+        let tableX = x ;
+        let tableY = studentDetailsStartY + 15;
+
+        autoTable(doc,{
+          head:[StudentDailyAttHeader],
+          body: StudentDailyAttBody,
+          startY: tableY,
+          theme: 'grid',
+          styles: {
+            textColor: '#000',
+            fontSize: 7,
+            minCellHeight: 4,
+          },
+          margin: { left: tableX+3 },
+          headStyles: {
+            cellWidth: 6.4,
+            fillColor: '#fff',
+            textColor: '#000',
+            minCellHeight: 3,
+            fontSize:6,
+          },
+          columnStyles: {
+            1: {cellWidth: 10}, //Month Name
+            33: {cellWidth: 9},
+            34: {cellWidth: 9},
+            35: {cellWidth: 10},
+            36: {cellWidth: 11},
+          },
+        });
 
 
 
