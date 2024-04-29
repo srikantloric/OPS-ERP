@@ -42,7 +42,6 @@ import Search from "@mui/icons-material/Search";
 import { StudentDetailsType } from "types/student";
 import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
-// import { StudentDetailsType } from "types/student";
 
 type AttendanceHeaderDataType = {
   totalStudent: number;
@@ -100,8 +99,9 @@ function ViewAttendance() {
                 }
               });
             setLoading(false)
-            console.log(filterdata);
-            console.log(attendancedata);
+            console.log("1=>"+filterdata);
+            console.log("2=>"+attendancedata);
+
           } else {
             setLoading(false);
             enqueueSnackbar("No student with this student ID!", {
@@ -188,36 +188,11 @@ function ViewAttendance() {
 
 
   const GetFullAttendance = async () => {
-    const [SelectedStuAttendance, setSelectedStuAttendance] = useState<
-      StudentAttendanceGlobalSchema[]
-    >([]);
-
-
-    try {
-      db.collection("STUDENTS")
-        .doc(filterdata[0].id)
-        .collection("ATTENDANCE")
-        .get()
-        .then((document) => {
-          if (document.size > 0) {
-            let arrAttendance2: StudentAttendanceGlobalSchema[] = [];
-            document.forEach((doc) => {
-              const data = doc.data() as StudentAttendanceGlobalSchema;
-              arrAttendance2.push(data);
-              setSelectedStuAttendance(arrAttendance2);
-            });
-          }
-        });
-    }
-    catch {
-      console.log("Error while feaching");
-    }
-    
-    const pdfRes2 = await FullAttendanceReport(filterdata, SelectedStuAttendance);
-    const window1 =
+    const pdfRes4 = await FullAttendanceReport(filterdata,attendancedata);
+    const window4 =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
 
-    window.open(pdfRes2, "_blank", window1);
+    window.open(pdfRes4, "_blank", window4);
   };
 
   return (
