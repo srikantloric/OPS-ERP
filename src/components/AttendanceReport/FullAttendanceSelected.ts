@@ -138,70 +138,51 @@ let FullAttendanceReport = async (FilterStudentData: StudentDetailsType[], FullA
       doc.setFontSize(8);
       doc.setFont("Poppins", "normal");
 
-      let studentDetailsStartY = y + 49;
+      let studentDetailsStartY = y + 37;
+      let studentDetailsStartX=x+3;
 
-      doc.text("Name: " + FilterStudentData[0].student_name, x + 3, studentDetailsStartY);
+      doc.text("Name: " + FilterStudentData[0].student_name, studentDetailsStartX, studentDetailsStartY);
 
       doc.text(
-        // "Class : " + FilterStudentData.class,
         "Class : " + FilterStudentData[0].class,
-        x + cardWidth / 2,
-        studentDetailsStartY,
-        {
-          align: "right",
-        }
+        studentDetailsStartX+ cardWidth/3,
+        studentDetailsStartY
       );
 
       doc.text(
-        // "Father Name: " + FilterStudentData.father_name,
         "Father Name: " + FilterStudentData[0].father_name,
-        x + cardWidth - margin,
-        studentDetailsStartY + 4.5
+        studentDetailsStartX + 2*(cardWidth/3) ,
+        studentDetailsStartY,
       );
 
       doc.text(
         "DOB : " + FilterStudentData[0].dob,
-        x + margin,
-        studentDetailsStartY + 4.5,
-        {
-          align: "right",
-        }
+        studentDetailsStartX,
+        studentDetailsStartY+5,
       );
 
       doc.text(
         "Phone No: " + FilterStudentData[0].contact_number,
-        x + cardWidth / 2,
-        studentDetailsStartY + 8.5
+        studentDetailsStartX + cardWidth/3,
+        studentDetailsStartY +5
       );
 
       doc.text(
         "Roll No: " + FilterStudentData[0].class_roll,
-        x + cardWidth - margin,
-        studentDetailsStartY + 8.5,
-        {
-          align: "right",
-        }
+        studentDetailsStartX + 2*(cardWidth/3),
+        studentDetailsStartY + 5,
       );
 
       doc.text(
         "Section: " + FilterStudentData[0].section,
-        x + 3,
-        studentDetailsStartY + 12.5,
-        {
-          align: "right",
-        }
+        studentDetailsStartX,
+        studentDetailsStartY + 10,
       );
 
       doc.text(
         "Reg. No : " + FilterStudentData[0].admission_no,
-        x + cardWidth / 2,
-        studentDetailsStartY + 12.5
-      );
-
-      doc.text(
-        "Address : " + FilterStudentData[0].address,
-        x + cardWidth - margin,
-        studentDetailsStartY + 16.5
+        studentDetailsStartX + cardWidth/3,
+        studentDetailsStartY + 10
       );
 
 
