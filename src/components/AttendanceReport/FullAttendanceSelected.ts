@@ -211,10 +211,10 @@ let FullAttendanceReport = async (FilterStudentData: StudentDetailsType[], FullA
 
 
       doc.setDrawColor("#cbc9c9");
-      doc.line(x, studentDetailsStartY + 55, cardWidth, studentDetailsStartY + 55);
+      doc.line(x, studentDetailsStartY + 10, cardWidth, studentDetailsStartY + 55);
 
       let tableX = x;
-      let tableY = studentDetailsStartY + 55;
+      let tableY = studentDetailsStartY + 20;
 
       autoTable(doc, {
         head: [StudentDailyAttHeader],
