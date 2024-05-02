@@ -253,13 +253,13 @@ function FeeReceipt() {
 
   const getPdfUrl1 = async () => {
     const pdfRes1 = await DueRecieptList(sampleObjects);
-    setPdfUrl(pdfRes1);
+    setPdfUrl1(pdfRes1);
   };
 
   useEffect(() => {
     getPdfUrl1();
   }, []);
-  
+
   const handleDueRecieptList=()=>{
     const features1 =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
