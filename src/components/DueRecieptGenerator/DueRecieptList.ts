@@ -180,6 +180,7 @@ export const DueRecieptList = async (
             doc.text("Due Reciept List", cardWidth / 2 - 8, y + 30);
 
 
+            doc.setFontSize(7);
             let tableX = x - 7;
             let tableY = y + 43.5;
             doc.text("Session - "+recieptData[0].current_session,tableX,tableY);
@@ -213,7 +214,7 @@ export const DueRecieptList = async (
                     7:{cellWidth:25}, //Father's Name
                     8:{cellWidth:23}, //Contact
                     9:{cellWidth:20}, //Due Amount
-                    10:{cellWidth:53}, //Remark
+                    10:{cellWidth:40}, //Remark
                 },
             });
 
