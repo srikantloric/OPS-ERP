@@ -53,7 +53,6 @@ export const DueRecieptList = async (
 
     let tempArr:any[] = [];
     let DueRecieptListArr = recieptData.map((item, index) => {
-        recieptData.map((item, index) => {
             const stringArr = [];
             stringArr.push((index + 1).toString());
             stringArr.push(item.current_session);
@@ -68,9 +67,9 @@ export const DueRecieptList = async (
             stringArr.push(item.fee_heads[0].value+item.fee_heads[1].value+item.fee_heads[2].value);
             stringArr.push("");
             tempArr.push(stringArr);
+            return tempArr;
         });
-        return tempArr;
-    })
+
     console.log("DueArr=" + DueRecieptListArr);
 
 
