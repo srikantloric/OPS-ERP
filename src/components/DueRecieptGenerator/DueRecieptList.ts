@@ -65,7 +65,7 @@ export const DueRecieptList = async (
             stringArr.push(item.section);
             stringArr.push(item.roll_number.toString());
             stringArr.push(item.phone_number.toString());
-            stringArr.push(item.fee_heads);
+            stringArr.push(item.fee_heads[0].value+item.fee_heads[1].value+item.fee_heads[2].value);
             stringArr.push("");
             tempArr.push(stringArr);
         });
@@ -202,7 +202,7 @@ export const DueRecieptList = async (
                     minCellHeight: 4,
                 },
                 columnStyles:{
-                    0:{cellWidth:12},
+                    0:{cellWidth:12}, //Sl no
                     1:{cellWidth:20}, //Session
                     2:{cellWidth:20}, //Due Month
                     3:{cellWidth:17}, //Due Date
@@ -210,8 +210,8 @@ export const DueRecieptList = async (
                     5:{cellWidth:20}, //Admission no
                     6:{cellWidth:20}, //Class
                     7:{cellWidth:9},  //Section
-                    8:{cellWidth:15}, //Roll
-                    9:{cellWidth:30}, //Contact
+                    8:{cellWidth:13}, //Roll
+                    9:{cellWidth:25}, //Contact
                     10:{cellWidth:25}, //Due Amount
                     11:{cellWidth:60}, //Remark
                 },
