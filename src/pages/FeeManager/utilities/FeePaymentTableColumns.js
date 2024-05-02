@@ -1,9 +1,18 @@
+import { getFeeHeaderByCode } from "utilities/UtilitiesFunctions";
+
 export const FEE_TABLE_COLS = [
   {
     field: "id",
     title: "Payment ID",
   },
-  { field: "fee_title", title: "Fee Title" },
+  { field: "fee_title", title: "Fee Title",
+
+  render:(rowData)=>{
+    const feeTitle = getFeeHeaderByCode(rowData.fee_title)
+    return <p></p>
+  }
+
+},
   { field: "fee_total", title: "Tution Fee" },
   { field: "computer_fee", title: "Computer Fee" },
   { field: "transportation_fee", title: "Transport Fee" },

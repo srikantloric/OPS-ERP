@@ -1,16 +1,14 @@
 import MaterialTable from "@material-table/core";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import PageContainer from "../../components/Utils/PageContainer";
 import LSPage from "../../components/Utils/LSPage";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
-import GrainIcon from "@mui/icons-material/Grain";
 import { ExportCsv, ExportPdf } from "@material-table/exporters";
 import EditIcon from "@mui/icons-material/Edit";
 import PrintIcon from "@mui/icons-material/Print";
 import { FEE_TABLE_COLS } from "./utilities/FeePaymentTableColumns";
 
 import {
-  Breadcrumbs,
   Divider,
   LinearProgress,
   ListItemIcon,
@@ -19,35 +17,43 @@ import {
   Paper,
 } from "@mui/material";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
-import { Delete, Edit, MoreVert } from "@mui/icons-material";
+import { Add, Delete, Edit, MoreVert } from "@mui/icons-material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
-import { Button, Typography } from "@mui/joy";
+import { Box, Button, Stack, Tooltip, Typography } from "@mui/joy";
 import QuickPaymentModal from "./utilities/QuickPaymentModal";
-import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
 import BreadCrumbsV3 from "components/Breadcrumbs/BreadCrumbsV3";
+import Navbar from "components/Navbar/Navbar";
+import {
+  AddCircle,
+  Calculator,
+  CardEdit,
+  MinusCirlce,
+  Moneys,
+  More,
+  Wallet,
+} from "iconsax-react";
+import { getClassNameByValue } from "utilities/UtilitiesFunctions";
+import AddFeeArrearModal from "components/Modals/AddFeeArrearModal";
 
-
-const SearchAnotherButton = ()=>{
+const SearchAnotherButton = () => {
   const historyRef = useNavigate();
   return (
     <Button
-    startIcon={<ControlPointIcon />}
-    variant="solid"
-    disableElevation
-    style={{ backgroundColor: "var(--bs-primary)" }}
-    onClick={(e) => {
-      historyRef("/FeeManagement");
-    }}
-  >
-    Search Another
-  </Button>
-  )
-}
-
+      startIcon={<ControlPointIcon />}
+      variant="solid"
+      disableElevation
+      style={{ backgroundColor: "var(--bs-primary)" }}
+      onClick={(e) => {
+        historyRef("/FeeManagement");
+      }}
+    >
+      Search Another
+    </Button>
+  );
+};
 
 //main element
 function StudentFeeDetails() {
@@ -63,6 +69,9 @@ function StudentFeeDetails() {
   ///Sof Menu State
   const [anchorEll, setAnchorEll] = useState(null);
   const menuOpen = Boolean(anchorEll);
+
+  //Add Fee Arrear Modal
+  const [addArrearModalOpen,setAddArrearModalopen] = useState(false);
 
   const handleMenuClick = (event, rowData) => {
     setAnchorEll(event.currentTarget);
@@ -82,7 +91,7 @@ function StudentFeeDetails() {
 
   useEffect(() => {
     setLoading(true);
-    console.log(location.state[0])
+    console.log(location.state[0]);
     const userDocId = location.state[0].id;
     // console.log(location.state[0]);
     if (userDocId) {
@@ -102,76 +111,74 @@ function StudentFeeDetails() {
             setFeeDetails(feeArr);
             setLoading(false);
           } else {
-            setLoading(false)
-            enqueueSnackbar("No fee generated for student !", { variant: "error" });
+            setLoading(false);
+            enqueueSnackbar("No fee generated for student !", {
+              variant: "error",
+            });
           }
         });
       return () => dbSubscription();
     } else {
       setLoading(false);
-      enqueueSnackbar("User document not found, please refresh and try again...", { variant: "error" });
+      enqueueSnackbar(
+        "User document not found, please refresh and try again...",
+        { variant: "error" }
+      );
     }
   }, []);
 
   return (
     <PageContainer>
+      <Navbar />
       <LSPage>
-        <BreadCrumbsV3 Path="Fee Management/Fee Details" Icon={AccountBalanceWalletIcon} ActionBtn={SearchAnotherButton} />
-        <br />
-        <Paper
-          sx={{
-            padding: "8px",
-            background: "var(--bs-primary)",
-            color: "#fff",
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <ArrowCircleRightIcon sx={{ mr: "5px" }} />
-          <Typography sx={{ fontSize: "18px", color: "#fff" }}>
-            Student Fee Management
-          </Typography>
-        </Paper>
+        <BreadCrumbsV3
+          Path="Fee Management/Fee Details"
+          Icon={AccountBalanceWalletIcon}
+          ActionBtn={SearchAnotherButton}
+        />
         <br />
         <Paper sx={{ backgroundColor: "#FBFCFE", display: "flex" }}>
           <div style={{ margin: "10px" }}>
             <img
               src={location.state[0].profil_url}
-              width={90}
+              width={100}
               height="100%"
               style={{ objectFit: "cover" }}
             ></img>
           </div>
           <div
             style={{
-              margin: "10px 10px 10px 0px",
-              width: "100%",
+              margin: "8px 10px 8px 0px",
+              width: "50%",
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
             }}
           >
             <div>
-              <h4 style={{ margin: 0, padding: 0, textTransform: "uppercase" }}>
-                {location.state[0].student_name}
-              </h4>
-              <p
-                style={{
-                  margin: "10px 0px 0px 0px",
-                  padding: 0,
-                  fontSize: "14px",
-                }}
+              <Typography
+                level="h4"
+                sx={{ fontWeight: "500" }}
+                textTransform="uppercase"
               >
+                {location.state[0].student_name}
+              </Typography>
+              <Typography level="body-sm">
                 Father's Name : {location.state[0].father_name}
-              </p>
+              </Typography>
+              <Typography level="body-sm">
+                Student's ID: {location.state[0].admission_no}
+              </Typography>
             </div>
             <div
               style={{
                 backgroundColor: "#F0F4F8",
                 display: "flex",
+                borderRadius: "8px",
                 gap: "20px",
                 marginTop: "10px",
-                padding: "10px",
+                padding: "10px 16px",
+                width: "fit-content",
               }}
             >
               <div
@@ -181,10 +188,11 @@ function StudentFeeDetails() {
                   alignItems: "center",
                 }}
               >
-                <p style={{ margin: 0, padding: 0 }}>Class</p>
-                <p style={{ margin: 0, padding: 0 }}>
-                  {location.state[0].class}
-                </p>
+                <Typography level="body-sm">Class</Typography>
+                <Typography level="title-sm">
+                  {getClassNameByValue(location.state[0].class)}
+                  {/* {location.state[0].class} */}
+                </Typography>
               </div>
               <div
                 style={{
@@ -193,10 +201,10 @@ function StudentFeeDetails() {
                   alignItems: "center",
                 }}
               >
-                <p style={{ margin: 0, padding: 0 }}>Roll</p>
-                <p style={{ margin: 0, padding: 0 }}>
+                <Typography level="body-sm">Roll</Typography>
+                <Typography level="title-sm">
                   {location.state[0].class_roll}
-                </p>
+                </Typography>
               </div>
               <div
                 style={{
@@ -205,16 +213,129 @@ function StudentFeeDetails() {
                   alignItems: "center",
                 }}
               >
-                <p style={{ margin: 0, padding: 0 }}>Admission No</p>
-                <p style={{ margin: 0, padding: 0 }}>
-                  {location.state[0].admission_no}
-                </p>
+                <Typography level="body-sm">Admission Date</Typography>
+                <Typography level="title-sm">
+                  {location.state[0].date_of_addmission}
+                </Typography>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Typography level="body-sm">Fee</Typography>
+                <Typography level="title-sm">
+                  ₹{location.state[0].monthly_fee}
+                </Typography>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Typography level="body-sm">Discount</Typography>
+                <Typography level="title-sm">
+                  ₹{location.state[0].fee_discount}
+                </Typography>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Typography level="body-sm">Transport</Typography>
+                <Typography level="title-sm">
+                  ₹{location.state[0].transportation_fee}
+                </Typography>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                }}
+              >
+                <Typography level="body-sm">Computer</Typography>
+                <Typography level="title-sm">
+                  ₹{location.state[0].computer_fee}
+                </Typography>
               </div>
             </div>
           </div>
+          <Box
+            sx={{
+              display: "flex",
+              border: "1px solid var(--bs-gray-400)",
+              margin: "14px",
+              flex: 1,
+              borderRadius: "8px",
+              padding: "10px",
+              alignItems: "center",
+              justifyContent: "space-evenly",
+            }}
+          >
+            <Stack direction="column" alignItems="center">
+              <Calculator size="26" color="#2ccce4" />
+
+              <Typography level="h4" mt={1}>
+                ₹94,00
+              </Typography>
+              <Typography level="body-sm">Total Dues</Typography>
+            </Stack>
+
+            <Stack direction="column" alignItems="center">
+              <CardEdit color="#ff8a65" size="26" />
+              <Typography level="h4" mt={1}>
+                ₹20,00
+              </Typography>
+              <Typography level="body-sm">Consession</Typography>
+            </Stack>
+
+            <Stack direction="column" alignItems="center">
+              <Moneys color="#37d67a" size="26" />
+              <Typography level="h4" mt={1}>
+                ₹100
+              </Typography>
+              <Typography level="body-sm">Collection</Typography>
+            </Stack>
+            <Stack direction="column" alignItems="center">
+              <Wallet color="#f47373" size="26" />
+              <Typography level="h4" mt={1}>
+                ₹9400
+              </Typography>
+              <Typography level="body-sm">Balance</Typography>
+            </Stack>
+          </Box>
         </Paper>
         <br />
         {loading ? <LinearProgress /> : null}
+        <Box sx={{ display: "flex", justifyContent: "end", mb: "0px" }}>
+          <Box
+            sx={{
+              // background: "var(--bs-gray-300)",
+              borderTop: "1px solid var(--bs-gray-300)",
+              borderLeft: "1px solid var(--bs-gray-300)",
+              borderRight: "1px solid var(--bs-gray-300)",
+              borderRadius: "10px 10px 0px 0px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+            }}
+            padding="8px"
+          >
+            <Button variant="soft" color="primary" onClick={()=>setAddArrearModalopen(true)}>
+              Add Arrear
+            </Button>
+
+            <Button variant="soft">Add Consession</Button>
+          </Box>
+        </Box>
         <MaterialTable
           style={{ display: "grid" }}
           columns={FEE_TABLE_COLS}
@@ -305,9 +426,9 @@ function StudentFeeDetails() {
               <PaymentIcon fontSize="small" />
             </ListItemIcon>
             Quick Payment
-          </MenuItem>  
+          </MenuItem>
           <Divider />
-          <MenuItem onClick={()=>historyRef("/feeReciept")}>
+          <MenuItem onClick={() => historyRef("/feeReciept")}>
             <ListItemIcon>
               <PrintIcon fontSize="small" />
             </ListItemIcon>
@@ -329,7 +450,6 @@ function StudentFeeDetails() {
           </MenuItem>
         </Menu>
 
-  
         <QuickPaymentModal
           selectedRowData={selectedRow}
           userPaymentData={location.state[0]}
@@ -340,6 +460,8 @@ function StudentFeeDetails() {
           // paymentDate={paymentDate}
           // setPaymentDate={setPaymentDate}
         />
+
+        <AddFeeArrearModal open={addArrearModalOpen} setOpen={setAddArrearModalopen}/>
       </LSPage>
     </PageContainer>
   );
