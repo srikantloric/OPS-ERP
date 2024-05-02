@@ -50,8 +50,6 @@ export const DueRecieptList = async (
     recieptData: DueRecieptPropsType[]
 ): Promise<string> => {
 
-    let DueRecieptListArr:DueRecieptPropsType[]=[];
-
     return new Promise((resolve, reject) => {
         try {
             const doc = new jsPDF({
