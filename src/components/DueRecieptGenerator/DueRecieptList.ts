@@ -200,11 +200,17 @@ export const DueRecieptList = async (
                     minCellHeight: 4,
                 },
                 columnStyles:{
-                    0:{cellWidth:9},
-                    1:{cellWidth:12},
-                    4:{cellWidth:15},
-                    6:{cellWidth:10},
-                    10:{cellWidth:30},
+                    0:{cellWidth:12},
+                    1:{cellWidth:20}, //Session
+                    2:{cellWidth:20}, //Due Month
+                    3:{cellWidth:17}, //Due Date
+                    4:{cellWidth:25}, //Name
+                    5:{cellWidth:20}, //Admission no
+                    6:{cellWidth:20}, //Class
+                    7:{cellWidth:9},  //Section
+                    8:{cellWidth:20}, //Roll
+                    9:{cellWidth:30}, //Contact
+                    10:{cellWidth:70}, //Remark
                 },
             });
 
