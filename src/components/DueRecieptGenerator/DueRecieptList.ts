@@ -15,18 +15,17 @@ import {
     SCHOOL_NAME,
 } from "config/schoolConfig";
 import { DueRecieptPropsType } from "types/student";
-// import { CellInput } from "jspdf-autotable";
+
 
 let DueRecieptListHeader = [
-    "Sl no.",
-    "Session",
+    "S No",
     "Due Month",
     "Due Date",
     "Name",
     "Ad no",
     "Class",
-    "Sectin",
     "Roll",
+    "Father's Name",
     "Contact",
     "Due Amount",
     "Remark",
@@ -55,14 +54,13 @@ export const DueRecieptList = async (
     let DueRecieptListArr = recieptData.map((item, index) => {
             const stringArr = [];
             stringArr.push((index + 1).toString());
-            stringArr.push(item.current_session);
             stringArr.push(item.due_month);
             stringArr.push(item.due_date);
             stringArr.push(item.student_name);
             stringArr.push(item.admission_no);
-            stringArr.push(item.class);
-            stringArr.push(item.section);
+            stringArr.push(item.class+" "+item.section);
             stringArr.push(item.roll_number.toString());
+            stringArr.push(item.father_name);
             stringArr.push(item.phone_number.toString());
             stringArr.push(item.fee_heads[0].value+item.fee_heads[1].value+item.fee_heads[2].value);
             stringArr.push("");
@@ -76,7 +74,7 @@ export const DueRecieptList = async (
     return new Promise((resolve, reject) => {
         try {
             const doc = new jsPDF({
-                orientation: "l",
+                orientation: "p",
                 unit: "mm",
                 format: "a4",
             });
@@ -182,8 +180,12 @@ export const DueRecieptList = async (
             doc.text("Due Reciept List", cardWidth / 2 - 8, y + 30);
 
 
-            let tableX = x - 3;
+            let tableX = x - 7;
             let tableY = y + 43.5;
+            doc.text("Session - "+recieptData[0].current_session,tableX,tableY);
+
+            tableX = x - 7;
+            tableY = y + 53.5;
 
             autoTable(doc, {
                 head: [DueRecieptListHeader],
@@ -201,18 +203,17 @@ export const DueRecieptList = async (
                     minCellHeight: 4,
                 },
                 columnStyles:{
-                    0:{cellWidth:12}, //Sl no
-                    1:{cellWidth:20}, //Session
-                    2:{cellWidth:20}, //Due Month
-                    3:{cellWidth:17}, //Due Date
-                    4:{cellWidth:27}, //Name
-                    5:{cellWidth:20}, //Admission no
-                    6:{cellWidth:20}, //Class
-                    7:{cellWidth:12},  //Section
-                    8:{cellWidth:13}, //Roll
-                    9:{cellWidth:25}, //Contact
-                    10:{cellWidth:23}, //Due Amount
-                    11:{cellWidth:60}, //Remark
+                    0:{cellWidth:9}, //Sl no
+                    1:{cellWidth:20}, //Due Month
+                    2:{cellWidth:17}, //Due Date
+                    3:{cellWidth:25}, //Name
+                    4:{cellWidth:20}, //Admission no
+                    5:{cellWidth:20}, //Class
+                    6:{cellWidth:13}, //Roll
+                    7:{cellWidth:25}, //Father's Name
+                    8:{cellWidth:23}, //Contact
+                    9:{cellWidth:20}, //Due Amount
+                    10:{cellWidth:53}, //Remark
                 },
             });
 
