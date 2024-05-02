@@ -207,12 +207,12 @@ export const DueRecieptList = async (
                     2:{cellWidth:20}, //Due Month
                     3:{cellWidth:17}, //Due Date
                     4:{cellWidth:25}, //Name
-                    5:{cellWidth:20}, //Admission no
+                    5:{cellWidth:18}, //Admission no
                     6:{cellWidth:20}, //Class
-                    7:{cellWidth:9},  //Section
+                    7:{cellWidth:12},  //Section
                     8:{cellWidth:13}, //Roll
                     9:{cellWidth:25}, //Contact
-                    10:{cellWidth:25}, //Due Amount
+                    10:{cellWidth:23}, //Due Amount
                     11:{cellWidth:60}, //Remark
                 },
             });
