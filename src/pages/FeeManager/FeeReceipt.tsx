@@ -6,10 +6,12 @@ import LSPage from "components/Utils/LSPage";
 import PageContainer from "components/Utils/PageContainer";
 import { useEffect, useState } from "react";
 import { DueRecieptPropsType } from "types/student";
+import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
 
 
 function FeeReceipt() {
   const [pdfUrl, setPdfUrl] = useState<string>("");
+  const [pdfUrl1, setPdfUrl1] = useState<string>("");
   const sampleObjects: DueRecieptPropsType[] = [
     {
       reciept_id: "RCPT12345",
@@ -248,11 +250,30 @@ function FeeReceipt() {
     window.open(pdfUrl, "_blank", features);
   };
 
+
+  const getPdfUrl1 = async () => {
+    const pdfRes1 = await DueRecieptList(sampleObjects);
+    setPdfUrl(pdfRes1);
+  };
+
+  useEffect(() => {
+    getPdfUrl1();
+  }, []);
+  const handleDueRecieptList=()=>{
+    const features1 =
+      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+
+    window.open(pdfUrl1, "_blank", features1);
+  };
+
+
   return (
     <PageContainer>
       <Navbar />
       <LSPage>
-        <Button onClick={handleNewWindowOpen}>Open New Window</Button>
+        <Button onClick={handleNewWindowOpen}>Generate Due Reciept</Button>
+        <br/><br/>
+        <Button onClick={handleDueRecieptList}>Due Reciept List</Button>
       </LSPage>
     </PageContainer>
   );
