@@ -186,19 +186,25 @@ export const DueRecieptList = async (
 
             autoTable(doc, {
                 head: [DueRecieptListHeader],
-                body: DueRecieptListArr,
+                body: tempArr,
                 startY: tableY,
                 theme: "grid",
                 styles: {
                     textColor: "#000",
                     fontSize: 8,
                 },
-                margin: { left: tableX + 20 },
+                margin: { left: tableX + 10 },
                 headStyles: {
-                    cellWidth: 20,
                     fillColor: "#fff",
                     textColor: "#000",
                     minCellHeight: 4,
+                },
+                columnStyles:{
+                    0:{cellWidth:9},
+                    1:{cellWidth:12},
+                    4:{cellWidth:15},
+                    6:{cellWidth:10},
+                    10:{cellWidth:30},
                 },
             });
 
