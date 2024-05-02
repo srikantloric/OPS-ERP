@@ -15,9 +15,9 @@ import {
     SCHOOL_NAME,
 } from "config/schoolConfig";
 import { DueRecieptPropsType } from "types/student";
-import { CellInput } from "jspdf-autotable";
+// import { CellInput } from "jspdf-autotable";
 
-let DueRecieptListHeader=[
+let DueRecieptListHeader = [
     "Sl no.",
     "Session",
     "Due Month",
@@ -49,6 +49,28 @@ let DueRecieptListHeader=[
 export const DueRecieptList = async (
     recieptData: DueRecieptPropsType[]
 ): Promise<string> => {
+
+    let tempArr:any[] = [];
+    let DueRecieptListArr = recieptData.map((item, index) => {
+        recieptData.map((item, index) => {
+            const stringArr = [];
+            stringArr.push((index + 1).toString());
+            stringArr.push(item.current_session);
+            stringArr.push(item.due_month);
+            stringArr.push(item.due_date);
+            stringArr.push(item.student_name);
+            stringArr.push(item.admission_no);
+            stringArr.push(item.class);
+            stringArr.push(item.section);
+            stringArr.push(item.roll_number.toString());
+            stringArr.push(item.phone_number.toString());
+            stringArr.push("");
+            tempArr.push(stringArr);
+        });
+        return tempArr;
+    })
+    console.log("DueArr=" + DueRecieptListArr);
+
 
     return new Promise((resolve, reject) => {
         try {
@@ -164,37 +186,21 @@ export const DueRecieptList = async (
 
             autoTable(doc, {
                 head: [DueRecieptListHeader],
-                body: recieptData.map((item) => {
-                    var tempArr: CellInput[] = [];
-                    const stringArr: string[] = [];
-                    stringArr.push("");
-                    stringArr.push(item.section);
-                    stringArr.push(item.due_month);
-                    stringArr.push(item.due_date);
-                    stringArr.push(item.student_name);
-                    stringArr.push(item.admission_no);
-                    stringArr.push(item.class);
-                    stringArr.push(item.section);
-                    stringArr.push(item.roll_number.toString());
-                    stringArr.push(item.phone_number.toString());
-                    stringArr.push("");
-                    tempArr.push(stringArr);
-                    return tempArr;
-                  }),
+                body: DueRecieptListArr,
                 startY: tableY,
                 theme: "grid",
                 styles: {
-                  textColor: "#000",
-                  fontSize: 8,
+                    textColor: "#000",
+                    fontSize: 8,
                 },
                 margin: { left: tableX + 20 },
                 headStyles: {
-                  cellWidth: 20,
-                  fillColor: "#fff",
-                  textColor: "#000",
-                  minCellHeight: 4,
+                    cellWidth: 20,
+                    fillColor: "#fff",
+                    textColor: "#000",
+                    minCellHeight: 4,
                 },
-              });
+            });
 
 
             ///End Of PDF DESIGN
