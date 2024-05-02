@@ -25,6 +25,7 @@ let DueRecieptListHeader = [
     "Name",
     "Ad no",
     "Class",
+    "Sectin",
     "Roll",
     "Contact",
     "Due Amount",
@@ -64,6 +65,7 @@ export const DueRecieptList = async (
             stringArr.push(item.section);
             stringArr.push(item.roll_number.toString());
             stringArr.push(item.phone_number.toString());
+            stringArr.push(item.fee_heads);
             stringArr.push("");
             tempArr.push(stringArr);
         });
@@ -208,9 +210,10 @@ export const DueRecieptList = async (
                     5:{cellWidth:20}, //Admission no
                     6:{cellWidth:20}, //Class
                     7:{cellWidth:9},  //Section
-                    8:{cellWidth:20}, //Roll
+                    8:{cellWidth:15}, //Roll
                     9:{cellWidth:30}, //Contact
-                    10:{cellWidth:70}, //Remark
+                    10:{cellWidth:25}, //Due Amount
+                    11:{cellWidth:60}, //Remark
                 },
             });
 
