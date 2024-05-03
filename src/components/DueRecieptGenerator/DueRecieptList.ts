@@ -127,7 +127,7 @@ export const DueRecieptList = async (
             doc.rect(
                 schoolHeaderStartX + 5,
                 schoolContactDetailStartY + 5,
-                cardXEndPoint - 140,
+                cardXEndPoint - 120,
                 4,
                 "F"
             );
