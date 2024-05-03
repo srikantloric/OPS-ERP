@@ -68,8 +68,6 @@ export const DueRecieptList = async (
             return tempArr;
         });
 
-    console.log("DueArr=" + DueRecieptListArr);
-
 
     return new Promise((resolve, reject) => {
         try {
