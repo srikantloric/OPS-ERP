@@ -33,5 +33,16 @@ export interface StudentAttendanceGlobalSchema {
   studentFatherName:string,
   studentProfile:string,
   studentContact:string,
+  
+
+}
+export interface StudentSatus {
+  presentDates:string[],
+  absentDates:string[],
+  halfDayDates:string[],
+  notMarkedDates:string[],
+  futureDates:string[],
+  onChange:string,
+  onDateChange:string,
 
 }

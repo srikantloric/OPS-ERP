@@ -24,7 +24,7 @@ import {
   Stack,
   Grid,
 } from "@mui/joy";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SCHOOL_CLASSES } from "config/schoolConfig";
 import {
   getAttendanceStatusByCode,
@@ -41,6 +41,7 @@ import { AttendanceReportGenerator } from "components/AttendanceReport/Attendanc
 import { StudentDetailsType } from "types/student";
 import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
+import Calender from "components/AttendanceReport/Calender";
 
 type AttendanceHeaderDataType = {
   totalStudent: number;
@@ -66,10 +67,16 @@ function ViewAttendance() {
     StudentAttendanceGlobalSchema[]
   >([]);
 
+  const [presentDates, setPresentDates] = useState(["2024-05-03","present"]);
+  const [absentDates, setAbsentDates] = useState([]);
+  const [halfDayDates, setHalfDayDates] = useState([]);
+  const [notMarkedDates, setNotMarkedDates] = useState([]);
+  const [futureDates, setFutureDates] = useState([]);
+
   function handlesearch(): void {
     // setfilterdata(undefined)
     if (searchInput) {
-      setLoading(true)
+      setLoading(true);
       // setfilterdata(undefined)
       console.log(searchInput);
       db.collection("STUDENTS")
@@ -85,7 +92,8 @@ function ViewAttendance() {
             });
             db.collection("STUDENTS")
               .doc(filterdata[0].id)
-              .collection("ATTENDANCE").where("attendanceDate", "==", selectedDate)
+              .collection("ATTENDANCE")
+              .where("attendanceDate", "==", selectedDate)
               .get()
               .then((document) => {
                 if (document.size > 0) {
@@ -97,10 +105,9 @@ function ViewAttendance() {
                   });
                 }
               });
-            setLoading(false)
+            setLoading(false);
             console.log("1=>" + filterdata);
             console.log("2=>" + attendancedata);
-
           } else {
             setLoading(false);
             enqueueSnackbar("No student with this student ID!", {
@@ -113,10 +120,11 @@ function ViewAttendance() {
           setLoading(false);
         });
     } else {
-      setLoading(false)
+      setLoading(false);
       enqueueSnackbar("Please enter Student Id", { variant: "error" });
     }
   }
+  useEffect(() => {}, []);
 
   const fetchStudentAtt = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -184,8 +192,6 @@ function ViewAttendance() {
     window.open(pdfRes, "_blank", features);
   };
 
-
-
   const GetFullAttendance = async () => {
     const pdfRes4 = await FullAttendanceReport(filterdata, attendancedata);
     const window4 =
@@ -213,7 +219,6 @@ function ViewAttendance() {
             <OverViewTab />
             <AttendanceIndex />
           </TabPanel>
-          
           <TabPanel value={2}>
             <Grid container spacing={2} marginTop={2}>
               <Paper
@@ -240,14 +245,6 @@ function ViewAttendance() {
                     onChange={(e) => setSearchInput(e.target.value)}
                   />
 
-                  <FormLabel>Select Date</FormLabel>
-                  <Input
-                    required
-                    placeholder="Placeholder"
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                  />
                   {/* <FormHelperText>This is a helper text.</FormHelperText> */}
 
                   <Button
@@ -259,34 +256,33 @@ function ViewAttendance() {
                   </Button>
 
                   <Button
-                    sx={{ height: 20, marginLeft: '30px' }}
+                    sx={{ height: 20, marginLeft: "30px" }}
                     type="submit"
                     onClick={GetFullAttendance}
-                  >Get Full Attendance
+                  >
+                    Get Full Attendance
                   </Button>
-
                 </Stack>
                 {loading ? <LinearProgress /> : null}
-                <Table
-                  aria-label="table variants"
-                  variant="plain"
-                  color="neutral"
-                  stripe={"odd"}
-                >
-                  <thead>
-                    <tr>
-                      <th>STUDENT</th>
-                      <th>FATHER</th>
-                      <th>CONTACT</th>
 
-                      <th>STATUS</th>
-                      <th>COMMENT</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filterdata &&
-                      filterdata.map((student, i) => {
-                        return (
+                {filterdata &&
+                  filterdata.map((student, i) => {
+                    return (
+                      <>
+                      <Table
+                        aria-label="table variants"
+                        variant="plain"
+                        color="neutral"
+                        stripe={"odd"}
+                      >
+                        <thead>
+                          <tr>
+                            <th>STUDENT</th>
+                            <th>FATHER</th>
+                            <th>CONTACT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
                           <tr key={student.student_name}>
                             <td>
                               <div
@@ -305,20 +301,35 @@ function ViewAttendance() {
                             {attendancedata &&
                               attendancedata.map((student, i) => {
                                 return (
-
-                                  <tr
-                                  >
-                                    <td>{student.attendanceStatus}</td>
+                                  <tr>
+                                    <td>
+                                      {student.attendanceStatus === null
+                                        ? student.attendanceStatus
+                                        : "NO RECORD FOUND"}
+                                    </td>
                                     <td>{student.comment}</td>
                                   </tr>
-
-                                )
+                                );
                               })}
                           </tr>
-                        );
-                      })}
-                  </tbody>
-                </Table>
+                        </tbody>
+                      </Table>
+                      <Calender 
+                      presentDates={presentDates}
+                      absentDates={absentDates}
+                      halfDayDates={halfDayDates}
+                      notMarkedDates={notMarkedDates}
+                      futureDates={futureDates}
+                      onChange=''
+                      onDateChange=""
+
+                      />
+                      </>
+                    );
+                    
+                  })}
+
+                
               </Paper>
             </Grid>
           </TabPanel>
