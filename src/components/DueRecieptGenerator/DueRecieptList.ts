@@ -18,16 +18,16 @@ import { DueRecieptPropsType } from "types/student";
 
 
 let DueRecieptListHeader = [
-    "S No",
-    "Due Month",
-    "Due Date",
+    "#",
+    "D_Month",
+    "D_Date",
     "Name",
     "Ad no",
     "Class",
     "Roll",
     "Father's Name",
     "Contact",
-    "Due Amount",
+    "D_Amount",
     "Remark",
 ];
 
@@ -181,12 +181,13 @@ export const DueRecieptList = async (
 
 
             doc.setFontSize(7);
+            doc.setTextColor("#000");
             let tableX = x - 7;
-            let tableY = y + 43.5;
-            doc.text("Session - "+recieptData[0].current_session,tableX,tableY);
+            let tableY = y + 38.5;
+            doc.text("Session - "+recieptData[0].current_session,x+3,tableY);
 
             tableX = x - 7;
-            tableY = y + 53.5;
+            tableY = y + 42.5;
 
             autoTable(doc, {
                 head: [DueRecieptListHeader],
@@ -195,7 +196,7 @@ export const DueRecieptList = async (
                 theme: "grid",
                 styles: {
                     textColor: "#000",
-                    fontSize: 8,
+                    fontSize: 6.5,
                 },
                 margin: { left: tableX + 10 },
                 headStyles: {
@@ -204,17 +205,17 @@ export const DueRecieptList = async (
                     minCellHeight: 4,
                 },
                 columnStyles:{
-                    0:{cellWidth:9}, //Sl no
-                    1:{cellWidth:20}, //Due Month
-                    2:{cellWidth:17}, //Due Date
-                    3:{cellWidth:25}, //Name
-                    4:{cellWidth:20}, //Admission no
-                    5:{cellWidth:20}, //Class
-                    6:{cellWidth:13}, //Roll
-                    7:{cellWidth:25}, //Father's Name
-                    8:{cellWidth:23}, //Contact
-                    9:{cellWidth:20}, //Due Amount
-                    10:{cellWidth:40}, //Remark
+                    0:{cellWidth:6}, //Sl no
+                    1:{cellWidth:17}, //Due Month
+                    2:{cellWidth:13}, //Due Date
+                    3:{cellWidth:20}, //Name
+                    4:{cellWidth:16}, //Admission no
+                    5:{cellWidth:18}, //Class
+                    6:{cellWidth:8}, //Roll
+                    7:{cellWidth:23}, //Father's Name
+                    8:{cellWidth:18}, //Contact
+                    9:{cellWidth:15}, //Due Amount
+                    10:{cellWidth:35}, //Remark
                 },
             });
 
