@@ -67,9 +67,9 @@ function ViewAttendance() {
     StudentAttendanceGlobalSchema[]
   >([]);
 
-  const [presentDates, setPresentDates] = useState([]);
-  const [absentDates, setAbsentDates] = useState([]);
-  const [halfDayDates, setHalfDayDates] = useState([]);
+  const [presentDates, setPresentDates] = useState(["2024-05-04","2024-05-06"]);
+  const [absentDates, setAbsentDates] = useState(["2024-05-05"]);
+  const [halfDayDates, setHalfDayDates] = useState(["2024-05-07"]);
   const [notMarkedDates, setNotMarkedDates] = useState([]);
   const [futureDates, setFutureDates] = useState([]);
 
