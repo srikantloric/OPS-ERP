@@ -34,6 +34,7 @@ export type StudentDetailsType = {
   created_at?: firebase.firestore.Timestamp|firebase.firestore.FieldValue;
   transportation_fee:number;
   generated_fee:string[]
+  fee_discount?:number
 };
 
 export interface StudentFeeDetailsType  {
