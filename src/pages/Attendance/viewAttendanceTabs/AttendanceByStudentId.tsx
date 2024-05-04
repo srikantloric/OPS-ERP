@@ -84,7 +84,7 @@ function AttendanceByStudentId() {
           }
         })
         .catch((e) => {
-          enqueueSnackbar("INVALID STUDENT ID", e);
+          enqueueSnackbar("Invalid Student Id!",{variant:"error"});
           setLoading(false);
         });
     } else {
@@ -127,9 +127,6 @@ function AttendanceByStudentId() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
-
-            {/* <FormHelperText>This is a helper text.</FormHelperText> */}
-
             <Button sx={{ height: 20 }} type="submit" onClick={handlesearch}>
               Search
             </Button>
@@ -180,7 +177,7 @@ function AttendanceByStudentId() {
                         Father's Name : {student.father_name}
                       </Typography>
                       <Typography level="body-sm">
-                        Student's ID: {student.student_id}
+                        Student's ID: {student.admission_no}
                       </Typography>
                     </div>
                     <div
