@@ -37,6 +37,7 @@ import {
 } from "iconsax-react";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 import AddFeeArrearModal from "components/Modals/AddFeeArrearModal";
+import { FEE_HEADERS } from "constants";
 
 const SearchAnotherButton = () => {
   const historyRef = useNavigate();
@@ -126,6 +127,7 @@ function StudentFeeDetails() {
       );
     }
   }, []);
+
 
   return (
     <PageContainer>
@@ -337,15 +339,28 @@ function StudentFeeDetails() {
           </Box>
         </Box>
         <MaterialTable
-          style={{ display: "grid" }}
+          style={{ display: "grid",boxShadow:"none",border:"1px solid var(--bs-gray-300)",borderRadius:"10px 0px 10px 10px",padding:"10px" }}
           columns={FEE_TABLE_COLS}
+
           data={feeDetails}
+
+          // parentChildData={(row, rows) => rows.find(a => a.id === row.parentId)}
+
           title="Fee Details"
           options={{
+            columnResizable:true,
             headerStyle: {
               backgroundColor: "var(--bs-secondary)",
               color: "#FFF",
+              textAlign:"left",
+              fontSize:"13px",
+              paddingRight:"10px",
+              paddingLeft:"5px",
             },
+            rowStyle: {
+              backgroundColor: '#EEE',
+            },
+            editCellStyle: { borderRight: '1px solid #eee' },
             exportAllData: true,
             exportMenu: [
               {
@@ -362,13 +377,6 @@ function StudentFeeDetails() {
             actionsColumnIndex: -1,
           }}
           actions={[
-            {
-              icon: () => <EditIcon sx={{ color: "var(--bs-primary)" }} />,
-              tooltip: "Edit Row",
-              onClick: (event, rowData) => {
-                // handleMenuClick(event);
-              },
-            },
             {
               icon: () => (
                 <MoreVert

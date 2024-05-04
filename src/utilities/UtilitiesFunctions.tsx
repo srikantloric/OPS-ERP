@@ -111,11 +111,14 @@ export const getAttendanceStatusByCode = (code: string): any => {
 
 export const getFeeHeaderByCode = (code: string): string => {
   switch (code) {
+    case "M01":
+      
+      return "Monthly Fee";
     case "E01":
       return "Examination Fee";
     case "A01":
       return "Anual Fee";
-    case "M01":
+    case "X01":
       return "Other Fee";
     default:
       return "Invalid Fee Header";

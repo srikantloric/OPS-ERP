@@ -1,4 +1,4 @@
-export const FEE_TYPE_MONTHLY = "T01";
+export const FEE_TYPE_MONTHLY = "M01";
 export const FEE_HEADERS = [
   {
     title: "Examination Fee",
@@ -10,6 +10,6 @@ export const FEE_HEADERS = [
   },
   {
     title: "Other Fee",
-    value: "M01",
+    value: "X01",
   },
 ];
