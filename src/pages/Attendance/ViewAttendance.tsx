@@ -33,7 +33,7 @@ import {
 } from "utilities/UtilitiesFunctions";
 import { enqueueSnackbar } from "notistack";
 import { db } from "../../firebase";
-import { StudentAttendanceGlobalSchema } from "types/attendance";
+import { StudentAttendanceGlobalSchema, StudentSatus } from "types/attendance";
 import { Paper } from "@mui/material";
 import { Print } from "@mui/icons-material";
 import OverViewTab from "./viewAttendanceTabs/OverViewTab";
@@ -68,9 +68,7 @@ function ViewAttendance() {
     StudentAttendanceGlobalSchema[]
   >([]);
 
-  const [presentDates, setPresentDates] = useState<string[]>([
-    
-  ]);
+  const [presentDates, setPresentDates] = useState<StudentSatus[]>([]);
   const [absentDates, setAbsentDates] = useState(["2024-05-05"]);
   const [halfDayDates, setHalfDayDates] = useState(["2024-05-07"]);
   const [notMarkedDates, setNotMarkedDates] = useState([]);
@@ -93,21 +91,22 @@ function ViewAttendance() {
               tempArr.push(resData);
               setfilterdata(tempArr);
             });
-            // db.collection("STUDENTS")
-            //   .doc(filterdata[0].id)
-            //   .collection("ATTENDANCE")
-            //   .where("attendanceStatus", "==", "P")
-            //   .get()
-            //   .then((document) => {
-            //     if (document.size > 0) {
-            //       let arrAttendance: StudentAttendanceGlobalSchema[] = [];
-            //       document.forEach((doc) => {
-            //         const data = doc.data() as StudentAttendanceGlobalSchema;
-            //         arrAttendance.push(data);
-            //         setPresentDates(arrAttendance);
-            //       });
-            //     }
-            //   });
+            db.collection("STUDENTS")
+              .doc(filterdata[0].id)
+              .collection("ATTENDANCE")
+              .where("attendanceStatus", "==", "P")
+              .get()
+              .then((document) => {
+                if (document.size > 0) {
+                  let arrAttendance: any[] = [];
+                  document.forEach((doc) => {
+                    const data = doc.data().attendanceDate as any;
+                    arrAttendance.push(data);
+                    setPresentDates(arrAttendance);
+                    console.log(presentDates);
+                  });
+                }
+              });
             setLoading(false);
             console.log("1=>" + filterdata);
             console.log("2=>" + attendancedata);
@@ -340,7 +339,9 @@ function ViewAttendance() {
                                 }}
                               >
                                 <Typography level="body-sm">Roll</Typography>
-                                <Typography level="title-sm">{student.class_roll}</Typography>
+                                <Typography level="title-sm">
+                                  {student.class_roll}
+                                </Typography>
                               </div>
                               <div
                                 style={{
@@ -352,7 +353,9 @@ function ViewAttendance() {
                                 <Typography level="body-sm">
                                   Admission Date
                                 </Typography>
-                                <Typography level="title-sm">{student.admission_no}</Typography>
+                                <Typography level="title-sm">
+                                  {student.admission_no}
+                                </Typography>
                               </div>
                               <div
                                 style={{
@@ -360,20 +363,14 @@ function ViewAttendance() {
                                   flexDirection: "column",
                                   alignItems: "center",
                                 }}
-                              >
-                                
-                                
-                              </div>
+                              ></div>
                               <div
                                 style={{
                                   display: "flex",
                                   flexDirection: "column",
                                   alignItems: "center",
                                 }}
-                              >
-                                
-                              </div>
-                             
+                              ></div>
                             </div>
                           </div>
                           <Box
@@ -389,8 +386,6 @@ function ViewAttendance() {
                             }}
                           >
                             <Stack direction="column" alignItems="center">
-                              
-
                               <Typography level="h4" mt={1}>
                                 10
                               </Typography>
@@ -400,7 +395,6 @@ function ViewAttendance() {
                             </Stack>
 
                             <Stack direction="column" alignItems="center">
-                              
                               <Typography level="h4" mt={1}>
                                 6
                               </Typography>
@@ -410,7 +404,6 @@ function ViewAttendance() {
                             </Stack>
 
                             <Stack direction="column" alignItems="center">
-                              
                               <Typography level="h4" mt={1}>
                                 5
                               </Typography>
@@ -419,7 +412,6 @@ function ViewAttendance() {
                               </Typography>
                             </Stack>
                             <Stack direction="column" alignItems="center">
-                             
                               <Typography level="h4" mt={1}>
                                 5
                               </Typography>

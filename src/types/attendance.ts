@@ -33,6 +33,7 @@ export interface StudentAttendanceGlobalSchema {
   studentFatherName:string,
   studentProfile:string,
   studentContact:string,
+
   
 
 }
