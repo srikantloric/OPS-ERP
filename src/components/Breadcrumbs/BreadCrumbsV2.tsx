@@ -37,7 +37,7 @@ function BreadCrumbsV2({Icon,Path}:BreadcrumProps) {
                     </Typography>
                     </Link>
                   )
-                }else if(key === breadCrumbPath.length-1){
+                }else if(key == breadCrumbPath.length-1){
                   return(
                   <Typography
                   key={key}

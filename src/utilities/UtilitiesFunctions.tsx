@@ -95,7 +95,7 @@ export function getCurrentDate(): string {
 export const getAttendanceStatusByCode = (code: string): any => {
   switch (code) {
     case "A":
-      return <Chip color="danger" >Absent</Chip>;
+      return <Chip color="danger">Absent</Chip>;
     case "P":
       return <Chip color="success">Present</Chip>;
     case "H":
@@ -108,3 +108,20 @@ export const getAttendanceStatusByCode = (code: string): any => {
       return "Error Code";
   }
 };
+
+export const getFeeHeaderByCode = (code: string): string => {
+  switch (code) {
+    case "M01":
+      
+      return "Monthly Fee";
+    case "E01":
+      return "Examination Fee";
+    case "A01":
+      return "Anual Fee";
+    case "X01":
+      return "Other Fee";
+    default:
+      return "Invalid Fee Header";
+  }
+};
+

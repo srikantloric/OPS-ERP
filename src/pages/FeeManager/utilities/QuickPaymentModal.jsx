@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ElectricBoltIcon from "@mui/icons-material/ElectricBolt";
 import PrintIcon from "@mui/icons-material/Print";
 import CheckIcon from "@mui/icons-material/Check";
@@ -16,10 +16,9 @@ import {
   Divider,
   Typography,
 } from "@mui/joy";
-import { auth, db } from "../../../firebase";
+import { db } from "../../../firebase";
 
 import { GenerateFeeReciept } from "utilities/GenerateFeeReciept";
-import { Stack } from "@mui/material";
 
 function QuickPaymentModal({
   selectedRowData,
@@ -43,7 +42,7 @@ function QuickPaymentModal({
   const [remarkError, setRemarkError] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [totalFeeAmount, setTotalFeeAmount] = useState();
-  const [sendSms, setSendSMS] = useState(true);
+  // const [sendSms, setSendSMS] = useState(true);
   const [paidAmountError, setPaidAmountError] = useState(false);
   const [paymentMode, setPaymentMode] = useState("cash");
   const [paidAmount, setPaidAmount] = useState();
@@ -231,7 +230,7 @@ function QuickPaymentModal({
                 <div style={{ display: "flex" }}>
                   <div>
                     <Typography level="body-md" sx={{ mt: 1 }}>
-                      Payment ID :
+                      Slip Id :
                     </Typography>
                     <Typography level="body-md">Payment Title :</Typography>
                     <Typography level="body-md">Tution Fee :</Typography>

@@ -3,13 +3,13 @@ import "firebase/firestore";
 import "firebase/remote-config";
 
 const app = firebase.initializeApp({
-  apiKey: "AIzaSyAaPYVd2N7YepVt3RPj1d6CtXKaHuw0pt4",
-  authDomain: "orient-public-school-prod.firebaseapp.com",
-  projectId: "orient-public-school-prod",
-  storageBucket: "orient-public-school-prod.appspot.com",
-  messagingSenderId: "995813385072",
-  appId: "1:995813385072:web:280e2f800cd216d589e5b5",
-  measurementId: "G-DP1MLS115J"
+  apiKey: "AIzaSyDKol2whJU77OFRQPN98w0JwmgxVHFEJBM",
+  authDomain: "orient-public-school.firebaseapp.com",
+  projectId: "orient-public-school",
+  storageBucket: "orient-public-school.appspot.com",
+  messagingSenderId: "54950814214",
+  appId: "1:54950814214:web:970b0ee7c967149bfb1987",
+  measurementId: "G-HWF98CSVYZ",
 });
 
 export const auth = app.auth();

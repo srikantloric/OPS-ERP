@@ -1,4 +1,3 @@
-import React from "react";
 import PageContainer from "../../components/Utils/PageContainer";
 import Navbar from "../../components/Navbar/Navbar";
 import LSPage from "../../components/Utils/LSPage";
@@ -11,7 +10,6 @@ import {
   LinearProgress,
   ListItemIcon,
   Menu,
-
   Typography,
 } from "@mui/material";
 
@@ -42,14 +40,12 @@ import { MoreVert } from "@mui/icons-material";
 
 import { useSnackbar } from "notistack";
 import ConfirmationModal from "../../components/Modals/ConfirmationModal";
-import { Avatar} from "@mui/joy";
+
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
-import { SCHOOL_CLASSES, SCHOOL_SECTIONS } from "config/schoolConfig";
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);
-  console.log(data);
   const isDataLoading = useSelector((state) => state.students.loading);
   const error = useSelector((state) => state.students.error);
 
@@ -98,7 +94,7 @@ function ViewStudents() {
     if (Array.from(data).length === 0) {
       dipatch(fetchstudent());
     }
-  }, [data, dipatch]);
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -130,13 +126,10 @@ function ViewStudents() {
         return data.class === selectedClass;
       });
       setFilteredData(dataNew);
-      setFilterChipLabel(
-        "Filter set for class " + getClassNameByValue(selectedClass)
-      );
+      setFilterChipLabel("Filter set for class " + getClassNameByValue(selectedClass));
       setFilterChip(true);
     }
 
-    console.log(selectedClass, selectedSection);
   };
 
   const deletestudent = (data) => {
@@ -164,6 +157,8 @@ function ViewStudents() {
     navigate(`/students/update-student/${student.id}`);
   };
 
+
+
   //column for material table
   const columnMat = [
     {
@@ -186,9 +181,10 @@ function ViewStudents() {
           borderRadius: "50%",
           cursor: "pointer",
           objectFit: "cover",
-          objectPosition: "top",
         };
-        return <Avatar src={rowData.profil_url} sx={styles} />;
+        return (
+          <img src={rowData.profil_url} style={styles} alt="profile-student" />
+        );
       },
     },
 
@@ -288,13 +284,19 @@ function ViewStudents() {
                 <MenuItem value={-1}>
                   <em>Select</em>
                 </MenuItem>
-                {SCHOOL_CLASSES.map((item) => {
-                  return (
-                    <MenuItem value={item.value} key={item.id}>
-                      {item.title}
-                    </MenuItem>
-                  );
-                })}
+                <MenuItem value={1}>Nursery</MenuItem>
+                <MenuItem value={2}>LKG</MenuItem>
+                <MenuItem value={3}>UKG</MenuItem>
+                <MenuItem value={4}>STD-1</MenuItem>
+                <MenuItem value={5}>STD-2</MenuItem>
+                <MenuItem value={6}>STD-3</MenuItem>
+                <MenuItem value={7}>STD-4</MenuItem>
+                <MenuItem value={8}>STD-5</MenuItem>
+                <MenuItem value={9}>STD-6</MenuItem>
+                <MenuItem value={10}>STD-7</MenuItem>
+                <MenuItem value={11}>STD-8</MenuItem>
+                <MenuItem value={12}>STD-9</MenuItem>
+                <MenuItem value={13}>STD-10</MenuItem>
               </Select>
             </FormControl>
 
@@ -312,13 +314,10 @@ function ViewStudents() {
                 <MenuItem value={-1}>
                   <em>Select</em>
                 </MenuItem>
-                {SCHOOL_SECTIONS.map((item) => {
-                  return (
-                    <MenuItem value={item.value} key={item.id}>
-                    {item.title}
-                    </MenuItem>
-                  );
-                })}
+                <MenuItem value={"A"}>SEC-A</MenuItem>
+                <MenuItem value={"B"}>SEC-B</MenuItem>
+                <MenuItem value={"C"}>SEC-C</MenuItem>
+                <MenuItem value={"D"}>SEC-D</MenuItem>
               </Select>
             </FormControl>
             <IconButton
@@ -470,7 +469,7 @@ function ViewStudents() {
           <StudentProfileDetailsModal
             selectedRowData={selectedRowData}
             handleStudentProfileModalClose={() => {
-              setStudentProfileModalOpen(false);
+              setStudentProfileModalOpen(false)
               setSelectedRowData(null);
             }}
           />

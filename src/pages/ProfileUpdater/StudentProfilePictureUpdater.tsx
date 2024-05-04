@@ -108,7 +108,7 @@ const StudentProfilePictureUpdater: React.FC = () => {
       </ToggleButtonGroup>
       <br />
       <center>
-        {tabSelected == "byClass" ? (
+        {tabSelected === "byClass" ? (
           <>
             <Grid container spacing={2}>
               <Grid xs={4}>

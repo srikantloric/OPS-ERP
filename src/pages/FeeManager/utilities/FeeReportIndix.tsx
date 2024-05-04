@@ -1,20 +1,17 @@
-// import { generateDueReciept } from "components/DueRecieptGenerator/DueRecieptGenerator";
-import { Button } from "@mui/joy";
+import { Grid } from "@mui/joy";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { generateDueReciept2 } from "components/DueRecieptGenerator/DueRecieptGenerator2";
-import Navbar from "components/Navbar/Navbar";
-import LSPage from "components/Utils/LSPage";
-import PageContainer from "components/Utils/PageContainer";
+import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
 import { useEffect, useState } from "react";
 import { DueRecieptPropsType } from "types/student";
-import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
-import FeeRecieptIndex from "./utilities/FeeReportIndix";
 
+interface Indexdata {
+    column1: string;
+    column2: string;
+    clickHandler: () => void;
+}
 
-function FeeReceipt() {
-  const [pdfUrl, setPdfUrl] = useState<string>("");
-  const [pdfUrl1, setPdfUrl1] = useState<string>("");
-
-  const sampleObjects: DueRecieptPropsType[] = [
+const sampleObjects1: DueRecieptPropsType[] = [
     {
       reciept_id: "RCPT12345",
       current_session: "2023-2024",
@@ -227,62 +224,90 @@ function FeeReceipt() {
     },
   ];
 
-  
 
-  const getPdfUrl = async () => {
-    // const pdfRes = await generateDueReciept(sampleObjects);
-    const pdfRes = await generateDueReciept2(sampleObjects);
-    setPdfUrl(pdfRes);
-  };
+function FeeRecieptIndex() {
 
-  useEffect(() => {
-    getPdfUrl();
-  }, []);
+    const [pdfUrl, setPdfUrl] = useState<string>("");
+  const [pdfUrl1, setPdfUrl1] = useState<string>("");
 
-  const handleNewWindowOpen = () => {
-    // const stringfy = JSON.stringify({data:sampleObjects})
+    const getPdfUrl = async () => {
+        // const pdfRes = await generateDueReciept(sampleObjects);
+        const pdfRes = await generateDueReciept2(sampleObjects1);
+        setPdfUrl(pdfRes);
+      };
+    
+      useEffect(() => {
+        getPdfUrl();
+      }, []);
+    
+      const handleNewWindowOpen = () => {
+        const features =
+          "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+    
+        window.open(pdfUrl, "_blank", features);
+      };
+    
+    
+      const getPdfUrl1 = async () => {
+        const pdfRes1 = await DueRecieptList(sampleObjects1);
+        setPdfUrl1(pdfRes1);
+      };
+    
+      useEffect(() => {
+        getPdfUrl1();
+      }, []);
+    
+      const handleDueRecieptList=()=>{
+        const features1 =
+          "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+    
+        window.open(pdfUrl1, "_blank", features1);
+      };
 
-    // / URL of the new page to open
-    // const url = `http://localhost:3000/smart-pdf-viewer?pdfUrl=${encodeURIComponent(
-    //   pdfUrl
-    // )}`;
+      const rowData: Indexdata[] = [
+        { column1: '1', column2: 'Generate Due Reciept', clickHandler: () => handleNewWindowOpen() },
+        { column1: '2', column2: 'DueReciept List', clickHandler: () => handleDueRecieptList() },
+    ];
 
-    // Specify window features
-    const features =
-      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
-
-    window.open(pdfUrl, "_blank", features);
-  };
-
-
-  const getPdfUrl1 = async () => {
-    const pdfRes1 = await DueRecieptList(sampleObjects);
-    setPdfUrl1(pdfRes1);
-  };
-
-  useEffect(() => {
-    getPdfUrl1();
-  }, []);
-
-  const handleDueRecieptList=()=>{
-    const features1 =
-      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
-
-    window.open(pdfUrl1, "_blank", features1);
-  };
-
-
-  return (
-    <PageContainer>
-      <Navbar />
-      <LSPage>
-        <Button onClick={handleNewWindowOpen}>Generate Due Reciept</Button>
-        <br/><br/>
-        <Button onClick={handleDueRecieptList}>Due Reciept List</Button>
-        <FeeRecieptIndex/>
-      </LSPage>
-    </PageContainer>
-  );
+    return (
+        <>
+            <Grid container spacing={2} marginTop={2}>
+                <Paper
+                    sx={{
+                        padding: "8px",
+                        height: "100%",
+                        width: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <TableContainer>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>S No.</TableCell>
+                                    <TableCell>Receipt Title</TableCell>
+                                    <TableCell>Reciept Links</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {rowData.map((row, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{row.column1}</TableCell>
+                                        <TableCell>{row.column2}</TableCell>
+                                        <TableCell>
+                                            <a onClick={row.clickHandler} style={{textDecoration:"underline",color:"var(--bs-primary)",cursor:"pointer"}}>Get Reciept</a>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            </Grid>
+        </>
+    )
 }
 
-export default FeeReceipt;
+export default FeeRecieptIndex;

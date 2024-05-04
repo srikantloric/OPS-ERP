@@ -7,7 +7,6 @@ export const SCHOOL_ACCOUNTANT = ''
 
 
 export const SCHOOL_CLASSES = [
-  { title: "Pre-Nursery", value: 14,id:14 },
   { title: "Nursery", value: 1 ,id:1},
   { title: "LKG", value: 2 ,id:2},
   { title: "UKG", value: 3,id:3},
@@ -21,6 +20,7 @@ export const SCHOOL_CLASSES = [
   { title: "STD-8", value: 11 ,id:11},
   { title: "STD-9", value: 12,id:12 },
   { title: "STD-10", value: 13,id:13 },
+  { title: "Pre-Nursery", value: 14,id:14 },
 ];
 
 export const SCHOOL_SECTIONS = [
