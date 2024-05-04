@@ -1,5 +1,5 @@
 import Calendar from "react-calendar";
-import "../AttendanceReport/caleder.css";
+import "./AttendanceCalendar.css";
 import "react-calendar/dist/Calendar.css";
 import {
   CheckCircleOutlineOutlined,
@@ -10,7 +10,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { StudentSatus } from "types/attendance";
 
-const Calender: React.FC<StudentSatus> = ({
+const AttendanceCalendar: React.FC<StudentSatus> = ({
   absentDates,
   presentDates,
   halfDayDates,
@@ -168,4 +168,4 @@ const Calender: React.FC<StudentSatus> = ({
   );
 };
 
-export default Calender;
+export default AttendanceCalendar;

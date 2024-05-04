@@ -42,7 +42,7 @@ export interface StudentSatus {
   halfDayDates:string[],
   notMarkedDates:string[],
   futureDates:string[],
-  onChange:string,
-  onDateChange:string,
+  onChange?:()=>void,
+  onDateChange?:()=>void,
 
 }

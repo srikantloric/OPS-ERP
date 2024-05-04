@@ -41,8 +41,8 @@ import { AttendanceReportGenerator } from "components/AttendanceReport/Attendanc
 import { StudentDetailsType } from "types/student";
 import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
-import Calender from "components/AttendanceReport/Calender";
-import { Calculator, CardEdit, Moneys, Wallet } from "iconsax-react";
+import AttendanceCalendar from "components/Calendar/AttendanceCalendar";
+
 
 type AttendanceHeaderDataType = {
   totalStudent: number;
@@ -472,14 +472,13 @@ function ViewAttendance() {
                           </tr>
                         </tbody>
                       </Table> */}
-                        <Calender
+                        <AttendanceCalendar
                           presentDates={presentDates}
                           absentDates={absentDates}
                           halfDayDates={halfDayDates}
                           notMarkedDates={notMarkedDates}
                           futureDates={futureDates}
-                          onChange=""
-                          onDateChange=""
+                        
                         />
                       </>
                     );
