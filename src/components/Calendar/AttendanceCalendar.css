@@ -1,5 +1,7 @@
 .react-calendar {
     width: 100% !important;
+    padding: 10px !important;
+    margin-top: 16px !important;
   }
   
   .calender-body {
@@ -49,8 +51,10 @@
   .tile-day {
     border: 1px solid #b2a9b5 !important;
     height: 90px !important;
-    border-radius: 5px;
-    margin-bottom: 5px !important;
+    /* border-radius: 5px; */
+    /* margin-bottom: 5px !important; */
+    width: 90% !important;
+    /* margin: 10px !important; */
   }
   
   .attendance-not-marked abbr {

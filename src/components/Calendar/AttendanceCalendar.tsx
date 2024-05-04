@@ -2,8 +2,6 @@ import Calendar from "react-calendar";
 import "./AttendanceCalendar.css";
 import "react-calendar/dist/Calendar.css";
 import {
-  CheckCircleOutlineOutlined,
-  CancelOutlined,
   RemoveCircleOutline,
   RemoveOutlined,
 } from "@mui/icons-material";
@@ -88,13 +86,13 @@ const AttendanceCalendar: React.FC<StudentSatus> = ({
       case "present":
         return (
           <div className="present-marker">
-            <CheckCircleOutlineOutlined />
+            <p>Present</p>
           </div>
         );
       case "absent":
         return (
           <div className="absent-marker">
-            <CancelOutlined />
+             <p>Absent</p>
           </div>
         );
       case "halfDay":
@@ -125,16 +123,7 @@ const AttendanceCalendar: React.FC<StudentSatus> = ({
     return classes.join(" ");
   }
 
-  const formatShortWeekday: (
-    locale: string | undefined,
-    date: Date
-  ) => string = (locale, date) => {
-    if (!date) {
-      return "";
-    }
-    const weekdays = ["S", "M", "T", "W", "T", "F", "S"];
-    return weekdays[date.getDay()];
-  };
+
 
   const handleActiveStartDateChange: ({
     action,
@@ -154,14 +143,13 @@ const AttendanceCalendar: React.FC<StudentSatus> = ({
 
   return (
     <div className="day-tile-wrapper">
-      <Calendar 
+      <Calendar     
       onChange={handleDateChange}
       value={date}
       tileContent={tileContent}
       tileClassName={tileClassName}
       className="calender-body" 
       calendarType="gregory"
-       formatShortWeekday={formatShortWeekday}
           onActiveStartDateChange={handleActiveStartDateChange}
        />
     </div>

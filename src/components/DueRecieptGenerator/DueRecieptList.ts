@@ -51,22 +51,22 @@ export const DueRecieptList = async (
 ): Promise<string> => {
 
     let tempArr:any[] = [];
-    let DueRecieptListArr = recieptData.map((item, index) => {
-            const stringArr = [];
-            stringArr.push((index + 1).toString());
-            stringArr.push(item.due_month);
-            stringArr.push(item.due_date);
-            stringArr.push(item.student_name);
-            stringArr.push(item.admission_no);
-            stringArr.push(item.class+" "+item.section);
-            stringArr.push(item.roll_number.toString());
-            stringArr.push(item.father_name);
-            stringArr.push(item.phone_number.toString());
-            stringArr.push(item.fee_heads[0].value+item.fee_heads[1].value+item.fee_heads[2].value);
-            stringArr.push("");
-            tempArr.push(stringArr);
-            return tempArr;
-        });
+    // let DueRecieptListArr = recieptData.map((item, index) => {
+    //         const stringArr = [];
+    //         stringArr.push((index + 1).toString());
+    //         stringArr.push(item.due_month);
+    //         stringArr.push(item.due_date);
+    //         stringArr.push(item.student_name);
+    //         stringArr.push(item.admission_no);
+    //         stringArr.push(item.class+" "+item.section);
+    //         stringArr.push(item.roll_number.toString());
+    //         stringArr.push(item.father_name);
+    //         stringArr.push(item.phone_number.toString());
+    //         stringArr.push(item.fee_heads[0].value+item.fee_heads[1].value+item.fee_heads[2].value);
+    //         stringArr.push("");
+    //         tempArr.push(stringArr);
+    //         return tempArr;
+    //     });
 
 
     return new Promise((resolve, reject) => {
