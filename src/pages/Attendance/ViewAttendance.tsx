@@ -42,6 +42,7 @@ import { StudentDetailsType } from "types/student";
 import AttendanceIndex from "./viewAttendanceTabs/AttendanceIndex";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
 import Calender from "components/AttendanceReport/Calender";
+import { Calculator, CardEdit, Moneys, Wallet } from "iconsax-react";
 
 type AttendanceHeaderDataType = {
   totalStudent: number;
@@ -67,7 +68,9 @@ function ViewAttendance() {
     StudentAttendanceGlobalSchema[]
   >([]);
 
-  const [presentDates, setPresentDates] = useState(["2024-05-04","2024-05-06"]);
+  const [presentDates, setPresentDates] = useState<string[]>([
+    
+  ]);
   const [absentDates, setAbsentDates] = useState(["2024-05-05"]);
   const [halfDayDates, setHalfDayDates] = useState(["2024-05-07"]);
   const [notMarkedDates, setNotMarkedDates] = useState([]);
@@ -90,21 +93,21 @@ function ViewAttendance() {
               tempArr.push(resData);
               setfilterdata(tempArr);
             });
-            db.collection("STUDENTS")
-              .doc(filterdata[0].id)
-              .collection("ATTENDANCE")
-              .where("attendanceDate", "==", selectedDate)
-              .get()
-              .then((document) => {
-                if (document.size > 0) {
-                  let arrAttendance: StudentAttendanceGlobalSchema[] = [];
-                  document.forEach((doc) => {
-                    const data = doc.data() as StudentAttendanceGlobalSchema;
-                    arrAttendance.push(data);
-                    setattendancedata(arrAttendance);
-                  });
-                }
-              });
+            // db.collection("STUDENTS")
+            //   .doc(filterdata[0].id)
+            //   .collection("ATTENDANCE")
+            //   .where("attendanceStatus", "==", "P")
+            //   .get()
+            //   .then((document) => {
+            //     if (document.size > 0) {
+            //       let arrAttendance: StudentAttendanceGlobalSchema[] = [];
+            //       document.forEach((doc) => {
+            //         const data = doc.data() as StudentAttendanceGlobalSchema;
+            //         arrAttendance.push(data);
+            //         setPresentDates(arrAttendance);
+            //       });
+            //     }
+            //   });
             setLoading(false);
             console.log("1=>" + filterdata);
             console.log("2=>" + attendancedata);
@@ -269,7 +272,162 @@ function ViewAttendance() {
                   filterdata.map((student, i) => {
                     return (
                       <>
-                      <Table
+                        <br />
+                        <Paper
+                          sx={{ backgroundColor: "#FBFCFE", display: "flex" }}
+                        >
+                          <div style={{ margin: "10px" }}>
+                            <img
+                              src={student.profil_url}
+                              width={100}
+                              height="100%"
+                              style={{ objectFit: "cover" }}
+                            ></img>
+                          </div>
+                          <div
+                            style={{
+                              margin: "8px 10px 8px 0px",
+                              width: "50%",
+                              display: "flex",
+                              flexDirection: "column",
+                              justifyContent: "center",
+                            }}
+                          >
+                            <div>
+                              <Typography
+                                level="h4"
+                                sx={{ fontWeight: "500" }}
+                                textTransform="uppercase"
+                              >
+                                {student.student_name}
+                              </Typography>
+                              <Typography level="body-sm">
+                                Father's Name : {student.father_name}
+                              </Typography>
+                              <Typography level="body-sm">
+                                Student's ID: {student.student_id}
+                              </Typography>
+                            </div>
+                            <div
+                              style={{
+                                backgroundColor: "#F0F4F8",
+                                display: "flex",
+                                borderRadius: "8px",
+                                gap: "20px",
+                                marginTop: "10px",
+                                padding: "10px 16px",
+                                width: "fit-content",
+                              }}
+                            >
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Typography level="body-sm">Class</Typography>
+                                <Typography level="title-sm">
+                                  {student.class}
+                                  {/* {location.state[0].class} */}
+                                </Typography>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Typography level="body-sm">Roll</Typography>
+                                <Typography level="title-sm">{student.class_roll}</Typography>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Typography level="body-sm">
+                                  Admission Date
+                                </Typography>
+                                <Typography level="title-sm">{student.admission_no}</Typography>
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                
+                                
+                              </div>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  alignItems: "center",
+                                }}
+                              >
+                                
+                              </div>
+                             
+                            </div>
+                          </div>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              border: "1px solid var(--bs-gray-400)",
+                              margin: "14px",
+                              flex: 1,
+                              borderRadius: "8px",
+                              padding: "10px",
+                              alignItems: "center",
+                              justifyContent: "space-evenly",
+                            }}
+                          >
+                            <Stack direction="column" alignItems="center">
+                              
+
+                              <Typography level="h4" mt={1}>
+                                10
+                              </Typography>
+                              <Typography level="body-sm">
+                                Total Present
+                              </Typography>
+                            </Stack>
+
+                            <Stack direction="column" alignItems="center">
+                              
+                              <Typography level="h4" mt={1}>
+                                6
+                              </Typography>
+                              <Typography level="body-sm">
+                                Total Absents
+                              </Typography>
+                            </Stack>
+
+                            <Stack direction="column" alignItems="center">
+                              
+                              <Typography level="h4" mt={1}>
+                                5
+                              </Typography>
+                              <Typography level="body-sm">
+                                Total Holiday
+                              </Typography>
+                            </Stack>
+                            <Stack direction="column" alignItems="center">
+                             
+                              <Typography level="h4" mt={1}>
+                                5
+                              </Typography>
+                              <Typography level="body-sm">Half Day</Typography>
+                            </Stack>
+                          </Box>
+                        </Paper>
+                        {/* <Table
                         aria-label="table variants"
                         variant="plain"
                         color="neutral"
@@ -313,23 +471,19 @@ function ViewAttendance() {
                               })}
                           </tr>
                         </tbody>
-                      </Table>
-                      <Calender 
-                      presentDates={presentDates}
-                      absentDates={absentDates}
-                      halfDayDates={halfDayDates}
-                      notMarkedDates={notMarkedDates}
-                      futureDates={futureDates}
-                      onChange=''
-                      onDateChange=""
-
-                      />
+                      </Table> */}
+                        <Calender
+                          presentDates={presentDates}
+                          absentDates={absentDates}
+                          halfDayDates={halfDayDates}
+                          notMarkedDates={notMarkedDates}
+                          futureDates={futureDates}
+                          onChange=""
+                          onDateChange=""
+                        />
                       </>
                     );
-                    
                   })}
-
-                
               </Paper>
             </Grid>
           </TabPanel>

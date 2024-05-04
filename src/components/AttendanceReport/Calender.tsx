@@ -161,8 +161,8 @@ const Calender: React.FC<StudentSatus> = ({
       tileClassName={tileClassName}
       className="calender-body" 
       calendarType="gregory"
-      formatShortWeekday={formatShortWeekday}
-      onActiveStartDateChange={handleActiveStartDateChange}
+       formatShortWeekday={formatShortWeekday}
+          onActiveStartDateChange={handleActiveStartDateChange}
        />
     </div>
   );
