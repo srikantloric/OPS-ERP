@@ -25,6 +25,7 @@ import { useState } from "react";
 import { StudentDetailsType, StudentFeeDetailsType } from "types/student";
 import {
   generateAlphanumericUUID,
+  getPaymentDueDate,
   makeDoubleDigit,
 } from "utilities/UtilitiesFunctions";
 import firebase from "firebase";
@@ -47,6 +48,12 @@ function GenerateCustomFee() {
   const [selectedYear, setSelectedYear] = useState<string | null>();
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [studentData, setStudentData] = useState<StudentFeeDataType[]>([]);
+  const [paymentDueDate, setPaymentDueDate] = useState<string>(
+    getPaymentDueDate()
+  );
+  const [lateFine, setLateFine] = useState<number>(0);
+
+
 
   const handleFetch = async (e: any) => {
     e.preventDefault();
@@ -123,7 +130,7 @@ function GenerateCustomFee() {
             payment_remarks: "",
             fee_month_year: "" + selectedMonth + "/" + selectedYear,
             is_payment_done: false,
-            payment_due_date: new Date(),
+            payment_due_date: paymentDueDate,
             fee_header_type: feeString,
           };
 
@@ -260,13 +267,17 @@ function GenerateCustomFee() {
               <Grid xs={2}>
                 <FormControl>
                   <FormLabel>Due Date</FormLabel>
-                  <Input type="date" required />
+                  <Input type="date" required    value={paymentDueDate}
+                    onChange={(e) => setPaymentDueDate(e.currentTarget.value)}/>
                 </FormControl>
               </Grid>
               <Grid xs={2}>
                 <FormControl>
                   <FormLabel>Late Fine</FormLabel>
-                  <Input type="number" required />
+                  <Input type="number" required   value={lateFine}
+                    onChange={(e) =>
+                      setLateFine(parseInt(e.currentTarget.value))
+                    }/>
                 </FormControl>
               </Grid>
             

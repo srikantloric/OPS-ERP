@@ -92,6 +92,17 @@ export function getCurrentDate(): string {
   return `${year}-${month}-${day}`;
 }
 
+///Generate payment due date in string
+export function getPaymentDueDate(): string {
+  const currentDate = new Date();
+
+  const year = currentDate.getFullYear();
+  const month = ("0" + (currentDate.getMonth() + 1)).slice(-2); // Adding 1 because months are zero indexed
+  const day = ("0" + 10).slice(-2);
+
+  return `${year}-${month}-${day}`;
+}
+
 export const getAttendanceStatusByCode = (code: string): any => {
   switch (code) {
     case "A":
@@ -112,7 +123,6 @@ export const getAttendanceStatusByCode = (code: string): any => {
 export const getFeeHeaderByCode = (code: string): string => {
   switch (code) {
     case "M01":
-      
       return "Monthly Fee";
     case "E01":
       return "Examination Fee";
@@ -124,4 +134,3 @@ export const getFeeHeaderByCode = (code: string): string => {
       return "Invalid Fee Header";
   }
 };
-

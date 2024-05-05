@@ -26,6 +26,7 @@ import { StudentDetailsType, StudentFeeDetailsType } from "types/student";
 import {
   generateAlphanumericUUID,
   getMonthTitleByValue,
+  getPaymentDueDate,
   makeDoubleDigit,
 } from "utilities/UtilitiesFunctions";
 import firebase from "firebase";
@@ -45,6 +46,10 @@ function GenerateMonthlyFee() {
   const [selectedYear, setSelectedYear] = useState<string | null>();
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [studentData, setStudentData] = useState<StudentFeeDataType[]>([]);
+  const [paymentDueDate, setPaymentDueDate] = useState<string>(
+    getPaymentDueDate()
+  );
+  const [lateFine, setLateFine] = useState<number>(0);
 
   const handleFetch = async (e: any) => {
     e.preventDefault();
@@ -112,30 +117,31 @@ function GenerateMonthlyFee() {
           // Create payment entry in subcollection 'PAYMENTS'
           const subCollDocId = generateAlphanumericUUID(30);
           const paymentData: StudentFeeDetailsType = {
-            credit_by: "",
-            student_id: student.studentData.student_id,
+            id: "" + Math.floor(100000 + Math.random() * 900000),
             doc_id: subCollDocId,
-            discount_amount: 0,
+            student_id: student.studentData.student_id,
+            credit_by: "",
             fee_title: getMonthTitleByValue(selectedMonth!)!.toString(),
             fee_total: student.studentData.monthly_fee!,
-            transportation_fee: 0,
             computer_fee: student.studentData.computer_fee,
-            id: "" + Math.floor(100000 + Math.random() * 900000),
-            late_fee: 0,
-            paid_amount: 0,
-            payment_date: null,
+            late_fee: lateFine,
             created_at: firebase.firestore.FieldValue.serverTimestamp(),
-            payment_mode: "",
-            payment_remarks: "",
             fee_month_year: "" + selectedMonth + "/" + selectedYear,
             is_payment_done: false,
-            payment_due_date: new Date(),
+            payment_due_date: paymentDueDate,
             fee_header_type: feeString,
+            ///Initial fields
+            payment_remarks: "",
+            payment_date: null,
+            payment_mode: "",
+            paid_amount: 0,
+            discount_amount: 0,
             ///extra fee header
-            admission_fee:0,
-            exam_fee:0,
-            other_fee:0,
-            annual_fee:0,
+            transportation_fee: 0,
+            admission_fee: 0,
+            exam_fee: 0,
+            other_fee: 0,
+            annual_fee: 0,
           };
 
           try {
@@ -260,13 +266,25 @@ function GenerateMonthlyFee() {
               <Grid xs={2}>
                 <FormControl>
                   <FormLabel>Due Date</FormLabel>
-                  <Input type="date" required />
+                  <Input
+                    type="date"
+                    required
+                    value={paymentDueDate}
+                    onChange={(e) => setPaymentDueDate(e.currentTarget.value)}
+                  />
                 </FormControl>
               </Grid>
               <Grid xs={2}>
                 <FormControl>
                   <FormLabel>Late Fine</FormLabel>
-                  <Input type="number" required />
+                  <Input
+                    type="number"
+                    required
+                    value={lateFine}
+                    onChange={(e) =>
+                      setLateFine(parseInt(e.currentTarget.value))
+                    }
+                  />
                 </FormControl>
               </Grid>
               <FormControlLabel

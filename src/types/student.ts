@@ -58,10 +58,7 @@ export interface StudentFeeDetailsType {
   fee_month_year?: string;
   is_payment_done: boolean;
   doc_id: string;
-  payment_due_date:
-    | firebase.firestore.Timestamp
-    | firebase.firestore.FieldValue
-    | Date;
+  payment_due_date:string;
   fee_header_type: string;
   monthly_fee?: number;
 
