@@ -1,3 +1,4 @@
+import { MoreVert } from "@mui/icons-material";
 import { getFeeHeaderByCode } from "utilities/UtilitiesFunctions";
 
 export const FEE_TABLE_COLS = [
@@ -142,6 +143,6 @@ export const FEE_TABLE_COLS = [
           </p>
         );
       }
-    },
-  },
+    }
+  }
 ];
