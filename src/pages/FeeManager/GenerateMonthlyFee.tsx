@@ -131,6 +131,11 @@ function GenerateMonthlyFee() {
             is_payment_done: false,
             payment_due_date: new Date(),
             fee_header_type: feeString,
+            ///extra fee header
+            admission_fee:0,
+            exam_fee:0,
+            other_fee:0,
+            annual_fee:0,
           };
 
           try {

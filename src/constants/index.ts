@@ -3,16 +3,25 @@ export const FEE_HEADERS = [
   {
     title: "Examination Fee",
     value: "E01",
-    titleShort:"EXAM"
+    titleShort: "EXAM",
+    field: "exam_fee",
   },
   {
     title: "Anual Fee",
     value: "A01",
-    titleShort:"ANUAL"
+    titleShort: "ANUAL",
+    field: "annual_fee",
+  },
+  {
+    title: "Admission Fee",
+    value: "A02",
+    titleShort: "ADD.",
+    field: "addmission_fee",
   },
   {
     title: "Other Fee",
     value: "X01",
-    titleShort:"OTHER"
+    titleShort: "OTHER",
+    field: "other_fee",
   },
 ];

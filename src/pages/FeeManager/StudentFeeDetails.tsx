@@ -17,7 +17,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
-import { Box, Button, Table, Tooltip } from "@mui/joy";
+import { Box, Button, Table, Tooltip, Typography } from "@mui/joy";
 import QuickPaymentModal from "./utilities/QuickPaymentModal";
 import BreadCrumbsV3 from "components/Breadcrumbs/BreadCrumbsV3";
 import Navbar from "components/Navbar/Navbar";
@@ -42,10 +42,7 @@ const SearchAnotherButton = () => {
   );
 };
 
-//main element
 function StudentFeeDetails() {
-  //StudentMasterData State
-
   const [modelOpen, setModelOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<StudentFeeDetailsType | null>(
     null
@@ -56,7 +53,7 @@ function StudentFeeDetails() {
   const historyRef = useNavigate();
   const location = useLocation();
 
-  ///Sof Menu State
+  /// Menu State
   const [anchorEll, setAnchorEll] = useState<HTMLAnchorElement | null>(null);
   const menuOpen = Boolean(anchorEll);
 
@@ -71,11 +68,23 @@ function StudentFeeDetails() {
     setSelectedRow(rowData);
   };
 
-  // useEffect(() => {
-  //   if (selectedRow) {
-  //     setPaymentRemarks(selectedRow.payment_remarks);
-  //   }
-  // }, [selectedRow]);
+  function sum(
+    column:
+      | "fee_total"
+      | "transportation_fee"
+      | "computer_fee"
+      | "exam_fee"
+      | "admission_fee"
+      | "other_fee"
+      | "annual_fee"
+      |"total_due"
+  ) {
+    console.log(feeDetails);
+    console.log(feeDetails.at(0)?.fee_total);
+    const result = feeDetails.reduce((acc, row) => acc + row[column]!, 0);
+    console.log(result);
+    return result;
+  }
 
   const handleMenuClose = () => {
     setAnchorEll(null);
@@ -103,6 +112,14 @@ function StudentFeeDetails() {
             var feeArr: StudentFeeDetailsType[] = [];
             snapshot.forEach((doc) => {
               const data = doc.data() as StudentFeeDetailsType;
+              data["total_due"] =
+                data.fee_total +
+                data.admission_fee! +
+                data.annual_fee! +
+                data.computer_fee +
+                data.exam_fee! +
+                data.other_fee! +
+                data.transportation_fee;
               feeArr.push(data);
             });
             setFeeDetails(feeArr);
@@ -164,7 +181,11 @@ function StudentFeeDetails() {
           </Box>
         </Box>
 
-        <Box>
+        <Box sx={{ border: "1px solid var(--bs-gray-300)", padding: "8px" }}>
+          <Typography level="title-lg" m="8px" color="primary">
+            Due Fee Challans
+          </Typography>
+
           <Table
             variant="outlined"
             sx={{
@@ -179,18 +200,17 @@ function StudentFeeDetails() {
           >
             <thead>
               <tr style={{ backgroundColor: "red" }}>
-                <th>RECIEPT ID</th>
+                <th style={{ width: "10%" }}>RECIEPT ID</th>
                 <th>TITLE</th>
+                <th>FEE</th>
                 <th>FINE</th>
                 <th>TRFEE</th>
                 <th>COMFEE</th>
                 {FEE_HEADERS.map((item) => {
                   return <th>{item.titleShort}</th>;
                 })}
-                <th>TOTAL</th>
-                <th>REC.</th>
-                <th>CONC.</th>
-                <th>BAL.</th>
+                <th>TOTAL DUE</th>
+                <th>STATUS</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -200,17 +220,27 @@ function StudentFeeDetails() {
                   <>
                     <tr>
                       <td>{item.id}</td>
-                      <td>159</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>24</td>
-                      <td>6</td>
+                      <td>{item.fee_title}</td>
+                      <td>{item.fee_total}</td>
+                      <td>{item.late_fee}</td>
+                      <td>{item.transportation_fee}</td>
+                      <td>{item.computer_fee}</td>
+                      <td>{item.exam_fee}</td>
+                      <td>{item.annual_fee}</td>
+                      <td>{item.admission_fee}</td>
+                      <td>{item.other_fee}</td>
+                      <td>{item.total_due}</td>
+                      <td>
+                        <Box
+                          sx={{
+                            background: "var(--bs-danger2)",
+                            color: "#fff",
+                            textAlign: "center",
+                          }}
+                        >
+                          Due
+                        </Box>
+                      </td>
                       <td>
                         <Tooltip title="More options">
                           <Button
@@ -226,10 +256,23 @@ function StudentFeeDetails() {
                 );
               })}
             </tbody>
+            <tfoot>
+              <tr>
+                <th>Grand Total</th>
+                <th></th>
+                <th>{sum("fee_total").toFixed(0)}</th>
+                <th>0</th>
+                <th>{sum("transportation_fee").toFixed(0)}</th>
+                <th>{sum("computer_fee").toFixed(0)}</th>
+                <th>{sum("exam_fee").toFixed(0)}</th>
+                <th>{sum("annual_fee").toFixed(0)}</th>
+                <th>{sum("admission_fee").toFixed(0)}</th>
+                <th>{sum("other_fee").toFixed(0)}</th>
+                <th>{sum("total_due").toFixed(0)}</th>
+              </tr>
+            </tfoot>
           </Table>
         </Box>
-
-    
         <Menu
           anchorEl={anchorEll}
           id="account-menu"
