@@ -23,7 +23,7 @@ function AttendanceByStudentId() {
   const [loading, setLoading] = useState<boolean>(false);
 
   ///attendance state
-  const [presentDates, setPresentDates] = useState<string[]>(["2024-05-06"]);
+  const [presentDates, setPresentDates] = useState<string[]>([]);
   const [absentDates, setAbsentDates] = useState<string[]>([]);
   const [halfDayDates, setHalfDayDates] = useState<string[]>([]);
   const [notMarkedDates, setNotMarkedDates] = useState([]);
@@ -34,16 +34,19 @@ function AttendanceByStudentId() {
   >([]);
 
   useEffect(() => {
-    setAbsentDates(["2024-05-05"]);
-    setHalfDayDates(["2024-05-07"]);
+    setAbsentDates([]);
+    setHalfDayDates([]);
     setNotMarkedDates([]);
     setFutureDates([]);
     setAttendanceData([]);
   }, []);
 
-  function handlesearch(): void {
+  const handlesearch = () => {
     // setfilterdata(undefined)
-    if (searchInput) {
+    if (searchInput === null) {
+      setLoading(false);
+      enqueueSnackbar("Please enter Student Id", { variant: "error" });
+    } else {
       setLoading(true);
       // setfilterdata(undefined)
       console.log(searchInput);
@@ -74,6 +77,37 @@ function AttendanceByStudentId() {
                   });
                 }
               });
+            db.collection("STUDENTS")
+              .doc(filterdata[0].id)
+              .collection("ATTENDANCE")
+              .where("attendanceStatus", "==", "H")
+              .get()
+              .then((document) => {
+                if (document.size > 0) {
+                  let arrAttendance: any[] = [];
+                  document.forEach((doc) => {
+                    const data = doc.data().attendanceDate as any;
+                    arrAttendance.push(data);
+                    setHalfDayDates(arrAttendance);
+                  });
+                }
+              });
+            db.collection("STUDENTS")
+              .doc(filterdata[0].id)
+              .collection("ATTENDANCE")
+              .where("attendanceStatus", "==", "A")
+              .get()
+              .then((document) => {
+                if (document.size > 0) {
+                  let arrAttendance: any[] = [];
+                  document.forEach((doc) => {
+                    const data = doc.data().attendanceDate as any;
+                    arrAttendance.push(data);
+                    setAbsentDates(arrAttendance);
+                    console.log(absentDates);
+                  });
+                }
+              });
             setLoading(false);
             console.log("1=>" + filterdata);
           } else {
@@ -87,11 +121,8 @@ function AttendanceByStudentId() {
           enqueueSnackbar("INVALID STUDENT ID", e);
           setLoading(false);
         });
-    } else {
-      setLoading(false);
-      enqueueSnackbar("Please enter Student Id", { variant: "error" });
     }
-  }
+  };
 
   const handlePrintAttendance = async () => {
     const pdfRes4 = await FullAttendanceReport(filterdata, attendanceData);
@@ -130,7 +161,7 @@ function AttendanceByStudentId() {
 
             {/* <FormHelperText>This is a helper text.</FormHelperText> */}
 
-            <Button sx={{ height: 20 }} type="submit" onClick={handlesearch}>
+            <Button sx={{ height: 20 }} onClick={handlesearch}>
               Search
             </Button>
           </Stack>
