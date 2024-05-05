@@ -28,6 +28,9 @@ function AttendanceByStudentId() {
   const [halfDayDates, setHalfDayDates] = useState<string[]>([]);
   const [notMarkedDates, setNotMarkedDates] = useState([]);
   const [futureDates, setFutureDates] = useState([]);
+  const[totalPresents,setTotalpresent]=useState<number|null>();
+  const[totalAbsents,setTotalAbsents]=useState<number|null>();
+  const[totalHalf,settotalHalf]= useState<number|null>();
 
   const [attendanceData, setAttendanceData] = useState<
     StudentAttendanceGlobalSchema[]
@@ -72,7 +75,9 @@ function AttendanceByStudentId() {
                   document.forEach((doc) => {
                     const data = doc.data().attendanceDate as any;
                     arrAttendance.push(data);
-                    setPresentDates(arrAttendance);
+                    const totalPresentnumber=arrAttendance.length;
+                    setTotalpresent(totalPresentnumber);
+                    setPresentDates(arrAttendance)
                     console.log(presentDates);
                   });
                 }
@@ -88,6 +93,8 @@ function AttendanceByStudentId() {
                   document.forEach((doc) => {
                     const data = doc.data().attendanceDate as any;
                     arrAttendance.push(data);
+                    const halfValue=arrAttendance.length;
+                    settotalHalf(halfValue);
                     setHalfDayDates(arrAttendance);
                   });
                 }
@@ -103,6 +110,8 @@ function AttendanceByStudentId() {
                   document.forEach((doc) => {
                     const data = doc.data().attendanceDate as any;
                     arrAttendance.push(data);
+                  const totalAbsentsValue=arrAttendance.length;
+                  setTotalAbsents(totalAbsentsValue);
                     setAbsentDates(arrAttendance);
                     console.log(absentDates);
                   });
@@ -158,14 +167,7 @@ function AttendanceByStudentId() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
-<<<<<<< HEAD
-
-            {/* <FormHelperText>This is a helper text.</FormHelperText> */}
-
-            <Button sx={{ height: 20 }} onClick={handlesearch}>
-=======
             <Button sx={{ height: 20 }} type="submit" onClick={handlesearch}>
->>>>>>> 51983793749319819cf64aff584f9303d43910ac
               Search
             </Button>
           </Stack>
@@ -296,14 +298,14 @@ function AttendanceByStudentId() {
                   >
                     <Stack direction="column" alignItems="center">
                       <Typography level="h4" mt={1}>
-                        10
+                        {totalPresents}
                       </Typography>
                       <Typography level="body-sm">Total Present</Typography>
                     </Stack>
 
                     <Stack direction="column" alignItems="center">
                       <Typography level="h4" mt={1}>
-                        6
+                        {totalAbsents}
                       </Typography>
                       <Typography level="body-sm">Total Absents</Typography>
                     </Stack>
@@ -316,7 +318,7 @@ function AttendanceByStudentId() {
                     </Stack>
                     <Stack direction="column" alignItems="center">
                       <Typography level="h4" mt={1}>
-                        5
+                        {totalHalf}
                       </Typography>
                       <Typography level="body-sm">Half Day</Typography>
                     </Stack>
