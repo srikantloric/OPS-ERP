@@ -2,11 +2,11 @@ import Calendar from "react-calendar";
 import "./AttendanceCalendar.css";
 import "react-calendar/dist/Calendar.css";
 import {
-  RemoveCircleOutline,
   RemoveOutlined,
 } from "@mui/icons-material";
 import { useEffect, useMemo, useState } from "react";
 import { StudentSatus } from "types/attendance";
+import { Typography } from "@mui/material";
 
 const AttendanceCalendar: React.FC<StudentSatus> = ({
   absentDates,
@@ -85,20 +85,23 @@ const AttendanceCalendar: React.FC<StudentSatus> = ({
     switch (status) {
       case "present":
         return (
-          <div className="present-marker">
-            <p>Present</p>
+          <div className="present-marker" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",textAlign:"center"}}>
+            <div style={{height:"12px",width:"12px",borderRadius:"50%",backgroundColor:"green"}}></div>
+            <Typography variant="subtitle2">Present</Typography>
           </div>
         );
       case "absent":
         return (
-          <div className="absent-marker">
-             <p>Absent</p>
+          <div className="absent-marker" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",textAlign:"center"}}>
+            <div style={{height:"12px",width:"12px",borderRadius:"50%",backgroundColor:"red"}}></div>
+            <Typography variant="subtitle2">Absent</Typography>
           </div>
         );
       case "halfDay":
         return (
-          <div>
-            <RemoveCircleOutline />
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:"5px",textAlign:"center",color:"orange"}}>
+           <div style={{height:"12px",width:"12px",borderRadius:"50%",backgroundColor:"orange"}}></div>
+            <Typography variant="subtitle2">HalfDay</Typography>
           </div>
         );
       case "futureDate":

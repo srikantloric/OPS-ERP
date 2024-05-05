@@ -46,7 +46,6 @@ import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);
-  console.log(data);
   const isDataLoading = useSelector((state) => state.students.loading);
   const error = useSelector((state) => state.students.error);
 
@@ -95,7 +94,7 @@ function ViewStudents() {
     if (Array.from(data).length === 0) {
       dipatch(fetchstudent());
     }
-  }, [data, dipatch]);
+  }, []);
 
   useEffect(() => {
     if (error) {
@@ -131,7 +130,6 @@ function ViewStudents() {
       setFilterChip(true);
     }
 
-    console.log(selectedClass, selectedSection);
   };
 
   const deletestudent = (data) => {

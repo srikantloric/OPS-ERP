@@ -230,7 +230,7 @@ function QuickPaymentModal({
                 <div style={{ display: "flex" }}>
                   <div>
                     <Typography level="body-md" sx={{ mt: 1 }}>
-                      Payment ID :
+                      Slip Id :
                     </Typography>
                     <Typography level="body-md">Payment Title :</Typography>
                     <Typography level="body-md">Tution Fee :</Typography>
