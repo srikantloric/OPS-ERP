@@ -11,7 +11,7 @@ import { Paper } from "@mui/material";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
 import AttendanceCalendar from "components/Calendar/AttendanceCalendar";
 import { db } from "../../../firebase";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { StudentDetailsType } from "types/student";
 import { enqueueSnackbar } from "notistack";
 import { StudentAttendanceGlobalSchema } from "types/attendance";
@@ -31,20 +31,21 @@ function AttendanceByStudentId() {
   const[totalPresents,setTotalpresent]=useState<number|null>();
   const[totalAbsents,setTotalAbsents]=useState<number|null>();
   const[totalHalf,settotalHalf]= useState<number|null>();
+  const[fetchdone,setFetchdone]=useState<boolean>(false);
 
   const [attendanceData, setAttendanceData] = useState<
     StudentAttendanceGlobalSchema[]
   >([]);
 
   useEffect(() => {
-    setAbsentDates([]);
-    setHalfDayDates([]);
-    setNotMarkedDates([]);
-    setFutureDates([]);
     setAttendanceData([]);
-  }, []);
+    setFutureDates([]);
+    setNotMarkedDates([])
+    setFetchdone(false)
+  }, [searchInput]);
 
-  const handlesearch = () => {
+  const handlesearch = (e:SyntheticEvent) => {
+    e.preventDefault();
     // setfilterdata(undefined)
     if (searchInput === null) {
       setLoading(false);
@@ -118,6 +119,7 @@ function AttendanceByStudentId() {
                 }
               });
             setLoading(false);
+            setFetchdone(true)
             console.log("1=>" + filterdata);
           } else {
             setLoading(false);
@@ -167,7 +169,7 @@ function AttendanceByStudentId() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
-            <Button sx={{ height: 20 }} type="submit" onClick={handlesearch}>
+            <Button sx={{ height: 20 }}  onClick={(e)=>handlesearch(e)} disabled={fetchdone}>
               Search
             </Button>
           </Stack>
