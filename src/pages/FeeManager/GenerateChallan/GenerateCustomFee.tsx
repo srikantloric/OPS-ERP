@@ -19,7 +19,7 @@ import Navbar from "components/Navbar/Navbar";
 import LSPage from "components/Utils/LSPage";
 import PageContainer from "components/Utils/PageContainer";
 import { SCHOOL_CLASSES, SCHOOL_FEE_MONTHS } from "config/schoolConfig";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { useState } from "react";
 
 import { StudentDetailsType, StudentFeeDetailsType } from "types/student";
@@ -52,6 +52,7 @@ function GenerateCustomFee() {
     getPaymentDueDate()
   );
   const [lateFine, setLateFine] = useState<number>(0);
+  const [feeAmount, setFeeAmount] = useState<number>();
 
 
 
@@ -280,7 +281,15 @@ function GenerateCustomFee() {
                     }/>
                 </FormControl>
               </Grid>
-            
+              <Grid xs={2}>
+                <FormControl>
+                  <FormLabel>FeeAmount</FormLabel>
+                  <Input type="number" required   value={feeAmount}
+                    onChange={(e) =>
+                      setFeeAmount(parseInt(e.currentTarget.value))
+                    }/>
+                </FormControl>
+              </Grid>
               <br />
               <Button
                 type="submit"

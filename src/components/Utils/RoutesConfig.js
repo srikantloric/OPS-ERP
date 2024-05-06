@@ -17,8 +17,8 @@ import UnderConstruction from "../../pages/Extras/UnderConstruction";
 import FeeManager from "../../pages/FeeManager/FeeManager";
 import FeaturesConfig from "../../FeaturesConfig";
 import ViewStudents from "../../pages/Users/ViewStudents";
-import GenerateMonthlyFee from "pages/FeeManager/GenerateMonthlyFee";
-import GenerateCustomFee from "pages/FeeManager/GenerateCustomFee";
+import GenerateMonthlyFee from "pages/FeeManager/GenerateChallan/GenerateMonthlyFee";
+import GenerateCustomFee from "pages/FeeManager/GenerateChallan/GenerateCustomFee";
 import FeeReceipt from "pages/FeeManager/FeeReceipt";
 import Transaction from "pages/Transaction/Transaction";
 

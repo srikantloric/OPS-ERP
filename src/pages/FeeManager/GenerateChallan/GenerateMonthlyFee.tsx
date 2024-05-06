@@ -19,7 +19,7 @@ import Navbar from "components/Navbar/Navbar";
 import LSPage from "components/Utils/LSPage";
 import PageContainer from "components/Utils/PageContainer";
 import { SCHOOL_CLASSES, SCHOOL_FEE_MONTHS } from "config/schoolConfig";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { useState } from "react";
 
 import { StudentDetailsType, StudentFeeDetailsType } from "types/student";
@@ -205,18 +205,11 @@ function GenerateMonthlyFee() {
             <Grid container spacing={2} sx={{ flexGrow: 1 }}>
               <Grid xs={2}>
                 <FormControl>
-                  <FormLabel>Fee Header</FormLabel>
-                  <Select defaultValue={null} required>
-                    <Option value="T01">Monthly Fee</Option>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid xs={2}>
-                <FormControl>
                   <FormLabel>Select Class</FormLabel>
                   <Select
                     defaultValue={null}
                     value={selectedClass}
+                    placeholder="select class.."
                     onChange={(e, val) => setSelectedClass(val)}
                     required
                   >
@@ -236,6 +229,7 @@ function GenerateMonthlyFee() {
                   <Select
                     defaultValue={null}
                     value={selectedMonth}
+                    placeholder="select month.."
                     onChange={(e, val) => setSelectedMonth(val)}
                     required
                   >
@@ -255,6 +249,7 @@ function GenerateMonthlyFee() {
                   <Select
                     defaultValue={null}
                     value={selectedYear}
+                    placeholder="select year.."
                     onChange={(e, val) => setSelectedYear(val)}
                     required
                   >
@@ -270,6 +265,7 @@ function GenerateMonthlyFee() {
                     type="date"
                     required
                     value={paymentDueDate}
+                    placeholder="select due date.."
                     onChange={(e) => setPaymentDueDate(e.currentTarget.value)}
                   />
                 </FormControl>
