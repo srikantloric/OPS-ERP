@@ -77,14 +77,21 @@ function StudentFeeDetails() {
       | "admission_fee"
       | "other_fee"
       | "annual_fee"
-      |"total_due"
+      | "total_due"
+      | "late_fee"
   ) {
-    console.log(feeDetails);
-    console.log(feeDetails.at(0)?.fee_total);
-    const result = feeDetails.reduce((acc, row) => acc + row[column]!, 0);
-    console.log(result);
-    return result;
+    return feeDetails.reduce((acc, row) => acc + row[column]!, 0);
   }
+
+  const calculatedLateFine = (lateFee: number, dueDate: string): number => {
+    const dueDateFormated = new Date(dueDate);
+    const currentDate = new Date();
+    let lateFine = 0;
+    if (dueDateFormated >= currentDate) {
+      lateFine = lateFee;
+    }
+    return lateFine;
+  };
 
   const handleMenuClose = () => {
     setAnchorEll(null);
@@ -107,11 +114,16 @@ function StudentFeeDetails() {
         .collection("STUDENTS")
         .doc(location.state[0].id)
         .collection("PAYMENTS")
+        .orderBy("created_at", "desc")
         .onSnapshot((snapshot) => {
           if (snapshot.docs) {
             var feeArr: StudentFeeDetailsType[] = [];
             snapshot.forEach((doc) => {
               const data = doc.data() as StudentFeeDetailsType;
+              data["late_fee"] = calculatedLateFine(
+                data.late_fee,
+                data.payment_due_date
+              );
               data["total_due"] =
                 data.fee_total +
                 data.admission_fee! +
@@ -119,7 +131,9 @@ function StudentFeeDetails() {
                 data.computer_fee +
                 data.exam_fee! +
                 data.other_fee! +
-                data.transportation_fee;
+                data.transportation_fee +
+                data.late_fee;
+
               feeArr.push(data);
             });
             setFeeDetails(feeArr);
@@ -261,7 +275,7 @@ function StudentFeeDetails() {
                 <th>Grand Total</th>
                 <th></th>
                 <th>{sum("fee_total").toFixed(0)}</th>
-                <th>0</th>
+                <th>{sum("late_fee").toFixed(0)}</th>
                 <th>{sum("transportation_fee").toFixed(0)}</th>
                 <th>{sum("computer_fee").toFixed(0)}</th>
                 <th>{sum("exam_fee").toFixed(0)}</th>
