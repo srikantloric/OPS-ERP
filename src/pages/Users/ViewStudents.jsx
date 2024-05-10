@@ -29,6 +29,7 @@ import {
   Paper,
   Select,
 } from "@mui/material";
+
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { deleltedata, fetchstudent } from "../../store/studentSlice";
@@ -43,7 +44,7 @@ import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
-import StudDataExcel from "components/StudentDetailsReport/StudentDetailsReportGenerator";
+import StudDataExcel from "components/StudentDetailsReport/StudentReportGenerator";
 
 
 function ViewStudents() {
