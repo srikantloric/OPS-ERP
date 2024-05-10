@@ -66,9 +66,9 @@ import {
         doc.addFont("Poppins-Semibold", "Poppins", "semibold");
         ///Start of PDF Design
   
-        doc.addImage(LOGO_BASE_64, x + 8, y + 2, 30, 25);
+        doc.addImage(LOGO_BASE_64, x + 45, y + 1, 30, 25);
   
-        const schoolHeaderStartX = x + 50;
+        const schoolHeaderStartX = x + 75;
         const schoolHeaderStartY = y + 5;
   
         doc.setFontSize(15);
@@ -93,7 +93,7 @@ import {
         doc.rect(
           schoolHeaderStartX + 5,
           schoolContactDetailStartY + 5,
-          cardXEndPoint - 140,
+          cardXEndPoint - 200,
           4,
           "F"
         );
