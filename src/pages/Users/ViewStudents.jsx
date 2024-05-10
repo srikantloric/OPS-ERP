@@ -45,6 +45,7 @@ import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 import StudDataExcel from "components/StudentDetailsReport/StudentReportGenerator";
+import { StudReportPDF } from "components/StudentDetailsReport/StudentReportGeneratorPDF";
 
 
 function ViewStudents() {
@@ -119,9 +120,9 @@ function ViewStudents() {
       setFilteredData(dataNew);
       setFilterChipLabel(
         "Filter set for class " +
-          getClassNameByValue(selectedClass) +
-          " and section " +
-          selectedSection
+        getClassNameByValue(selectedClass) +
+        " and section " +
+        selectedSection
       );
       setFilterChip(true);
     } else if (selectedSection === -1 && selectedClass !== -1) {
@@ -158,6 +159,13 @@ function ViewStudents() {
   const navigate = useNavigate();
   const updatestudent = (student) => {
     navigate(`/students/update-student/${student.id}`);
+  };
+
+  const handleNewWindowOpen = async () => {
+    const pdfRes = await StudReportPDF();
+    const features =
+      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+    window.open(pdfRes, "_blank", features);
   };
 
 
@@ -368,8 +376,10 @@ function ViewStudents() {
             exportMenu: [
               {
                 label: "Export PDF",
-                exportFunc: (cols, datas) =>
-                  ExportPdf(cols, datas, "myPdfFileName"),
+                // exportFunc: (cols, datas) =>
+                //   ExportPdf(cols, datas, "myPdfFileName"),
+                exportFunc: () =>
+                  handleNewWindowOpen()
               },
               {
                 label: "Export CSV",
