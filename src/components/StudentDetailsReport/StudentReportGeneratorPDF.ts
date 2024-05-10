@@ -41,7 +41,7 @@ import {
     return new Promise((resolve, reject) => {
       try {
         const doc = new jsPDF({
-          orientation: "p",
+          orientation: "l",
           unit: "mm",
           format: "a4",
         });
