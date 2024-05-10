@@ -7,7 +7,7 @@ const studentData = [  // Replace with your actual student data
     { ID: 456, Name: "Jane Smith", Fathername: "Jane Daddy", Class: "Nursary", Section:"B", Roll: "32", Contact: "987563269", Address:"Kadru Ranchi"},
 ];
 
-const companyName="Company Name";
+const companyName="ORIENT PUBLIC SCHOOL";
 
 
 const StudDataExcel = () => {
