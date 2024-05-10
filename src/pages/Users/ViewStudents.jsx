@@ -43,6 +43,8 @@ import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
+import StudDataExcel from "components/StudentDetailsReport/StudentDetailsReportGenerator";
+
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);
@@ -370,9 +372,9 @@ function ViewStudents() {
               },
               {
                 label: "Export CSV",
-                exportFunc: (cols, datas) =>
-                  ExportCsv(cols, datas, "myCsvFileName"),
-              },
+                exportFunc: () =>
+                  StudDataExcel(),
+              }
             ],
             actionsColumnIndex: -1,
           }}
