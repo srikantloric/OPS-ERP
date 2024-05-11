@@ -15,7 +15,6 @@ import {
 
 import Styles from "./ViewStudents.module.scss";
 import { useNavigate } from "react-router-dom";
-import { ExportCsv, ExportPdf } from "@material-table/exporters";
 import BadgeIcon from "@mui/icons-material/Badge";
 import GrainIcon from "@mui/icons-material/Grain";
 import SearchIcon from "@mui/icons-material/Search";
@@ -44,9 +43,8 @@ import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
-import StudDataExcel from "components/StudentDetailsReport/StudentReportGenerator";
 import { StudReportPDF } from "components/StudentDetailsReport/StudentReportGeneratorPDF";
-
+import ExportToExcel from "components/Reports/ExportToExcel";
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);
@@ -120,9 +118,9 @@ function ViewStudents() {
       setFilteredData(dataNew);
       setFilterChipLabel(
         "Filter set for class " +
-        getClassNameByValue(selectedClass) +
-        " and section " +
-        selectedSection
+          getClassNameByValue(selectedClass) +
+          " and section " +
+          selectedSection
       );
       setFilterChip(true);
     } else if (selectedSection === -1 && selectedClass !== -1) {
@@ -130,10 +128,11 @@ function ViewStudents() {
         return data.class === selectedClass;
       });
       setFilteredData(dataNew);
-      setFilterChipLabel("Filter set for class " + getClassNameByValue(selectedClass));
+      setFilterChipLabel(
+        "Filter set for class " + getClassNameByValue(selectedClass)
+      );
       setFilterChip(true);
     }
-
   };
 
   const deletestudent = (data) => {
@@ -167,8 +166,6 @@ function ViewStudents() {
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
     window.open(pdfRes, "_blank", features);
   };
-
-
 
   //column for material table
   const columnMat = [
@@ -378,14 +375,12 @@ function ViewStudents() {
                 label: "Export PDF",
                 // exportFunc: (cols, datas) =>
                 //   ExportPdf(cols, datas, "myPdfFileName"),
-                exportFunc: () =>
-                  handleNewWindowOpen()
+                exportFunc: () => handleNewWindowOpen(),
               },
               {
-                label: "Export CSV",
-                exportFunc: () =>
-                  StudDataExcel(),
-              }
+                label: "Export Excel",
+                exportFunc: () => ExportToExcel(filteredData),
+              },
             ],
             actionsColumnIndex: -1,
           }}
@@ -482,7 +477,7 @@ function ViewStudents() {
           <StudentProfileDetailsModal
             selectedRowData={selectedRowData}
             handleStudentProfileModalClose={() => {
-              setStudentProfileModalOpen(false)
+              setStudentProfileModalOpen(false);
               setSelectedRowData(null);
             }}
           />
