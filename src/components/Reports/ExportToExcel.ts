@@ -6,7 +6,13 @@ import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 const companyName = "ORIENT PUBLIC SCHOOL";
 
 const ExportToExcel = (students: StudentDetailsType[]) => {
-  const worksheet = XLSX.utils.json_to_sheet([[companyName]]);
+
+  const headerStyle = {
+    fill: { fgColor: { rgb: "000080" } },
+    font: { color: { rgb: "FFFFFF" }, bold: true, size: 16 }, // Increase font size and make it bold
+  };
+  
+  const worksheet = XLSX.utils.json_to_sheet([[{v:companyName, s:headerStyle}]]);
   const workbook = XLSX.utils.book_new();
 
   // Create a style object for the header cell
@@ -17,10 +23,6 @@ const ExportToExcel = (students: StudentDetailsType[]) => {
     { s: { r: 2, c: 0 }, e: { r: 2, c: 15 } },
     { s: { r: 3, c: 0 }, e: { r: 3, c: 15 } },
   ];
-  const headerStyle = {
-    fill: { fgColor: { rgb: "000080" } },
-    font: { color: { rgb: "FFFFFF" }, bold: true, size: 16 }, // Increase font size and make it bold
-  };
   // Create a worksheet
   XLSX.utils.sheet_add_aoa(worksheet, [
     // Header Title

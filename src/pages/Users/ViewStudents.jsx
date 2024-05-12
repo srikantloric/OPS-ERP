@@ -161,7 +161,7 @@ function ViewStudents() {
   };
 
   const handleNewWindowOpen = async () => {
-    const pdfRes = await StudReportPDF();
+    const pdfRes = await StudReportPDF(filteredData);
     const features =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
     window.open(pdfRes, "_blank", features);
