@@ -21,6 +21,7 @@ import ManualAttendance from "pages/Attendance/ManualAttendance";
 import ViewAttendance from "pages/Attendance/ViewAttendance";
 import AdmissionEnquiry from "pages/Admission/AdmissionEnquiry";
 import AddEnquire from "pages/Admission/AddEnquriStudent";
+import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
 
 const StudentProfilePictureUpdater = Loadable(lazy(()=>import("pages/ProfileUpdater/StudentProfilePictureUpdater")))
 
@@ -89,7 +90,7 @@ function App() {
               />
               <Route
                 path="accountings/generate-monthly-fee"
-                element={<GenerateMonthlyFee />}
+                element={<GenerateMonthlyChallan />}
               />
               <Route
                 path="accountings/generate-custom-fee"
