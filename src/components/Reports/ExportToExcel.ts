@@ -26,7 +26,7 @@ const ExportToExcel = (students: StudentDetailsType[]) => {
   // Create a worksheet
   XLSX.utils.sheet_add_aoa(worksheet, [
     // Header Title
-    [{ v: SCHOOL_NAME, s: headerStyle }],
+    [{ v: SCHOOL_NAME, s:{ font: { bold: true } }}],
     // Subtitle
     ["An English Medium School Based on CBSE Syllabus"],
     // Contact details
@@ -38,6 +38,7 @@ const ExportToExcel = (students: StudentDetailsType[]) => {
     worksheet,
     [
       [
+        "SL.",
         "ID",
         "Name",
         "Fathername",
@@ -57,6 +58,7 @@ const ExportToExcel = (students: StudentDetailsType[]) => {
       worksheet,
       [
         [
+          i+1,
           students[i].admission_no,
           students[i].student_name,
           students[i].father_name,
