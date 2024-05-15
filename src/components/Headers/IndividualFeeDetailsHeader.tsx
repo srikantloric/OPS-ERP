@@ -73,7 +73,7 @@ const IndividualFeeDetailsHeader: React.FC<Props> = ({
           >
             <Typography level="body-sm">Class</Typography>
             <Typography level="title-sm">
-              {getClassNameByValue(studentMasterData.class)}
+              {getClassNameByValue(studentMasterData.class!)}
               {/* {location.state[0].class} */}
             </Typography>
           </div>

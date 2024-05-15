@@ -124,7 +124,7 @@ function GenerateMonthlyChallan() {
       studentData.forEach(async (student) => {
         if (!student.isGenerated) {
           // Create payment entry in subcollection 'PAYMENTS'
-          const subCollDocId = generateAlphanumericUUID(30);
+          const extPaymentCollDOcId = generateAlphanumericUUID(30);
 
           if (
             student.studentData.monthly_fee !== undefined &&
@@ -132,9 +132,9 @@ function GenerateMonthlyChallan() {
             student.studentData.computer_fee !== undefined
           ) {
             const paymentData: IStudentFeeChallan = {
-              docId: subCollDocId,
+              docIdExt: extPaymentCollDOcId,
               studentId: student.studentData.id,
-              challanDocId:feeString,
+              challanDocId: feeString,
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               createdBy: "Admin",
               paymentId: "" + Math.floor(100000 + Math.random() * 900000),
@@ -142,10 +142,10 @@ function GenerateMonthlyChallan() {
               monthYear: monthYear,
               paymentStatus: paymentStatus.DEFAULT,
               paymentDueDate: paymentDueDate,
-              monthlyFee: student.studentData.monthly_fee,
-              computerFee: student.studentData.computer_fee,
+              monthlyFee: student.studentData.monthly_fee!,
+              computerFee: student.studentData.computer_fee!,
               lateFine: lateFine,
-              transportationFee: student.studentData.transportation_fee,
+              transportationFee: student.studentData.transportation_fee!,
             };
 
             var batch = db.batch();
@@ -156,7 +156,12 @@ function GenerateMonthlyChallan() {
               .collection("PAYMENTS")
               .doc(feeString);
 
+            var extPaymentCollRef = db
+              .collection("PAYMENTS")
+              .doc(extPaymentCollDOcId);
+
             batch.set(studentPaymentRef, paymentData);
+            batch.set(extPaymentCollRef, paymentData);
 
             // Update generatedFees array in STUDENTS document
             var studentDocRef = db
@@ -283,6 +288,11 @@ function GenerateMonthlyChallan() {
                     required
                   >
                     <Option value="2024">2024</Option>
+                    <Option value="2023">2023</Option>
+                    <Option value="2022">2022</Option>
+                    <Option value="2021">2021</Option>
+                    <Option value="2020">2020</Option>
+                    <Option value="2019">2019</Option>
                   </Select>
                 </FormControl>
               </Grid>

@@ -160,7 +160,7 @@ export const StudReportPDF = async (students: StudentDetailsType[]) => {
           stringArr.push(item.admission_no);
           stringArr.push(item.student_name);
           stringArr.push(item.father_name);
-          classValue=getClassNameByValue(item.class);
+          classValue=getClassNameByValue(item.class!);
           stringArr.push(classValue? classValue.toString():"");
           stringArr.push(item.section);
           stringArr.push(item.class_roll);

@@ -62,7 +62,7 @@ const ExportToExcel = (students: StudentDetailsType[]) => {
           students[i].admission_no,
           students[i].student_name,
           students[i].father_name,
-          getClassNameByValue(students[i].class),
+          getClassNameByValue(students[i].class!),
           students[i].section,
           students[i].class_roll,
           students[i].contact_number,

@@ -23,7 +23,9 @@ import AdmissionEnquiry from "pages/Admission/AdmissionEnquiry";
 import AddEnquire from "pages/Admission/AddEnquriStudent";
 import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
 
-const StudentProfilePictureUpdater = Loadable(lazy(()=>import("pages/ProfileUpdater/StudentProfilePictureUpdater")))
+const StudentProfilePictureUpdater = Loadable(
+  lazy(() => import("pages/ProfileUpdater/StudentProfilePictureUpdater"))
+);
 
 const ViewStudents = Loadable(lazy(() => import("./pages/Users/ViewStudents")));
 const UnderConstruction = Loadable(
@@ -72,13 +74,13 @@ function App() {
               />
               <Route
                 path="students/Admission-students/add-students/:id"
-                element={< AddEnquire/>}
+                element={<AddEnquire />}
               />
               <Route
                 path="students/Admission-students"
                 element={<AdmissionEnquiry />}
               />
-              
+
               <Route path="students/view-students" element={<ViewStudents />} />
 
               <Route path="/view-faculties" element={<UnderConstruction />} />
@@ -94,7 +96,7 @@ function App() {
               />
               <Route
                 path="accountings/generate-custom-fee"
-                element={<GenerateCustomFee />}
+                element={<GenerateMonthlyChallan />}
               />
               <Route
                 path="attendance/show-student-attendance"
@@ -111,7 +113,10 @@ function App() {
 
               <Route path="feeReciept" element={<FeeReceipt />} />
             </Route>
-            <Route path="update-student-profile-picture" element={<StudentProfilePictureUpdater/>}/>
+            <Route
+              path="update-student-profile-picture"
+              element={<StudentProfilePictureUpdater />}
+            />
             <Route path="/login" element={<AuthenticationLayout />}>
               <Route index element={<Login />} />
             </Route>
