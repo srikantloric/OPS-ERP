@@ -11,7 +11,7 @@ import { Paper } from "@mui/material";
 import FullAttendanceReport from "components/AttendanceReport/FullAttendanceSelected";
 import AttendanceCalendar from "components/Calendar/AttendanceCalendar";
 import { db } from "../../../firebase";
-import { useEffect, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { StudentDetailsType } from "types/student";
 import { enqueueSnackbar } from "notistack";
 import { StudentAttendanceGlobalSchema } from "types/attendance";
@@ -23,27 +23,34 @@ function AttendanceByStudentId() {
   const [loading, setLoading] = useState<boolean>(false);
 
   ///attendance state
-  const [presentDates, setPresentDates] = useState<string[]>(["2024-05-06"]);
+  const [presentDates, setPresentDates] = useState<string[]>([]);
   const [absentDates, setAbsentDates] = useState<string[]>([]);
   const [halfDayDates, setHalfDayDates] = useState<string[]>([]);
   const [notMarkedDates, setNotMarkedDates] = useState([]);
   const [futureDates, setFutureDates] = useState([]);
+  const[totalPresents,setTotalpresent]=useState<number|null>();
+  const[totalAbsents,setTotalAbsents]=useState<number|null>();
+  const[totalHalf,settotalHalf]= useState<number|null>();
+  const[fetchdone,setFetchdone]=useState<boolean>(false);
 
   const [attendanceData, setAttendanceData] = useState<
     StudentAttendanceGlobalSchema[]
   >([]);
 
   useEffect(() => {
-    setAbsentDates(["2024-05-05"]);
-    setHalfDayDates(["2024-05-07"]);
-    setNotMarkedDates([]);
-    setFutureDates([]);
     setAttendanceData([]);
-  }, []);
+    setFutureDates([]);
+    setNotMarkedDates([])
+    setFetchdone(false)
+  }, [searchInput]);
 
-  function handlesearch(): void {
+  const handlesearch = (e:SyntheticEvent) => {
+    e.preventDefault();
     // setfilterdata(undefined)
-    if (searchInput) {
+    if (searchInput === null) {
+      setLoading(false);
+      enqueueSnackbar("Please enter Student Id", { variant: "error" });
+    } else {
       setLoading(true);
       // setfilterdata(undefined)
       console.log(searchInput);
@@ -69,12 +76,50 @@ function AttendanceByStudentId() {
                   document.forEach((doc) => {
                     const data = doc.data().attendanceDate as any;
                     arrAttendance.push(data);
-                    setPresentDates(arrAttendance);
+                    const totalPresentnumber=arrAttendance.length;
+                    setTotalpresent(totalPresentnumber);
+                    setPresentDates(arrAttendance)
                     console.log(presentDates);
                   });
                 }
               });
+            db.collection("STUDENTS")
+              .doc(filterdata[0].id)
+              .collection("ATTENDANCE")
+              .where("attendanceStatus", "==", "H")
+              .get()
+              .then((document) => {
+                if (document.size > 0) {
+                  let arrAttendance: any[] = [];
+                  document.forEach((doc) => {
+                    const data = doc.data().attendanceDate as any;
+                    arrAttendance.push(data);
+                    const halfValue=arrAttendance.length;
+                    settotalHalf(halfValue);
+                    setHalfDayDates(arrAttendance);
+                  });
+                }
+              });
+            db.collection("STUDENTS")
+              .doc(filterdata[0].id)
+              .collection("ATTENDANCE")
+              .where("attendanceStatus", "==", "A")
+              .get()
+              .then((document) => {
+                if (document.size > 0) {
+                  let arrAttendance: any[] = [];
+                  document.forEach((doc) => {
+                    const data = doc.data().attendanceDate as any;
+                    arrAttendance.push(data);
+                  const totalAbsentsValue=arrAttendance.length;
+                  setTotalAbsents(totalAbsentsValue);
+                    setAbsentDates(arrAttendance);
+                    console.log(absentDates);
+                  });
+                }
+              });
             setLoading(false);
+            setFetchdone(true)
             console.log("1=>" + filterdata);
           } else {
             setLoading(false);
@@ -87,11 +132,8 @@ function AttendanceByStudentId() {
           enqueueSnackbar("Invalid Student Id!",{variant:"error"});
           setLoading(false);
         });
-    } else {
-      setLoading(false);
-      enqueueSnackbar("Please enter Student Id", { variant: "error" });
     }
-  }
+  };
 
   const handlePrintAttendance = async () => {
     const pdfRes4 = await FullAttendanceReport(filterdata, attendanceData);
@@ -127,7 +169,7 @@ function AttendanceByStudentId() {
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
             />
-            <Button sx={{ height: 20 }} type="submit" onClick={handlesearch}>
+            <Button sx={{ height: 20 }}  onClick={(e)=>handlesearch(e)} disabled={fetchdone}>
               Search
             </Button>
           </Stack>
@@ -258,14 +300,14 @@ function AttendanceByStudentId() {
                   >
                     <Stack direction="column" alignItems="center">
                       <Typography level="h4" mt={1}>
-                        10
+                        {totalPresents}
                       </Typography>
                       <Typography level="body-sm">Total Present</Typography>
                     </Stack>
 
                     <Stack direction="column" alignItems="center">
                       <Typography level="h4" mt={1}>
-                        6
+                        {totalAbsents}
                       </Typography>
                       <Typography level="body-sm">Total Absents</Typography>
                     </Stack>
@@ -278,7 +320,7 @@ function AttendanceByStudentId() {
                     </Stack>
                     <Stack direction="column" alignItems="center">
                       <Typography level="h4" mt={1}>
-                        5
+                        {totalHalf}
                       </Typography>
                       <Typography level="body-sm">Half Day</Typography>
                     </Stack>

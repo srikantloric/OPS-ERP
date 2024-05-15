@@ -32,6 +32,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 import { SCHOOL_CLASSES } from "config/schoolConfig";
 import { enqueueSnackbar } from "notistack";
+import { Print } from "@mui/icons-material";
 
 const schema = z.object({
   student_name: z.string().min(3),
@@ -154,6 +155,7 @@ const AdmissionEnquiry = () => {
               sx={{ display: "flex", justifyContent: "space-between", mt: 1 }}
             >
               <h3>Admission Enquiry</h3>
+
               <Button
                 variant="plain"
                 startDecorator={<CloseIcon />}
@@ -313,14 +315,25 @@ const AdmissionEnquiry = () => {
           <Typography variant="h5" m={1}>
             Admission Enquires ({enquiryData && enquiryData.length})
           </Typography>
-          <Button
-            startDecorator={<AddIcon />}
-            size="sm"
-            sx={{ m: 2 }}
-            onClick={() => setIsNewEnquiryFormVisible(true)}
-          >
-            Create New Enquiry
-          </Button>
+          <Box>
+            <Button
+              startDecorator={<AddIcon />}
+              size="sm"
+              sx={{ m: 2 }}
+              onClick={() => setIsNewEnquiryFormVisible(true)}
+            >
+              Create New Enquiry
+            </Button>
+            <Button
+              startDecorator={<Print />}
+              target="_blank"
+              color="success"
+              component="a"
+              href="https://firebasestorage.googleapis.com/v0/b/orient-public-school-prod.appspot.com/o/Forms%2Fadmission%20form%20orient.pdf?alt=media&token=4b3db9e7-4e88-4e32-967b-482e72f3864ds"
+            >
+              Admission Form
+            </Button>
+          </Box>
         </Stack>
         <Divider />
         <Table sx={{ mb: 3 }} stripe="even">

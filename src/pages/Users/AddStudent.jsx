@@ -21,25 +21,24 @@ import {
   Typography,
 } from "@mui/material";
 import Styles from "./AddStudent.module.scss";
-import { IconEdit, IconPrinter } from "@tabler/icons-react";
-import ReactToPrint from "react-to-print";
+import { IconEdit } from "@tabler/icons-react";
 import { useDispatch } from "react-redux";
 import { addstudent } from "../../store/studentSlice";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GrainIcon from "@mui/icons-material/Grain";
 import { useSnackbar } from "notistack";
 import { db } from "../../firebase";
-import { FormHelperText, FormLabel} from "@mui/joy";
+import { FormHelperText, FormLabel } from "@mui/joy";
 import { Link } from "react-router-dom";
 import { SCHOOL_CLASSES, SCHOOL_SECTIONS } from "../../config/schoolConfig";
+import { StudentDetailsType } from "types/student";
 
 function AddStudent() {
-  const printRef = useRef();
   const dispatch = useDispatch();
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [monthlyFee, setMonthlyFee] = useState(null);
+  const [monthlyFee, setMonthlyFee] = useState(0);
   const [computerFee, setComputerFee] = useState(0);
   const [transportationFee, setTransportationFee] = useState(0);
   const [admissionFee, setAdmissionFee] = useState(0);
@@ -58,6 +57,8 @@ function AddStudent() {
   };
 
   const [formData, setFormData] = useState({
+    student_id: "",
+    generatedChallans: [],
     student_name: "",
     class_roll: "",
     admission_no: "",
@@ -66,7 +67,7 @@ function AddStudent() {
     gender: "",
     blood_group: "",
     id: "",
-    class: "",
+    class: null,
     section: "",
     email: "",
     cast: "",
@@ -85,12 +86,12 @@ function AddStudent() {
     address: "",
     contact_number: "",
     alternate_number: "",
-    created_at: "",
-    updated_at: "",
-    monthly_fee: "",
-    computer_fee: "",
-    transportation_fee: "",
-    admission_fee: "",
+    created_at: null,
+    updated_at: null,
+    monthly_fee: null,
+    computer_fee: null,
+    transportation_fee: null,
+    admission_fee: null,
   });
 
   const handleSubmit = (event) => {
@@ -101,8 +102,8 @@ function AddStudent() {
       if (admissionFee) {
         formData["monthly_fee"] = monthlyFee;
         formData["computer_fee"] = computerFee;
-        formData["transportation_fee"] = monthlyFee;
-        formData["admission_fee"] = monthlyFee;
+        formData["transportation_fee"] = transportationFee;
+        formData["admission_fee"] = admissionFee;
 
         setLoading(true);
         dispatch(
@@ -113,7 +114,11 @@ function AddStudent() {
             enqueueSnackbar("Successfully Registered", { variant: "success" });
             setLoading(false);
             setSelectedImage(null);
-            formRef.current.reset();
+            setMonthlyFee(0);
+            setTransportationFee(0);
+            setAdmissionFee(0);
+            setComputerFee(0);
+            document.getElementById("student-reg-form").reset();
           })
           .catch((e) => {
             console.log({ "dispatch error": e });
@@ -134,13 +139,7 @@ function AddStudent() {
       .get()
       .then((snap) => {
         if (snap.exists) {
-          console.log(snap.data());
           setDefaultFee(snap.data());
-        } else {
-          enqueueSnackbar(
-            "Default fee cannot be determined! Please set default fee first.",
-            { variant: "warning" }
-          );
         }
       });
   }, []);
@@ -187,12 +186,13 @@ function AddStudent() {
         case 13:
           setMonthlyFee(defaultFee.default_fee_class_13);
           break;
+        case 14:
+          setMonthlyFee(defaultFee.default_fee_class_14);
+          break;
         default:
           setMonthlyFee(0);
           break;
       }
-    } else {
-      enqueueSnackbar("Default fee failed to load!");
     }
   }, [formData.class]);
 
@@ -238,14 +238,9 @@ function AddStudent() {
         >
           <div className={Styles.pageHeader}>
             <h3>Add Student Form</h3>
-            <ReactToPrint
-              content={() => printRef.current}
-              copyStyles={true}
-              trigger={() => <IconPrinter size={45} />}
-            />
           </div>
 
-          <form onSubmit={handleSubmit} ref={formRef}>
+          <form onSubmit={handleSubmit} id="student-reg-form">
             <span className={Styles.inputSeperator}>Personal Details</span>
             <Grid container spacing={2}>
               <Grid item xs={12} md={4}>
@@ -349,22 +344,7 @@ function AddStudent() {
                   required
                 />
               </Grid>
-              {/* <Grid item xs={12} md={4}>
-                <TextField
-                  sx={{ width: "100%" }}
-                  label="Admission Number"
-                  variant="outlined"
-                  inputProps={{ minLength: 6 }}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      admission_no: e.target.value,
-                    }))
-                  }
-                  type="number"
-                  required
-                />
-              </Grid> */}
+
               <Grid item xs={12} md={4}>
                 <TextField
                   sx={{ width: "100%" }}
@@ -686,7 +666,8 @@ function AddStudent() {
                   <OutlinedInput
                     id="outlined-adornment-amount"
                     size="small"
-                    onChange={(e) => setMonthlyFee(e.target.value)}
+                    type="number"
+                    onChange={(e) => setMonthlyFee(parseInt(e.target.value))}
                     disabled={isMonthlyFeeEditable}
                     startAdornment={
                       <InputAdornment position="start">₹</InputAdornment>
@@ -715,7 +696,8 @@ function AddStudent() {
                   <OutlinedInput
                     id="outlined-adornment-amount"
                     size="small"
-                    onChange={(e) => setComputerFee(e.target.value)}
+                    type="number"
+                    onChange={(e) => setComputerFee(parseInt(e.target.value))}
                     disabled={isComputerFeeEditable}
                     startAdornment={
                       <InputAdornment position="start">₹</InputAdornment>
@@ -746,7 +728,10 @@ function AddStudent() {
                   <OutlinedInput
                     id="outlined-adornment-amount"
                     size="small"
-                    onChange={(e) => setTransportationFee(e.target.value)}
+                    type="number"
+                    onChange={(e) =>
+                      setTransportationFee(parseInt(e.target.value))
+                    }
                     disabled={isTransportationFeeEditable}
                     startAdornment={
                       <InputAdornment position="start">₹</InputAdornment>
@@ -777,7 +762,8 @@ function AddStudent() {
                   <OutlinedInput
                     id="outlined-adornment-amount"
                     size="small"
-                    onChange={(e) => setAdmissionFee(e.target.value)}
+                    type="number"
+                    onChange={(e) => setAdmissionFee(parseInt(e.target.value))}
                     disabled={isAdmissionFeeEditable}
                     startAdornment={
                       <InputAdornment position="start">₹</InputAdornment>

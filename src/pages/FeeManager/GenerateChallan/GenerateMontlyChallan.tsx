@@ -11,7 +11,7 @@ import {
   Select,
   Table,
 } from "@mui/joy";
-import { Box,Paper } from "@mui/material";
+import { Box, Checkbox, FormControlLabel, Paper } from "@mui/material";
 import { IconAdjustmentsExclamation } from "@tabler/icons-react";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
 import HeaderTitleCard from "components/Card/HeaderTitleCard";
@@ -19,16 +19,18 @@ import Navbar from "components/Navbar/Navbar";
 import LSPage from "components/Utils/LSPage";
 import PageContainer from "components/Utils/PageContainer";
 import { SCHOOL_CLASSES, SCHOOL_FEE_MONTHS } from "config/schoolConfig";
-import { db } from "../../firebase";
+import { db } from "../../../firebase";
 import { useState } from "react";
 
-import { StudentDetailsType, StudentFeeDetailsType } from "types/student";
+import { IStudentFeeChallan, StudentDetailsType } from "types/student";
 import {
   generateAlphanumericUUID,
+  getChallanTitle,
+  getPaymentDueDate,
   makeDoubleDigit,
 } from "utilities/UtilitiesFunctions";
 import firebase from "firebase";
-import { FEE_HEADERS} from "constants/index";
+import { FEE_TYPE_MONTHLY, paymentStatus } from "constants/index";
 import { enqueueSnackbar } from "notistack";
 
 type StudentFeeDataType = {
@@ -37,27 +39,28 @@ type StudentFeeDataType = {
   errorLog: string;
 };
 
-function GenerateCustomFee() {
+function GenerateMonthlyChallan() {
   const [loading, setLoading] = useState(false);
   //form State
-  const [selectedFeeHeader, setSelectedFeeHeader] = useState<string | null>(
-    null
-  );
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
   const [selectedYear, setSelectedYear] = useState<string | null>();
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [studentData, setStudentData] = useState<StudentFeeDataType[]>([]);
+  const [paymentDueDate, setPaymentDueDate] = useState<string>(
+    getPaymentDueDate()
+  );
+  const [lateFine, setLateFine] = useState<number>(0);
 
   const handleFetch = async (e: any) => {
     e.preventDefault();
-    //Reset old state
+    // //Reset old state
     setStudentData([]);
 
     const feeString =
-      "FEE" +
-      selectedYear +
+      "CHALLAN" +
       makeDoubleDigit(selectedMonth!.toString()) +
-      selectedFeeHeader;
+      selectedYear +
+      FEE_TYPE_MONTHLY;
     setLoading(true);
     db.collection("STUDENTS")
       .where("class", "==", selectedClass)
@@ -65,18 +68,27 @@ function GenerateCustomFee() {
       .then((documetSnap) => {
         if (!documetSnap.empty) {
           let tempStudentArray: StudentFeeDataType[] = [];
+
           documetSnap.forEach((snap) => {
             const docData = snap.data() as StudentDetailsType;
-            if (!docData.generated_fee.includes(feeString)) {
-              tempStudentArray.push({
-                studentData: docData,
-                isGenerated: false,
-                errorLog: "_",
-              });
+            if (docData.generatedChallans !== undefined) {
+              if (!docData.generatedChallans.includes(feeString)) {
+                tempStudentArray.push({
+                  studentData: docData,
+                  isGenerated: false,
+                  errorLog: "_",
+                });
+              } else {
+                tempStudentArray.push({
+                  studentData: docData,
+                  isGenerated: true,
+                  errorLog: "already generated",
+                });
+              }
             } else {
               tempStudentArray.push({
                 studentData: docData,
-                isGenerated: true,
+                isGenerated: false,
                 errorLog: "_",
               });
             }
@@ -93,83 +105,122 @@ function GenerateCustomFee() {
       });
   };
   const generateFee = () => {
-    const feeString =
-      "FEE" +
-      selectedYear +
-      makeDoubleDigit(selectedMonth!.toString()) +
-      selectedFeeHeader;
+    //challan string
+    const monthYear = `${makeDoubleDigit(
+      selectedMonth!.toString()
+    )}${selectedYear}`;
+
+    const feeString = `CHALLAN${monthYear}`;
+
+    const feeChallanCode = `CHALLAN${makeDoubleDigit(
+      selectedMonth!.toString()
+    )}${selectedYear}M01`;
+
     if (studentData.length > 0) {
       const tempArr: StudentFeeDataType[] = [];
+
+      var promises: Promise<void>[] = [];
 
       studentData.forEach(async (student) => {
         if (!student.isGenerated) {
           // Create payment entry in subcollection 'PAYMENTS'
-          const subCollDocId = generateAlphanumericUUID(30);
-          const paymentData: StudentFeeDetailsType = {
-            credit_by: "",
-            student_id: student.studentData.student_id,
-            doc_id: subCollDocId,
-            discount_amount: 0,
-            fee_title: selectedFeeHeader!,
-            fee_total: 0,
-            transportation_fee: 0,
-            computer_fee: 0,
-            id: "" + Math.floor(100000 + Math.random() * 900000),
-            late_fee: 0,
-            paid_amount: 0,
-            payment_date: null,
-            created_at: firebase.firestore.FieldValue.serverTimestamp(),
-            payment_mode: "",
-            payment_remarks: "",
-            fee_month_year: "" + selectedMonth + "/" + selectedYear,
-            is_payment_done: false,
-            payment_due_date: new Date(),
-            fee_header_type: feeString,
-          };
+          const extPaymentCollDOcId = generateAlphanumericUUID(30);
 
-          try {
-            await db
+          if (
+            student.studentData.monthly_fee !== undefined &&
+            student.studentData.transportation_fee !== undefined &&
+            student.studentData.computer_fee !== undefined
+          ) {
+            const paymentData: IStudentFeeChallan = {
+              docIdExt: extPaymentCollDOcId,
+              studentId: student.studentData.id,
+              challanDocId: feeString,
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdBy: "Admin",
+              paymentId: "" + Math.floor(100000 + Math.random() * 900000),
+              challanTitle: getChallanTitle(selectedMonth!, selectedYear!),
+              monthYear: monthYear,
+              paymentStatus: paymentStatus.DEFAULT,
+              paymentDueDate: paymentDueDate,
+              monthlyFee: student.studentData.monthly_fee!,
+              computerFee: student.studentData.computer_fee!,
+              lateFine: lateFine,
+              transportationFee: student.studentData.transportation_fee!,
+            };
+
+            var batch = db.batch();
+
+            var studentPaymentRef = db
               .collection("STUDENTS")
               .doc(student.studentData.id)
               .collection("PAYMENTS")
-              .doc(subCollDocId)
-              .set(paymentData);
+              .doc(feeString);
+
+            var extPaymentCollRef = db
+              .collection("PAYMENTS")
+              .doc(extPaymentCollDOcId);
+
+            batch.set(studentPaymentRef, paymentData);
+            batch.set(extPaymentCollRef, paymentData);
+
             // Update generatedFees array in STUDENTS document
-            await db
+            var studentDocRef = db
               .collection("STUDENTS")
-              .doc(student.studentData.id)
-              .update({
-                generated_fee: [
-                  ...student.studentData.generated_fee,
-                  feeString,
-                ],
+              .doc(student.studentData.id);
+
+            if (student.studentData.generatedChallans) {
+              var arrT = student.studentData.generatedChallans;
+              arrT.push(feeChallanCode);
+              // Update the document by appending the feeChallanCode string to the generatedChallans array
+              batch.update(studentDocRef, {
+                generatedChallans: arrT,
               });
-            const successData: StudentFeeDataType = {
-              isGenerated: true,
-              studentData: student.studentData,
-              errorLog: "_",
-            };
-            tempArr.push(successData);
-          } catch (e) {
-            console.log("ERROR While Generating Fee", e);
+            } else {
+              var arrTem: string[] = [];
+              arrTem.push(feeChallanCode);
+              batch.update(studentDocRef, {
+                generatedChallans: arrTem,
+              });
+            }
+            // Push the Promise returned by batch.commit() into the promises array
+            promises.push(
+              new Promise((resolve, reject) => {
+                // Commit the batch
+                batch
+                  .commit()
+                  .then(() => {
+                    const successData: StudentFeeDataType = {
+                      isGenerated: true,
+                      studentData: student.studentData,
+                      errorLog: "Generated successfully",
+                    };
+                    tempArr.push(successData);
+                    resolve();
+                  })
+                  .catch((error) => {
+                    console.error("Error during batch commit:", error);
+                    reject(error);
+                  });
+              })
+            );
+          } else {
             const failureData: StudentFeeDataType = {
               isGenerated: false,
               studentData: student.studentData,
-              errorLog: "Error while generating",
+              errorLog: "Monthly/Computer/Trans. not found",
             };
             tempArr.push(failureData);
           }
-        } else {
-          const successData: StudentFeeDataType = {
-            isGenerated: true,
-            studentData: student.studentData,
-            errorLog: "_",
-          };
-          tempArr.push(successData);
         }
       });
-
-      setStudentData(tempArr);
+      // Wait for all Promises (batch commits) to resolve
+      Promise.all(promises)
+        .then(() => {
+          setStudentData(tempArr);
+        })
+        .catch((error) => {
+          console.error("Error during batch commits:", error);
+        });
     }
   };
 
@@ -179,38 +230,20 @@ function GenerateCustomFee() {
       <LSPage>
         <BreadCrumbsV2
           Icon={IconAdjustmentsExclamation}
-          Path="Accountings/Generate Custom Fee"
+          Path="Accountings/Generate Monthly Fee"
         />
-        <HeaderTitleCard Title="Generate Custom Fee" />
+        <HeaderTitleCard Title="Generate Monthly Fee" />
         <br />
         <Paper sx={{ pl: 2, pr: 2, pt: 2, pb: 3 }}>
           <Box component="form" onSubmit={handleFetch}>
             <Grid container spacing={2} sx={{ flexGrow: 1 }}>
               <Grid xs={2}>
                 <FormControl>
-                  <FormLabel>Fee Header</FormLabel>
-                  <Select
-                    defaultValue={null}
-                    required
-                    value={selectedFeeHeader}
-                    onChange={(e, val) => setSelectedFeeHeader(val)}
-                  >
-                    {FEE_HEADERS.map((item, key) => {
-                      return (
-                        <Option key={key} value={item.value}>
-                          {item.title}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid xs={2}>
-                <FormControl>
                   <FormLabel>Select Class</FormLabel>
                   <Select
                     defaultValue={null}
                     value={selectedClass}
+                    placeholder="select class.."
                     onChange={(e, val) => setSelectedClass(val)}
                     required
                   >
@@ -230,6 +263,7 @@ function GenerateCustomFee() {
                   <Select
                     defaultValue={null}
                     value={selectedMonth}
+                    placeholder="select month.."
                     onChange={(e, val) => setSelectedMonth(val)}
                     required
                   >
@@ -249,10 +283,16 @@ function GenerateCustomFee() {
                   <Select
                     defaultValue={null}
                     value={selectedYear}
+                    placeholder="select year.."
                     onChange={(e, val) => setSelectedYear(val)}
                     required
                   >
                     <Option value="2024">2024</Option>
+                    <Option value="2023">2023</Option>
+                    <Option value="2022">2022</Option>
+                    <Option value="2021">2021</Option>
+                    <Option value="2020">2020</Option>
+                    <Option value="2019">2019</Option>
                   </Select>
                 </FormControl>
               </Grid>
@@ -260,16 +300,33 @@ function GenerateCustomFee() {
               <Grid xs={2}>
                 <FormControl>
                   <FormLabel>Due Date</FormLabel>
-                  <Input type="date" required />
+                  <Input
+                    type="date"
+                    required
+                    value={paymentDueDate}
+                    placeholder="select due date.."
+                    onChange={(e) => setPaymentDueDate(e.currentTarget.value)}
+                  />
                 </FormControl>
               </Grid>
               <Grid xs={2}>
                 <FormControl>
                   <FormLabel>Late Fine</FormLabel>
-                  <Input type="number" required />
+                  <Input
+                    type="number"
+                    required
+                    value={lateFine}
+                    onChange={(e) =>
+                      setLateFine(parseInt(e.currentTarget.value))
+                    }
+                  />
                 </FormControl>
               </Grid>
-            
+              <FormControlLabel
+                sx={{ ml: 1 }}
+                control={<Checkbox defaultChecked />}
+                label="Include Transportation Fee"
+              />
               <br />
               <Button
                 type="submit"
@@ -308,13 +365,13 @@ function GenerateCustomFee() {
           >
             <thead>
               <tr>
-                <th style={{ width: "100px" }}>Profile</th>
+                <th style={{ width: "50px" }}>Profile</th>
                 <th>ID</th>
                 <th>Name</th>
                 <th>DOB</th>
                 <th>Father</th>
                 <th>Status</th>
-                <th>error</th>
+                <th style={{ width: "200px" }}>message</th>
               </tr>
             </thead>
             <tbody>
@@ -347,4 +404,4 @@ function GenerateCustomFee() {
   );
 }
 
-export default GenerateCustomFee;
+export default GenerateMonthlyChallan;

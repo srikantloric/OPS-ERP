@@ -7,12 +7,11 @@ export const store = configureStore({
   reducer: {
     students: studentslice,
     teachers: facultiesSlice,
-    
-
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),
 });
+
 
