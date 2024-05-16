@@ -98,38 +98,41 @@ function AddStudent() {
     event.preventDefault();
     // console.log(selectedImage);
 
-    if (monthlyFee) {
-      if (admissionFee) {
-        formData["monthly_fee"] = monthlyFee;
-        formData["computer_fee"] = computerFee;
-        formData["transportation_fee"] = transportationFee;
-        formData["admission_fee"] = admissionFee;
+    if (formData.contact_number.length !== 10) {
+      enqueueSnackbar("Please enter correct contact detail!", {
+        variant: "error",
+      });
+      return;
+    }
 
-        setLoading(true);
-        dispatch(
-          addstudent({ studentData: formData, studentProfile: selectedImage })
-        )
-          .unwrap()
-          .then((d) => {
-            enqueueSnackbar("Successfully Registered", { variant: "success" });
-            setLoading(false);
-            setSelectedImage(null);
-            setMonthlyFee(0);
-            setTransportationFee(0);
-            setAdmissionFee(0);
-            setComputerFee(0);
-            document.getElementById("student-reg-form").reset();
-          })
-          .catch((e) => {
-            console.log({ "dispatch error": e });
-            enqueueSnackbar(e, { variant: "error" });
-            setLoading(false);
-          });
-      } else {
-        enqueueSnackbar("Please enter admission fee!");
-      }
+    if (monthlyFee) {
+      formData["monthly_fee"] = monthlyFee;
+      formData["computer_fee"] = computerFee;
+      formData["transportation_fee"] = transportationFee;
+      formData["admission_fee"] = admissionFee;
+
+      setLoading(true);
+      dispatch(
+        addstudent({ studentData: formData, studentProfile: selectedImage })
+      )
+        .unwrap()
+        .then((d) => {
+          enqueueSnackbar("Successfully Registered", { variant: "success" });
+          setLoading(false);
+          setSelectedImage(null);
+          setMonthlyFee(0);
+          setTransportationFee(0);
+          setAdmissionFee(0);
+          setComputerFee(0);
+          document.getElementById("student-reg-form").reset();
+        })
+        .catch((e) => {
+          console.log({ "dispatch error": e });
+          enqueueSnackbar(e, { variant: "error" });
+          setLoading(false);
+        });
     } else {
-      enqueueSnackbar("Please enter monthly fee!");
+      enqueueSnackbar("Please enter monthly fee!", { variant: "error" });
     }
   };
 
@@ -659,7 +662,7 @@ function AddStudent() {
                 md={2}
                 sx={{ display: "flex", alignItems: "center", gap: "2px" }}
               >
-                <FormControl fullWidth sx={{ m: 1 }}>
+                <FormControl fullWidth sx={{ m: 1 }} required>
                   <InputLabel htmlFor="outlined-adornment-amount">
                     Monthly Fee
                   </InputLabel>
@@ -704,7 +707,6 @@ function AddStudent() {
                     }
                     value={computerFee}
                     label="Computer Fee"
-                    required
                   />
                 </FormControl>
                 <IconEdit
@@ -738,7 +740,6 @@ function AddStudent() {
                     }
                     value={transportationFee}
                     label="Transportation Fee"
-                    required
                   />
                 </FormControl>
                 <IconEdit
@@ -755,7 +756,7 @@ function AddStudent() {
                 md={2}
                 sx={{ display: "flex", alignItems: "center", gap: "2px" }}
               >
-                <FormControl fullWidth sx={{ m: 1 }} required>
+                <FormControl fullWidth sx={{ m: 1 }}>
                   <InputLabel htmlFor="outlined-adornment-amount">
                     Admission Fee
                   </InputLabel>
@@ -770,7 +771,6 @@ function AddStudent() {
                     }
                     value={admissionFee}
                     label="Admission Fee"
-                    required
                   />
                 </FormControl>
                 <IconEdit
