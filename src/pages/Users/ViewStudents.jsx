@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 
 import Styles from "./ViewStudents.module.scss";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import BadgeIcon from "@mui/icons-material/Badge";
 import GrainIcon from "@mui/icons-material/Grain";
 import SearchIcon from "@mui/icons-material/Search";
@@ -45,6 +45,7 @@ import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsM
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 import { StudReportPDF } from "components/StudentDetailsReport/StudentReportGeneratorPDF";
 import ExportToExcel from "components/Reports/ExportToExcel";
+import { Avatar } from "@mui/joy";
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);
@@ -173,14 +174,25 @@ function ViewStudents() {
       field: "student_id",
       title: "ID",
       render: (rowData) => {
-        const id = "" + rowData.student_id;
-
-        return <h5>{id.split("@")[0].toLocaleUpperCase()}</h5>;
+        return (
+          <Link
+            to={`/students/profile/${rowData.id}`}
+            style={{
+              fontSize: "14px",
+              textDecoration: "none",
+              fontWeight: "500",
+              color: "var(--bs-primary-text)",
+            }}
+          >
+            {rowData.admission_no}
+          </Link>
+        );
       },
     },
     {
       title: "Profile",
       field: "profil_url",
+
       export: false,
       render: (rowData) => {
         const styles = {
@@ -190,9 +202,7 @@ function ViewStudents() {
           cursor: "pointer",
           objectFit: "cover",
         };
-        return (
-          <img src={rowData.profil_url} style={styles} alt="profile-student" />
-        );
+        return <Avatar src={rowData.profil_url} alt="profile-student" />;
       },
     },
 
@@ -206,6 +216,7 @@ function ViewStudents() {
     },
     { field: "section", title: "Section" },
     { field: "class_roll", title: "Roll" },
+    { field: "father_name", title: "Father Name" },
     { field: "contact_number", title: " Contact number" },
   ];
   const handleDelete = () => {
@@ -457,15 +468,15 @@ function ViewStudents() {
             <ListItemIcon>
               <PersonIcon fontSize="small" />
             </ListItemIcon>
-            View Profile
+            View Quick Profile
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleMenuClick}>
+          {/* <MenuItem onClick={handleMenuClick}>
             <ListItemIcon>
               <BadgeIcon fontSize="small" />
             </ListItemIcon>
             Generate ID Card
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem onClick={handleMenuClick}>
             <ListItemIcon>
               <BlockIcon fontSize="small" />

@@ -18,8 +18,7 @@ import {
 import { SCHOOL_CLASSES, SCHOOL_SECTIONS } from "config/schoolConfig";
 import { Edit } from "iconsax-react";
 
-
-const VisuallyHiddenInput = styled('input')`
+const VisuallyHiddenInput = styled("input")`
   clip: rect(0 0 0 0);
   clip-path: inset(50%);
   height: 1px;
@@ -30,8 +29,6 @@ const VisuallyHiddenInput = styled('input')`
   white-space: nowrap;
   width: 1px;
 `;
-
-
 
 function PersonalTab() {
   return (
@@ -305,7 +302,15 @@ function PersonalTab() {
               <Typography level="title-md">Update Profile Picture</Typography>
             </Stack>
             <Divider />
-            <Box sx={{ p: "1rem", display: "flex", justifyContent: "center",alignItems:"center",gap:"1rem" }}>
+            <Box
+              sx={{
+                p: "1rem",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: "1rem",
+              }}
+            >
               <Avatar
                 alt="Remy Sharp"
                 sx={{ "--Avatar-size": "6rem" }}
@@ -317,7 +322,7 @@ function PersonalTab() {
                 tabIndex={-1}
                 variant="outlined"
                 color="neutral"
-                sx={{height:"20px"}}
+                sx={{ height: "20px" }}
                 startDecorator={
                   <SvgIcon>
                     <svg
