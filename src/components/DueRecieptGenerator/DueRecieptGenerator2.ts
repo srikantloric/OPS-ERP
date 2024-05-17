@@ -373,7 +373,7 @@ export const generateDueReciept2 = async (
         doc.text("Rs 3000",x+x_padd*2+10,feeTypeLayoutHeight + 22);
 
         //Circle Date
-        doc.text("15-04-24",x+10,feeTypeLayoutHeight + 30);
+        doc.text(data.due_date,x+10,feeTypeLayoutHeight + 30);
         doc.text("05-05-24",x+x_padd+10,feeTypeLayoutHeight + 30);
         doc.text("01-06-24",x+x_padd*2+10,feeTypeLayoutHeight + 30);
 
