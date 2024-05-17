@@ -8,7 +8,7 @@ import Navbar from "components/Navbar/Navbar";
 import LSPage from "components/Utils/LSPage";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Book, Moneys, Profile, Setting4, TableDocument } from "iconsax-react";
+import { Book, Moneys, Profile, Setting4, UserEdit } from "iconsax-react";
 import { Box, TabPanel, Typography } from "@mui/joy";
 import ProfileTab from "./Tabs/ProfileTab";
 import PersonalTab from "./Tabs/PersonalTab";
@@ -47,7 +47,7 @@ function ViewStudentProfile() {
               </Tab>
               <Tab>
                 <ListItemDecorator>
-                  <TableDocument size="18" />
+                  <UserEdit size="18" />
                 </ListItemDecorator>
                 Personal
               </Tab>
