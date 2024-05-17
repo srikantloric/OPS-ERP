@@ -345,7 +345,40 @@ export const generateDueReciept2 = async (
         doc.setFont("Poppins", "semibold");
         doc.setTextColor("#FF0000");
         doc.setFontSize(9);
-        doc.text("!!Thank you very much!!", x + 30, feeTypeLayoutHeight + 22);
+        // doc.text("!!Thank you very much!!", x + 30, feeTypeLayoutHeight + 22);
+
+        //Draw Circle //Danny
+        let x_padd=cardWidth/3;
+        doc.setDrawColor("#000");
+        doc.circle(x+15,feeTypeLayoutHeight + 25,2);
+        doc.circle(x+x_padd+15,feeTypeLayoutHeight + 25,2);
+        doc.circle(x+x_padd*2+15,feeTypeLayoutHeight + 25,2);
+
+        doc.line(x+17,feeTypeLayoutHeight + 25,x+x_padd+13,feeTypeLayoutHeight + 25);
+        doc.line(x+x_padd+17,feeTypeLayoutHeight + 25,x+x_padd*2+13,feeTypeLayoutHeight + 25);
+
+        
+        //Circle text
+        doc.setFont("Poppins", "semibold");
+        doc.setTextColor("#000");
+        doc.setFontSize(7);
+        doc.text("1",x+14.5,feeTypeLayoutHeight + 25.75);
+        doc.text("2",x+x_padd+14.5,feeTypeLayoutHeight + 25.75);
+        doc.text("",x+x_padd*2+14.5,feeTypeLayoutHeight + 25.75);
+
+        //Circle Amount
+        doc.text("Challan Amount",x+10,feeTypeLayoutHeight + 19);
+        doc.text("Rs 5000",x+10,feeTypeLayoutHeight + 22);
+        doc.text("Rs 2000",x+x_padd+10,feeTypeLayoutHeight + 22);
+        doc.text("Rs 3000",x+x_padd*2+10,feeTypeLayoutHeight + 22);
+
+        //Circle Date
+        doc.text("15-04-24",x+10,feeTypeLayoutHeight + 30);
+        doc.text("05-05-24",x+x_padd+10,feeTypeLayoutHeight + 30);
+        doc.text("01-06-24",x+x_padd*2+10,feeTypeLayoutHeight + 30);
+
+        //Danny
+
 
         ///End Of PDF DESIGN
         // Draw border around content
