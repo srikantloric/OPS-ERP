@@ -1,38 +1,18 @@
 import firebase from "firebase";
 
-export type StudentDetailsType = {
+export type FacultyDetailsType = {
   faculty_number: string;
-  fa: string;
-  admission_no: string;
-  alternate_number: string;
-  blood_group: string;
-  cast: string;
-  city: string;
-  class: number;
-  class_roll: string;
-  contact_number: string;
-  date_of_addmission: string;
-  dob: string;
-  email: string;
-  father_name: string;
-  father_occupation: string;
-  father_qualification: string;
-  gender: string;
+  faculty_address: string;
+  faculty_email: string;
+  faculty_gender: string;
+  faculty_pass: string;
+  faculty_phone: number;
+  faculty_qualification: string;
   id: string;
-  mother_name: string;
-  mother_occupation: string;
-  motherqualifiation: string;
-  postal_code: string;
-  profil_url: string;
-  religion: string;
-  section: string;
-  state: string;
-  student_id: string;
-  student_name: string;
-  monthly_fee?: number;
-  computer_fee: number;
+  faculty_image: string;
+  faculty_name: string;
+
   created_at?: firebase.firestore.Timestamp | firebase.firestore.FieldValue;
-  transportation_fee: number;
+
   generated_fee: string[];
-  fee_discount?: number;
 };

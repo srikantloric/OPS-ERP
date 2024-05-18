@@ -3,7 +3,7 @@ import FingerprintIcon from "@mui/icons-material/Fingerprint";
 
 import { Divider, LinearProgress, Paper } from "@mui/material";
 import PageContainer from "components/Utils/PageContainer";
-import firebase from "firebase";
+// import firebase from "firebase";
 import SaveIcon from "@mui/icons-material/Save";
 
 import {
@@ -22,18 +22,17 @@ import {
   Table,
 } from "@mui/joy";
 import { useState } from "react";
-import { getCurrentDate, makeDoubleDigit } from "utilities/UtilitiesFunctions";
+import { getCurrentDate } from "utilities/UtilitiesFunctions";
 import Search from "@mui/icons-material/Search";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
 import HeaderTitleCard from "components/Card/HeaderTitleCard";
 import LSPage from "components/Utils/LSPage";
-import { StudentDetailsType } from "types/student";
-import { StudentAttendanceSchema } from "types/attendance";
-import { SCHOOL_CLASSES } from "config/schoolConfig";
-import { enqueueSnackbar } from "notistack";
-import { db } from "../../firebase";
 
-interface StudentAttendanceType extends StudentDetailsType {
+import { SCHOOL_CLASSES } from "config/schoolConfig";
+
+import { FacultyDetailsType } from "types/facuities";
+
+interface FacultyAttendanceType extends FacultyDetailsType {
   selected_option?: string | null;
   comment?: string;
 }
@@ -41,7 +40,7 @@ interface StudentAttendanceType extends StudentDetailsType {
 export const FacultyAttendance = () => {
   const [selectedClass, setSelectedClass] = useState<number | null>(null);
 
-  const [studentData, setStudentData] = useState<StudentAttendanceType[]>([]);
+  const [FacultyData, setFacultyData] = useState<FacultyAttendanceType[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(getCurrentDate());
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -49,39 +48,37 @@ export const FacultyAttendance = () => {
   const [isSavingDone, setSavingDone] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
 
-  const filteredStudents = studentData.filter((student) => {
-    const isMatchedByName = student.student_name
+  const filteredStudents = FacultyData.filter((facuities) => {
+    const isMatchedByName = facuities.faculty_name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     return isMatchedByName;
   });
 
-  
-
   const handleRadioSelect = (
     e: React.ChangeEvent<HTMLInputElement>,
-    student: StudentAttendanceType
+    faculty: FacultyAttendanceType
   ) => {
-    const updatedStudents = studentData.map((item) =>
-      item.id === student.id
-        ? { ...student, selected_option: e.target.value }
+    const updatedStudents = FacultyData.map((item) =>
+      item.id === faculty.id
+        ? { ...faculty, selected_option: e.target.value }
         : item
     );
-    setStudentData(updatedStudents);
+    setFacultyData(updatedStudents);
   };
 
   const handleMarkAll = (val: string | null) => {
-    const updatedStudent = studentData.map((item) => {
+    const updatedStudent = FacultyData.map((item) => {
       return { ...item, selected_option: val };
     });
-    setStudentData(updatedStudent);
+    setFacultyData(updatedStudent);
   };
 
   const handleAttendanceComment = (comment: string, studentId: string) => {
-    const updatedStudents = studentData.map((item) =>
+    const updatedStudents = FacultyData.map((item) =>
       item.id === studentId ? { ...item, comment } : item
     );
-    setStudentData(updatedStudents);
+    setFacultyData(updatedStudents);
   };
   return (
     <>
@@ -140,7 +137,7 @@ export const FacultyAttendance = () => {
                 <Button sx={{ height: 20 }} type="submit">
                   Fetch
                 </Button>
-                {studentData.length > 0 ? (
+                {FacultyData.length > 0 ? (
                   <Button
                     startDecorator={<SaveIcon />}
                     sx={{ height: 20 }}
@@ -166,7 +163,7 @@ export const FacultyAttendance = () => {
             ) : null}
             <br />
             {loading ? <LinearProgress /> : null}
-            {studentData.length !== 0 ? (
+            {FacultyData.length !== 0 ? (
               <>
                 <Divider />
                 <br />
@@ -182,7 +179,7 @@ export const FacultyAttendance = () => {
                     defaultValue="P"
                     placeholder="Mark all as"
                     sx={{ minWidth: "200px" }}
-                    //   onChange={(e, val) => handleMarkAll(val)}
+                    onChange={(e, val) => handleMarkAll(val)}
                   >
                     <Option value="none">None </Option>
                     <Option value="P">Present</Option>
@@ -210,10 +207,10 @@ export const FacultyAttendance = () => {
                     </thead>
                     <tbody>
                       {filteredStudents &&
-                        filteredStudents.map((student, i) => {
+                        filteredStudents.map((faculty, i) => {
                           return (
-                            <tr key={student.id}>
-                              <td>{student.admission_no}</td>
+                            <tr key={faculty.id}>
+                              <td>{faculty.faculty_number}</td>
                               <td>
                                 <div
                                   style={{
@@ -222,18 +219,18 @@ export const FacultyAttendance = () => {
                                     gap: "10px",
                                   }}
                                 >
-                                  <Avatar src={student.profil_url} />
-                                  {student.student_name}
+                                  <Avatar src={faculty.faculty_image} />
+                                  {faculty.faculty_name}
                                 </div>
                               </td>
                               <td>
                                 <RadioGroup
                                   aria-labelledby="storage-label"
-                                  value={student.selected_option}
+                                  value={faculty.selected_option}
                                   defaultValue="P"
-                                  //                 onChange={(e) =>
-                                  //                   handleRadioSelect(e, student)
-                                  //                 }
+                                  onChange={(e) =>
+                                    handleRadioSelect(e, faculty)
+                                  }
                                   size="sm"
                                   sx={{
                                     display: "flex",
@@ -288,12 +285,12 @@ export const FacultyAttendance = () => {
                               <td>
                                 <Input
                                   type="text"
-                                  //                 onChange={(e) =>
-                                  //                   handleAttendanceComment(
-                                  //                     e.target.value,
-                                  //                     student.id
-                                  //                   )
-                                  //                 }
+                                  onChange={(e) =>
+                                    handleAttendanceComment(
+                                      e.target.value,
+                                      faculty.id
+                                    )
+                                  }
                                 />
                               </td>
                             </tr>
