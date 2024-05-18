@@ -3,8 +3,17 @@ import CallIcon from "@mui/icons-material/Call";
 import EmailIcon from "@mui/icons-material/Email";
 import MyLocationIcon from "@mui/icons-material/MyLocation";
 import { Dash, InfoCircle } from "iconsax-react";
+import { StudentDetailsType } from "types/student";
+import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 
-function ProfileTab() {
+interface StudentProfileProps {
+  studentData: StudentDetailsType;
+}
+
+const ProfileTab:React.FC<StudentProfileProps>=({studentData}) =>{
+
+  console.log(studentData)
+
   return (
     <Box sx={{ display: "flex", gap: "1.6rem", mt: "1rem" }}>
       <Box
@@ -17,7 +26,7 @@ function ProfileTab() {
       >
         <Stack alignItems="center">
           <Avatar
-            src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600"
+            src={studentData.profil_url}
             sx={{ "--Avatar-size": "5rem", mt: "10px" }}
           />
           <Chip
@@ -33,26 +42,26 @@ function ProfileTab() {
           >
             NEW
           </Chip>
-          <Typography level="title-lg">Josephine Blanton</Typography>
+          <Typography level="title-lg">{studentData.student_name}</Typography>
           <Typography level="body-md" sx={{ textAlign: "center" }}>
-            OPS202300023
+            {studentData.admission_no}
           </Typography>
           <Divider
             sx={{ ml: "20px", mr: "20px", mt: "1.5rem", mb: "1.2rem" }}
           />
           <Stack direction={"row"} gap={"1rem"}>
             <Stack>
-              <Typography level="title-md">STD-1</Typography>
+              <Typography level="title-md">{getClassNameByValue(studentData.class!)}</Typography>
               <Typography level="body-md">Class</Typography>
             </Stack>
             <Divider orientation="vertical" />
             <Stack alignItems={"center"}>
-              <Typography level="title-md">21</Typography>
+              <Typography level="title-md">{studentData.class_roll}</Typography>
               <Typography level="body-md">Roll No</Typography>
             </Stack>
             <Divider orientation="vertical" />
             <Stack alignItems={"center"}>
-              <Typography level="title-md">A</Typography>
+              <Typography level="title-md">{studentData.section}</Typography>
               <Typography level="body-md">Section</Typography>
             </Stack>
           </Stack>
@@ -78,7 +87,7 @@ function ProfileTab() {
                 </th>
                 <th style={{ textAlign: "end" }}>
                   <Typography level="body-sm" sx={{ fontWeight: "500" }}>
-                    +91-7979080633
+                    +91-{studentData.contact_number}
                   </Typography>
                 </th>
               </tr>
@@ -90,7 +99,7 @@ function ProfileTab() {
                 </th>
                 <th style={{ textAlign: "end" }}>
                   <Typography level="body-sm" sx={{ fontWeight: "500" }}>
-                    test@gmail.com
+                    {studentData.email}
                   </Typography>
                 </th>
               </tr>
@@ -102,7 +111,7 @@ function ProfileTab() {
                 </th>
                 <th style={{ textAlign: "end" }}>
                   <Typography level="body-sm" sx={{ fontWeight: "500" }}>
-                    Giridih
+                    {studentData.address}
                   </Typography>
                 </th>
               </tr>
@@ -127,43 +136,43 @@ function ProfileTab() {
                 <tr>
                   <td>
                     <Typography level="body-sm">Full Name</Typography>
-                    <Typography level="title-md">Srikant Loric</Typography>
+                    <Typography level="title-md">{studentData.student_name}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Father Name</Typography>
-                    <Typography level="title-md">Father</Typography>
+                    <Typography level="title-md">{studentData.father_name}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Mother Name</Typography>
-                    <Typography level="title-md">Mother</Typography>
+                    <Typography level="title-md">{studentData.mother_name}</Typography>
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <Typography level="body-sm">Gender</Typography>
-                    <Typography level="title-md">Male</Typography>
+                    <Typography level="title-md">{studentData.gender}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Date Of Birth</Typography>
-                    <Typography level="title-md">01-01-2003</Typography>
+                    <Typography level="title-md">{studentData.dob}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Blood Group</Typography>
-                    <Typography level="title-md">O+</Typography>
+                    <Typography level="title-md">{studentData.blood_group}</Typography>
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <Typography level="body-sm">Religion</Typography>
-                    <Typography level="title-md">Hindu</Typography>
+                    <Typography level="title-md">{studentData.religion}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Cast</Typography>
-                    <Typography level="title-md">OBC</Typography>
+                    <Typography level="title-md">{studentData.cast}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Aadhar Number</Typography>
-                    <Typography level="title-md">7194-9652-6742</Typography>
+                    <Typography level="title-md">{studentData.aadhar_number}</Typography>
                   </td>
                 </tr>
                 <tr>
@@ -171,29 +180,29 @@ function ProfileTab() {
                     <Typography level="body-sm">
                       Father's Qualification
                     </Typography>
-                    <Typography level="title-md">Graduate</Typography>
+                    <Typography level="title-md">{studentData.father_qualification}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Father's Occupation</Typography>
-                    <Typography level="title-md">Farmar</Typography>
+                    <Typography level="title-md">{studentData.father_occupation}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">
                       Mother's Qualification
                     </Typography>
-                    <Typography level="title-md">Matric</Typography>
+                    <Typography level="title-md">{studentData.motherqualifiation}</Typography>
                   </td>
                 </tr>
                 <tr>
                   <td>
                     <Typography level="body-sm">Father's Occupation</Typography>
-                    <Typography level="title-md">House Wife</Typography>
+                    <Typography level="title-md">{studentData.mother_occupation}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">
                       Mobile Number Alternate
                     </Typography>
-                    <Typography level="title-md">Farmar</Typography>
+                    <Typography level="title-md">{studentData.alternate_number}</Typography>
                   </td>
                   <td></td>
                 </tr>
@@ -201,8 +210,7 @@ function ProfileTab() {
                   <td colSpan={2}>
                     <Typography level="body-sm">Present Address</Typography>
                     <Typography level="title-md">
-                      At - Siyatand, P.O - Sonardih, Jamua,
-                      Giridih,Jharkhand-815312
+                    {studentData.address}
                     </Typography>
                   </td>
                   <td></td>
@@ -210,15 +218,15 @@ function ProfileTab() {
                 <tr>
                   <td>
                     <Typography level="body-sm">City</Typography>
-                    <Typography level="title-md">Giridih</Typography>
+                    <Typography level="title-md">{studentData.city}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">State</Typography>
-                    <Typography level="title-md">Jharkhand</Typography>
+                    <Typography level="title-md">{studentData.state}</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">Pin Code</Typography>
-                    <Typography level="title-md">815312</Typography>
+                    <Typography level="title-md">{studentData.postal_code}</Typography>
                   </td>
                 </tr>
               </thead>
@@ -247,11 +255,11 @@ function ProfileTab() {
                 <tr>
                   <td>
                     <Typography level="body-sm">Admission Date</Typography>
-                    <Typography level="title-md">01-01-2024</Typography>
+                    <Typography level="title-md">{studentData.date_of_addmission}</Typography>
                   </td>
                   <td colSpan={2}>
                     <Typography level="body-sm">Registration Number/Student Id</Typography>
-                    <Typography level="title-md">OPS202400025</Typography>
+                    <Typography level="title-md">{studentData.admission_no}</Typography>
                   </td>
                  
                   <td></td>
@@ -259,25 +267,25 @@ function ProfileTab() {
                 <tr>
                   <td>
                     <Typography level="body-sm">Current Montly Fee</Typography>
-                    <Typography level="title-md">₹400/month</Typography>
+                    <Typography level="title-md">₹{studentData.monthly_fee}/month</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">
                       Current Computer Fee
                     </Typography>
-                    <Typography level="title-md">₹200/month</Typography>
+                    <Typography level="title-md">₹{studentData.computer_fee}/month</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">
                       Current Transport Fee
                     </Typography>
-                    <Typography level="title-md">₹200/month</Typography>
+                    <Typography level="title-md">₹{studentData.transportation_fee}/month</Typography>
                   </td>
                   <td>
                     <Typography level="body-sm">
                       Current Student Discount
                     </Typography>
-                    <Typography level="title-md">₹200/month</Typography>
+                    <Typography level="title-md">₹{studentData.fee_discount?studentData.fee_discount:0}/month</Typography>
                   </td>
                 </tr>
               </thead>

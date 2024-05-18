@@ -17,6 +17,8 @@ import {
 } from "@mui/joy";
 import { SCHOOL_CLASSES, SCHOOL_SECTIONS } from "config/schoolConfig";
 import { Edit } from "iconsax-react";
+import { useEffect, useState } from "react";
+import { StudentDetailsType } from "types/student";
 
 const VisuallyHiddenInput = styled("input")`
   clip: rect(0 0 0 0);
@@ -30,7 +32,32 @@ const VisuallyHiddenInput = styled("input")`
   width: 1px;
 `;
 
-function PersonalTab() {
+interface StudentProfileProps {
+  studentData: StudentDetailsType;
+}
+
+const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
+  const [studentInfo, setStudentInfo] = useState<StudentDetailsType>();
+
+  useEffect(() => {
+    setStudentInfo(studentData);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setStudentInfo((prevInfo) => {
+      if (!prevInfo) return prevInfo; // Ensure prevInfo is defined
+      return {
+        ...prevInfo,
+        [name]: value,
+      };
+    });
+  };
+
+  useEffect(() => {
+    console.log(studentInfo);
+  }, [studentInfo]);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <Box sx={{ display: "flex", gap: "1.6rem", mt: "1rem" }}>
@@ -51,13 +78,17 @@ function PersonalTab() {
               <Grid md={5} xs={7}>
                 <FormControl>
                   <FormLabel>Student Name</FormLabel>
-                  <Input />
+                  <Input
+                    name="student_name"
+                    value={studentInfo?.student_name}
+                    onChange={handleInputChange}
+                  />
                 </FormControl>
               </Grid>
               <Grid md={3} xs={5}>
                 <FormControl>
                   <FormLabel>Gender</FormLabel>
-                  <Select>
+                  <Select value={studentInfo?.gender}>
                     <Option value="male">Male</Option>
                     <Option value="female">Female</Option>
                   </Select>
@@ -66,7 +97,7 @@ function PersonalTab() {
               <Grid md={3} xs={5}>
                 <FormControl>
                   <FormLabel>Date Of Birth</FormLabel>
-                  <Input type="date" />
+                  <Input type="date" value={studentInfo?.dob} />
                 </FormControl>
               </Grid>
             </Grid>
@@ -74,14 +105,14 @@ function PersonalTab() {
               <Grid md={5.8} xs={12}>
                 <FormControl>
                   <FormLabel>Father Name</FormLabel>
-                  <Input type="text" />
+                  <Input type="text" value={studentInfo?.father_name} />
                 </FormControl>
               </Grid>
 
               <Grid md={5.8} xs={12}>
                 <FormControl>
                   <FormLabel>Mother Name</FormLabel>
-                  <Input type="text" />
+                  <Input type="text" value={studentInfo?.mother_name!} />
                 </FormControl>
               </Grid>
             </Grid>
@@ -89,7 +120,7 @@ function PersonalTab() {
               <Grid md={3} xs={12}>
                 <FormControl>
                   <FormLabel>Religion</FormLabel>
-                  <Input type="text" />
+                  <Input type="text" value={studentInfo?.religion} />
                 </FormControl>
               </Grid>
 
@@ -262,7 +293,11 @@ function PersonalTab() {
                     <FormLabel>Class</FormLabel>
                     <Select placeholder="student current class">
                       {SCHOOL_CLASSES.map((item) => {
-                        return <Option value={item.value}>{item.title}</Option>;
+                        return (
+                          <Option key={item.id} value={item.value}>
+                            {item.title}
+                          </Option>
+                        );
                       })}
                     </Select>
                   </FormControl>
@@ -272,7 +307,11 @@ function PersonalTab() {
                     <FormLabel>Section</FormLabel>
                     <Select placeholder="student section">
                       {SCHOOL_SECTIONS.map((item) => {
-                        return <Option value={item.value}>{item.title}</Option>;
+                        return (
+                          <Option key={item.id} value={item.value}>
+                            {item.title}
+                          </Option>
+                        );
                       })}
                     </Select>
                   </FormControl>
@@ -362,6 +401,6 @@ function PersonalTab() {
       </Box>
     </Box>
   );
-}
+};
 
 export default PersonalTab;

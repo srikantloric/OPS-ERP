@@ -12,7 +12,64 @@ import { Book, Moneys, Profile, Setting4, UserEdit } from "iconsax-react";
 import { Box, TabPanel, Typography } from "@mui/joy";
 import ProfileTab from "./Tabs/ProfileTab";
 import PersonalTab from "./Tabs/PersonalTab";
+import { useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { StudentDetailsType } from "types/student";
+import { useEffect, useState } from "react";
+import { enqueueSnackbar } from "notistack";
+import {db} from '../../../firebase'
+
+interface IStudentReduxStore {
+  studentarray: [];
+  error: string | null;
+  loading: boolean;
+}
+interface ITeachersReduxStore {
+  studentarray: [];
+  error: string | null;
+  loading: boolean;
+}
+
+interface IReduxState {
+  students: IStudentReduxStore;
+  teachers: ITeachersReduxStore;
+}
+
 function ViewStudentProfile() {
+  const studentStateData = useSelector(
+    (state: IReduxState) => state.students.studentarray
+  ) as StudentDetailsType[];
+  const { id: studentDocId } = useParams();
+
+  const [studentData, setStudentData] = useState<StudentDetailsType | null>(
+    null
+  );
+
+  useEffect(() => {
+    if (studentStateData.length > 0) {
+      const currentFilteredStudent = studentStateData.find(
+        (students) => students.id == studentDocId
+      );
+      setStudentData(currentFilteredStudent!);
+      console.log(studentData);
+    } else {
+      
+      db.collection("STUDENTS")
+        .doc(studentDocId)
+        .get()
+        .then((data) => {
+          if (data.exists) {
+            const studentDocData = data.data() as StudentDetailsType;
+            setStudentData(studentDocData);
+          }else{
+            enqueueSnackbar("Unable to load student data!", { variant: "error" });
+          }
+        }).catch((error)=>{
+          enqueueSnackbar("Unable to load student data: "+error, { variant: "error" });
+        });
+    }
+  }, []);
+
   return (
     <PageContainer>
       <Navbar />
@@ -71,13 +128,19 @@ function ViewStudentProfile() {
               </Tab>
             </TabList>
             <TabPanel value={0}>
-              <ProfileTab />
+              {studentData ? <ProfileTab studentData={studentData!} /> : null}
             </TabPanel>
             <TabPanel value={1}>
-             <PersonalTab/>
+              {studentData?<PersonalTab studentData={studentData!} />:null}
             </TabPanel>
             <TabPanel value={2}>
-              <b>Third</b> tab panel
+              In Progress
+            </TabPanel>
+            <TabPanel value={3}>
+              In Progress
+            </TabPanel>
+            <TabPanel value={4}>
+              Settings
             </TabPanel>
           </Tabs>
         </Box>
