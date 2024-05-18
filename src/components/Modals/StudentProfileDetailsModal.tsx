@@ -323,7 +323,7 @@ const StudentProfileDetailsModal = ({selectedRowData,handleStudentProfileModalCl
                     <Grid item xs={12} md={6}>
                       <Stack spacing={1}>
                         <Typography color="secondary" fontSize={12}>Class</Typography>
-                        <Typography>{getClassName(selectedRowData.class)} {selectedRowData.section}</Typography>
+                        <Typography>{getClassName(selectedRowData.class!)} {selectedRowData.section}</Typography>
                       </Stack>
                     </Grid>
                   </Grid>

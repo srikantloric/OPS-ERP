@@ -14,8 +14,7 @@ import {
 } from "@mui/material";
 
 import Styles from "./ViewStudents.module.scss";
-import { useNavigate } from "react-router-dom";
-import { ExportCsv, ExportPdf } from "@material-table/exporters";
+import { Link, useNavigate } from "react-router-dom";
 import BadgeIcon from "@mui/icons-material/Badge";
 import GrainIcon from "@mui/icons-material/Grain";
 import SearchIcon from "@mui/icons-material/Search";
@@ -44,9 +43,9 @@ import ConfirmationModal from "../../components/Modals/ConfirmationModal";
 
 import StudentProfileDetailsModal from "components/Modals/StudentProfileDetailsModal";
 import { getClassNameByValue } from "utilities/UtilitiesFunctions";
-import StudDataExcel from "components/StudentDetailsReport/StudentReportGenerator";
 import { StudReportPDF } from "components/StudentDetailsReport/StudentReportGeneratorPDF";
-
+import ExportToExcel from "components/Reports/ExportToExcel";
+import { Avatar } from "@mui/joy";
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);
@@ -120,9 +119,9 @@ function ViewStudents() {
       setFilteredData(dataNew);
       setFilterChipLabel(
         "Filter set for class " +
-        getClassNameByValue(selectedClass) +
-        " and section " +
-        selectedSection
+          getClassNameByValue(selectedClass) +
+          " and section " +
+          selectedSection
       );
       setFilterChip(true);
     } else if (selectedSection === -1 && selectedClass !== -1) {
@@ -130,10 +129,11 @@ function ViewStudents() {
         return data.class === selectedClass;
       });
       setFilteredData(dataNew);
-      setFilterChipLabel("Filter set for class " + getClassNameByValue(selectedClass));
+      setFilterChipLabel(
+        "Filter set for class " + getClassNameByValue(selectedClass)
+      );
       setFilterChip(true);
     }
-
   };
 
   const deletestudent = (data) => {
@@ -162,13 +162,11 @@ function ViewStudents() {
   };
 
   const handleNewWindowOpen = async () => {
-    const pdfRes = await StudReportPDF();
+    const pdfRes = await StudReportPDF(filteredData);
     const features =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
     window.open(pdfRes, "_blank", features);
   };
-
-
 
   //column for material table
   const columnMat = [
@@ -176,14 +174,25 @@ function ViewStudents() {
       field: "student_id",
       title: "ID",
       render: (rowData) => {
-        const id = "" + rowData.student_id;
-
-        return <h5>{id.split("@")[0].toLocaleUpperCase()}</h5>;
+        return (
+          <Link
+            to={`/students/profile/${rowData.id}`}
+            style={{
+              fontSize: "14px",
+              textDecoration: "none",
+              fontWeight: "500",
+              color: "var(--bs-primary-text)",
+            }}
+          >
+            {rowData.admission_no}
+          </Link>
+        );
       },
     },
     {
       title: "Profile",
       field: "profil_url",
+
       export: false,
       render: (rowData) => {
         const styles = {
@@ -193,9 +202,7 @@ function ViewStudents() {
           cursor: "pointer",
           objectFit: "cover",
         };
-        return (
-          <img src={rowData.profil_url} style={styles} alt="profile-student" />
-        );
+        return <Avatar src={rowData.profil_url} alt="profile-student" />;
       },
     },
 
@@ -209,6 +216,7 @@ function ViewStudents() {
     },
     { field: "section", title: "Section" },
     { field: "class_roll", title: "Roll" },
+    { field: "father_name", title: "Father Name" },
     { field: "contact_number", title: " Contact number" },
   ];
   const handleDelete = () => {
@@ -378,14 +386,12 @@ function ViewStudents() {
                 label: "Export PDF",
                 // exportFunc: (cols, datas) =>
                 //   ExportPdf(cols, datas, "myPdfFileName"),
-                exportFunc: () =>
-                  handleNewWindowOpen()
+                exportFunc: () => handleNewWindowOpen(),
               },
               {
-                label: "Export CSV",
-                exportFunc: () =>
-                  StudDataExcel(),
-              }
+                label: "Export Excel",
+                exportFunc: () => ExportToExcel(filteredData),
+              },
             ],
             actionsColumnIndex: -1,
           }}
@@ -462,15 +468,15 @@ function ViewStudents() {
             <ListItemIcon>
               <PersonIcon fontSize="small" />
             </ListItemIcon>
-            View Profile
+            View Quick Profile
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleMenuClick}>
+          {/* <MenuItem onClick={handleMenuClick}>
             <ListItemIcon>
               <BadgeIcon fontSize="small" />
             </ListItemIcon>
             Generate ID Card
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem onClick={handleMenuClick}>
             <ListItemIcon>
               <BlockIcon fontSize="small" />
@@ -482,7 +488,7 @@ function ViewStudents() {
           <StudentProfileDetailsModal
             selectedRowData={selectedRowData}
             handleStudentProfileModalClose={() => {
-              setStudentProfileModalOpen(false)
+              setStudentProfileModalOpen(false);
               setSelectedRowData(null);
             }}
           />

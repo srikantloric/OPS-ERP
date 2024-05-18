@@ -25,3 +25,11 @@ export const FEE_HEADERS = [
     field: "other_fee",
   },
 ];
+
+
+///Payment state
+export const paymentStatus ={
+  DEFAULT:"UNPAID",
+  PARTIAL:"PARTIAL",
+  PAID:"PAID",
+}

@@ -8,7 +8,7 @@ export type StudentDetailsType = {
   blood_group: string;
   cast: string;
   city: string;
-  class: number;
+  class: number|null;
   class_roll: string;
   contact_number: string;
   date_of_addmission: string;
@@ -29,12 +29,14 @@ export type StudentDetailsType = {
   state: string;
   student_id: string;
   student_name: string;
-  monthly_fee?: number;
-  computer_fee: number;
-  created_at?: firebase.firestore.Timestamp | firebase.firestore.FieldValue;
-  transportation_fee: number;
-  generated_fee: string[];
-  fee_discount?: number;
+  monthly_fee: number|null;
+  computer_fee: number|null;
+  admission_fee?:number|null;
+  created_at?: firebase.firestore.Timestamp | firebase.firestore.FieldValue|null;
+  transportation_fee: number|null;
+  generatedChallans: string[];
+  fee_discount?: number|null;
+  updated_at?:firebase.firestore.FieldValue|null;
 };
 
 export interface StudentFeeDetailsType {
@@ -102,3 +104,39 @@ export type BalanceSheetType = {
   tran_desc: string;
   tran_amount: string;
 };
+
+
+
+export interface IStudentFeeChallan{
+  docIdExt:string,
+  studentId:string,
+  challanDocId:string,
+  createdAt:firebase.firestore.FieldValue;
+  createdBy?:string,
+  paymentId:string,
+  challanTitle:string,
+  monthYear:string,
+  paymentStatus:string,
+  paymentDueDate:string,
+  monthlyFee:number,
+  lateFine:number,
+  transportationFee:number,
+  computerFee:number,
+
+} 
+
+export interface IStudentFeeChallanExtended extends IStudentFeeChallan {
+  admissionFee?: number;
+  examFee?: number;
+  annualFee?: number;
+  otherFee?: number;
+  totalDue?: number;
+  feeConsession?: number;
+  paidAmount?: number;
+  paymentRecievedDate?: string;
+  paymentRecievedBy?: string;
+  challanCreationDate?:firebase.firestore.FieldValue,
+  challanCreatedBy?:string,
+  paymentRecivedDate?:string,
+  sumOfHeaders?:number,
+}

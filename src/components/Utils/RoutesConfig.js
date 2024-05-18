@@ -17,10 +17,10 @@ import UnderConstruction from "../../pages/Extras/UnderConstruction";
 import FeeManager from "../../pages/FeeManager/FeeManager";
 import FeaturesConfig from "../../FeaturesConfig";
 import ViewStudents from "../../pages/Users/ViewStudents";
-import GenerateMonthlyFee from "pages/FeeManager/GenerateChallan/GenerateMonthlyFee";
-import GenerateCustomFee from "pages/FeeManager/GenerateChallan/GenerateCustomFee";
 import FeeReceipt from "pages/FeeManager/FeeReceipt";
 import Transaction from "pages/Transaction/Transaction";
+import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
+import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
 
 export const routesConfig = [
   {
@@ -94,21 +94,21 @@ export const routesConfig = [
     icon: IconMoneybag,
     isCollapsable: false,
     isHeader: false,
-    Component: GenerateMonthlyFee,
+    Component: GenerateMonthlyChallan,
     childrens: [
       {
         title: "Generate Montly Fee",
         to: "accountings/generate-monthly-fee",
         isCollapsable: false,
         isHeader: false,
-        Component: <GenerateMonthlyFee />,
+        Component: <GenerateMonthlyChallan />,
       },
       {
         title: "Generate Custom Fee",
         to: "accountings/generate-custom-fee",
         isCollapsable: false,
         isHeader: false,
-        Component: <GenerateCustomFee />,
+        Component: <GenerateMonthlyChallan />,
       },
     ],
   },
@@ -180,6 +180,6 @@ export const routesConfig = [
     icon: IconMail,
     isCollapsable: false,
     isHeader: false,
-    Component: UnderConstruction,
+    Component: ViewStudentProfile,
   },
 ];

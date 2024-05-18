@@ -24,7 +24,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchstudent } from "../../store/studentSlice";
 import { enqueueSnackbar } from "notistack";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
-import DueRecieptGenerator from "../../components/DueRecieptGenerator/DueRecieptGenerator";
+import { StudentDetailsType } from "types/student";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -65,7 +65,7 @@ function FeeManager() {
   const historyRef = useNavigate();
 
   const dispatch = useDispatch();
-  const data = Array.from(useSelector((state) => state.students.studentarray));
+  const data = useSelector((state) => state.students.studentarray);
 
   const [searchList, setSearchList] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
@@ -76,23 +76,28 @@ function FeeManager() {
 
   const [loading, setLoading] = useState(false);
 
+  const setFilteredData = (data) => {
+    console.log("Student list fetched...");
+    const filteredDatadata = [];
+    data.forEach((item) => {
+      const obj = {
+        id: item.id,
+        name: item.student_name,
+        admission: item.admission_no,
+        profile: item.profil_url,
+        sId: item.student_id,
+        dob: item.dob,
+      };
+      filteredDatadata.push(obj);
+    });
+    setSearchList(filteredDatadata);
+  };
+
   useEffect(() => {
     if (data.length !== 0) {
-      const filteredDatadata = [];
-      data.forEach((item) => {
-        const obj = {
-          id: item.id,
-          name: item.student_name,
-          admission: item.admission_no,
-          profile: item.profil_url,
-          sId: item.student_id,
-          dob: item.dob,
-        };
-        filteredDatadata.push(obj);
-      });
-      setSearchList(filteredDatadata);
+      setFilteredData(data);
     }
-  }, []);
+  }, [data]);
 
   useEffect(() => {
     if (Array.from(data).length === 0) {
@@ -107,7 +112,8 @@ function FeeManager() {
     stringify: (option) => option.name + option.sId + option.admission,
   });
 
-  const handleNextPageBtn = () => {
+  const handleNextPageBtn = (e) => {
+    e.preventDefault();
     if (selectedDoc) {
       historyRef(`${"FeeDetails/" + selectedDoc}`, {
         state: data.filter((data) => data.id === selectedDoc),
@@ -159,48 +165,50 @@ function FeeManager() {
                 height: "30vh",
               }}
             >
-              <Autocomplete
-                id="country-select-demo"
-                color="primary"
-                onChange={(e, val) => {
-                  setSelectedDoc(val && val.id);
-                }}
-                placeholder="Search with Student ID/Admission No"
-                sx={{ width: "450px", m: "10px" }}
-                options={searchList}
-                autoHighlight
-                getOptionLabel={(option) =>
-                  `${option.name + " - " + option.id}`
-                }
-                filterOptions={filterOptions}
-                renderOption={(props, option) => (
-                  <AutocompleteOption {...props}>
-                    <ListItemDecorator>
-                      <img
-                        loading="lazy"
-                        width="20"
-                        src={`${option.profile}`}
-                        alt=""
-                      />
-                    </ListItemDecorator>
-                    <ListItemContent sx={{ fontSize: "sm" }}>
-                      <b>{option.name}</b>
-                      <Typography level="body-xs">
-                        OPS{option.admission} | {option.dob}
-                      </Typography>
-                    </ListItemContent>
-                  </AutocompleteOption>
-                )}
-              />
+              <Box component="form" onSubmit={handleNextPageBtn} sx={{display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <Autocomplete
+                  id="country-select-demo"
+                  color="primary"
+                  onChange={(e, val) => {
+                    setSelectedDoc(val && val.id);
+                  }}
+                  placeholder="Search with Student ID/Admission No"
+                  sx={{ width: "450px", m: "10px" }}
+                  options={searchList}
+                  autoHighlight
+                  getOptionLabel={(option) =>
+                    `${option.name + " - " + option.id}`
+                  }
+                  filterOptions={filterOptions}
+                  renderOption={(props, option) => (
+                    <AutocompleteOption {...props}>
+                      <ListItemDecorator>
+                        <img
+                          loading="lazy"
+                          width="20"
+                          src={`${option.profile}`}
+                          alt=""
+                        />
+                      </ListItemDecorator>
+                      <ListItemContent sx={{ fontSize: "sm" }}>
+                        <b>{option.name}</b>
+                        <Typography level="body-xs">
+                          {option.admission} | {option.dob}
+                        </Typography>
+                      </ListItemContent>
+                    </AutocompleteOption>
+                  )}
+                />
 
-              <Button
-                variant="contained"
-                sx={{ height: "36px" }}
-                disableElevation
-                onClick={handleNextPageBtn}
-              >
-                Search
-              </Button>
+                <Button
+                  variant="contained"
+                  sx={{ height: "36px" }}
+                  disableElevation
+                  type="submit"
+                >
+                  Search
+                </Button>
+              </Box>
             </div>
           </CustomTabPanel>
 
