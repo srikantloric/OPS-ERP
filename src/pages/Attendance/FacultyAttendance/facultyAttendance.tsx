@@ -21,7 +21,7 @@ import {
   Sheet,
   Table,
 } from "@mui/joy";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getCurrentDate } from "utilities/UtilitiesFunctions";
 import Search from "@mui/icons-material/Search";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
@@ -47,6 +47,13 @@ export const FacultyAttendance = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [isSavingDone, setSavingDone] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
+
+  useEffect(()=>{
+    setLoading(false);
+    setIsSaving(false);
+    setSavingDone(false);
+    setMessageText("")
+  },[])
 
   const filteredStudents = FacultyData.filter((facuities) => {
     const isMatchedByName = facuities.faculty_name
