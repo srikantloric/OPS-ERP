@@ -20,6 +20,7 @@ import ViewStudents from "../../pages/Users/ViewStudents";
 import FeeReceipt from "pages/FeeManager/FeeReceipt";
 import Transaction from "pages/Transaction/Transaction";
 import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
+import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
 
 export const routesConfig = [
   {
@@ -138,6 +139,13 @@ export const routesConfig = [
       {
         title: "Generate QR Sticker",
         to: "attendance/generate-attendance-qr",
+        isCollapsable: false,
+        isHeader: false,
+        Component: <Attendance />,
+      },
+      {
+        title: "Facuities Attendance",
+        to: "attendance/Facuities",
         isCollapsable: false,
         isHeader: false,
         Component: <Attendance />,

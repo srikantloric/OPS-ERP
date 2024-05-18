@@ -15,6 +15,13 @@ import {
 } from "config/schoolConfig";
 import { DueRecieptPropsType } from "types/student";
 
+let paymentTracArr = [
+  { date: "05-05-24", amount: 5000 },
+  { date: "20-05-24", amount: 2000 },
+  { date: "25-05-24", amount: 2000 },
+  { date: "02-06-24", amount: 1000 },
+];
+
 export const generateDueReciept2 = async (
   recieptData: DueRecieptPropsType[]
 ): Promise<string> => {
@@ -345,7 +352,66 @@ export const generateDueReciept2 = async (
         doc.setFont("Poppins", "semibold");
         doc.setTextColor("#FF0000");
         doc.setFontSize(9);
-        doc.text("!!Thank you very much!!", x + 30, feeTypeLayoutHeight + 22);
+        // doc.text("!!Thank you very much!!", x + 30, feeTypeLayoutHeight + 22);
+
+        //Draw Circle //Danny
+
+        //Challan circle
+        doc.setFontSize(6);
+        doc.setDrawColor("#000");
+        doc.text("Challan Amount", x + 10, feeTypeLayoutHeight + 19);
+
+        let len = paymentTracArr.length;
+        len < 5 && len > 0 ? (len -= 1) : (len = 3);
+        console.log("len=" + len);
+
+        let i = 0;
+
+        doc.setFont("Poppins", "normal");
+
+        for (i; i < len + 1; i++) {
+          let x_padd = cardWidth / (len + 1);
+
+          if (i <= len) {
+            doc.circle(x + x_padd * i + 15, feeTypeLayoutHeight + 25, 2);
+
+            //Circle Amount
+            doc.text(
+              paymentTracArr[i].amount.toString(),
+              x + x_padd * i + 12,
+              feeTypeLayoutHeight + 22
+            );
+
+            //Circle Date
+            doc.text(
+              paymentTracArr[i].date,
+              x + x_padd * i + 10,
+              feeTypeLayoutHeight + 30
+            );
+          }
+
+          //Circle text inside
+          doc.setFont("Poppins", "semibold");
+          if (i == len) {
+            doc.text(`√`, x + x_padd * i + 14.5, feeTypeLayoutHeight + 25.75);
+
+            break;
+          } else {
+            doc.text(
+              `${i}`,
+              x + x_padd * i + 14.5,
+              feeTypeLayoutHeight + 25.75
+            );
+            doc.line(
+              x + x_padd * i + 17,
+              feeTypeLayoutHeight + 25,
+              x + x_padd * (i + 1) + 13,
+              feeTypeLayoutHeight + 25
+            );
+          }
+        }
+
+        //Danny
 
         ///End Of PDF DESIGN
         // Draw border around content
