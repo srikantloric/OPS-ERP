@@ -18,7 +18,8 @@ import { DueRecieptPropsType } from "types/student";
 let paymentTracArr = [
   { date: "05-05-24", amount: 5000 },
   { date: "20-05-24", amount: 2000 },
-  { date: "25-05-24", amount: 3000 },
+  { date: "25-05-24", amount: 2000 },
+  { date: "02-06-24", amount: 1000 },
 ];
 
 export const generateDueReciept2 = async (
@@ -368,33 +369,32 @@ export const generateDueReciept2 = async (
 
         doc.setFont("Poppins", "normal");
 
-        for (i; i < len+1 ; i++) {
+        for (i; i < len + 1; i++) {
           let x_padd = cardWidth / (len + 1);
 
           if (i <= len) {
             doc.circle(x + x_padd * i + 15, feeTypeLayoutHeight + 25, 2);
 
             //Circle Amount
-          doc.text(
-            paymentTracArr[i ].amount.toString(),
-            x + x_padd * i + 10,
-            feeTypeLayoutHeight + 22
-          );
+            doc.text(
+              paymentTracArr[i].amount.toString(),
+              x + x_padd * i + 12,
+              feeTypeLayoutHeight + 22
+            );
 
-          //Circle Date
-          doc.text(
-            paymentTracArr[i].date,
-            x + x_padd * i + 10,
-            feeTypeLayoutHeight + 30
-          );
+            //Circle Date
+            doc.text(
+              paymentTracArr[i].date,
+              x + x_padd * i + 10,
+              feeTypeLayoutHeight + 30
+            );
           }
-
 
           //Circle text inside
           doc.setFont("Poppins", "semibold");
           if (i == len) {
             doc.text(`√`, x + x_padd * i + 14.5, feeTypeLayoutHeight + 25.75);
-            
+
             break;
           } else {
             doc.text(
@@ -405,7 +405,7 @@ export const generateDueReciept2 = async (
             doc.line(
               x + x_padd * i + 17,
               feeTypeLayoutHeight + 25,
-              x + x_padd * (i+1) + 13,
+              x + x_padd * (i + 1) + 13,
               feeTypeLayoutHeight + 25
             );
           }
