@@ -364,7 +364,7 @@ export const generateDueReciept2 = async (
         doc.setFontSize(7);
         doc.text("1",x+14.5,feeTypeLayoutHeight + 25.75);
         doc.text("2",x+x_padd+14.5,feeTypeLayoutHeight + 25.75);
-        doc.text("",x+x_padd*2+14.5,feeTypeLayoutHeight + 25.75);
+        doc.text("√",x+x_padd*2+14,feeTypeLayoutHeight + 25.75);
 
         //Circle Amount
         doc.text("Challan Amount",x+10,feeTypeLayoutHeight + 19);
