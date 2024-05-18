@@ -180,6 +180,6 @@ export const routesConfig = [
     icon: IconMail,
     isCollapsable: false,
     isHeader: false,
-    Component: ViewStudentProfile,
+    Component: UnderConstruction,
   },
 ];
