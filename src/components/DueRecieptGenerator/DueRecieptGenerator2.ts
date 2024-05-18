@@ -15,6 +15,12 @@ import {
 } from "config/schoolConfig";
 import { DueRecieptPropsType } from "types/student";
 
+let paymentTracArr = [
+  { date: "05-05-24", amount: 5000 },
+  { date: "20-05-24", amount: 2000 },
+  { date: "25-05-24", amount: 3000 },
+];
+
 export const generateDueReciept2 = async (
   recieptData: DueRecieptPropsType[]
 ): Promise<string> => {
@@ -348,37 +354,64 @@ export const generateDueReciept2 = async (
         // doc.text("!!Thank you very much!!", x + 30, feeTypeLayoutHeight + 22);
 
         //Draw Circle //Danny
-        let x_padd=cardWidth/3;
-        doc.setDrawColor("#000");
-        doc.circle(x+15,feeTypeLayoutHeight + 25,2);
-        doc.circle(x+x_padd+15,feeTypeLayoutHeight + 25,2);
-        doc.circle(x+x_padd*2+15,feeTypeLayoutHeight + 25,2);
 
-        doc.line(x+17,feeTypeLayoutHeight + 25,x+x_padd+13,feeTypeLayoutHeight + 25);
-        doc.line(x+x_padd+17,feeTypeLayoutHeight + 25,x+x_padd*2+13,feeTypeLayoutHeight + 25);
-
-        
-        //Circle text
-        doc.setFont("Poppins", "semibold");
-        doc.setTextColor("#000");
+        //Challan circle
         doc.setFontSize(7);
-        doc.text("1",x+14.5,feeTypeLayoutHeight + 25.75);
-        doc.text("2",x+x_padd+14.5,feeTypeLayoutHeight + 25.75);
-        doc.text("√",x+x_padd*2+14,feeTypeLayoutHeight + 25.75);
+        doc.setDrawColor("#000");
+        doc.text("Challan Amount", x + 10, feeTypeLayoutHeight + 19);
 
-        //Circle Amount
-        doc.text("Challan Amount",x+10,feeTypeLayoutHeight + 19);
-        doc.text("Rs 5000",x+10,feeTypeLayoutHeight + 22);
-        doc.text("Rs 2000",x+x_padd+10,feeTypeLayoutHeight + 22);
-        doc.text("Rs 3000",x+x_padd*2+10,feeTypeLayoutHeight + 22);
+        let len = paymentTracArr.length;
+        len < 5 && len > 0 ? (len -= 1) : (len = 3);
+        console.log("len=" + len);
 
-        //Circle Date
-        doc.text(data.due_date,x+10,feeTypeLayoutHeight + 30);
-        doc.text("05-05-24",x+x_padd+10,feeTypeLayoutHeight + 30);
-        doc.text("01-06-24",x+x_padd*2+10,feeTypeLayoutHeight + 30);
+        let i = 0;
+
+        doc.setFont("Poppins", "normal");
+
+        for (i; i < len+1 ; i++) {
+          let x_padd = cardWidth / (len + 1);
+
+          if (i <= len) {
+            doc.circle(x + x_padd * i + 15, feeTypeLayoutHeight + 25, 2);
+
+            //Circle Amount
+          doc.text(
+            paymentTracArr[i ].amount.toString(),
+            x + x_padd * i + 10,
+            feeTypeLayoutHeight + 22
+          );
+
+          //Circle Date
+          doc.text(
+            paymentTracArr[i].date,
+            x + x_padd * i + 10,
+            feeTypeLayoutHeight + 30
+          );
+          }
+
+
+          //Circle text inside
+          doc.setFont("Poppins", "semibold");
+          if (i == len) {
+            doc.text(`√`, x + x_padd * i + 14.5, feeTypeLayoutHeight + 25.75);
+            
+            break;
+          } else {
+            doc.text(
+              `${i}`,
+              x + x_padd * i + 14.5,
+              feeTypeLayoutHeight + 25.75
+            );
+            doc.line(
+              x + x_padd * i + 17,
+              feeTypeLayoutHeight + 25,
+              x + x_padd * (i+1) + 13,
+              feeTypeLayoutHeight + 25
+            );
+          }
+        }
 
         //Danny
-
 
         ///End Of PDF DESIGN
         // Draw border around content
