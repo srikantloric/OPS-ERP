@@ -357,7 +357,7 @@ export const generateDueReciept2 = async (
         //Draw Circle //Danny
 
         //Challan circle
-        doc.setFontSize(7);
+        doc.setFontSize(6);
         doc.setDrawColor("#000");
         doc.text("Challan Amount", x + 10, feeTypeLayoutHeight + 19);
 
