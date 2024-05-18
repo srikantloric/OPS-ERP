@@ -143,6 +143,13 @@ export const routesConfig = [
         isHeader: false,
         Component: <Attendance />,
       },
+      {
+        title: "Facuities Attendance",
+        to: "attendance/Facuities",
+        isCollapsable: false,
+        isHeader: false,
+        Component: <Attendance />,
+      },
     ],
   },
 
