@@ -21,6 +21,7 @@ import ManualAttendance from "pages/Attendance/ManualAttendance";
 import ViewAttendance from "pages/Attendance/ViewAttendance";
 import AdmissionEnquiry from "pages/Admission/AdmissionEnquiry";
 import AddEnquire from "pages/Admission/AddEnquriStudent";
+import { FacultyAttendance } from "pages/Attendance/FacultyAttendance/facultyAttendance";
 
 const StudentProfilePictureUpdater = Loadable(lazy(()=>import("pages/ProfileUpdater/StudentProfilePictureUpdater")))
 
@@ -106,6 +107,10 @@ function App() {
               <Route
                 path="attendance/generate-attendance-qr"
                 element={<GenerateQrSticker />}
+              />
+              <Route
+                path="attendance/Facuities"
+                element={<FacultyAttendance />}
               />
 
               <Route path="feeReciept" element={<FeeReceipt />} />
