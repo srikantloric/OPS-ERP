@@ -135,17 +135,33 @@ export const getFeeHeaderByCode = (code: string): string => {
   }
 };
 
-
-
 ///Challan Title Generator
 export function getChallanTitle(month: number, year: string): string {
   const months = [
-      'January', 'February', 'March', 'April', 'May', 'June', 
-      'July', 'August', 'September', 'October', 'November', 'December'
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
   if (month < 1 || month > 12) {
-      throw new Error('Invalid month number. Month number should be between 1 and 12.');
+    throw new Error(
+      "Invalid month number. Month number should be between 1 and 12."
+    );
   }
   const monthName = months[month - 1];
   return `${monthName}-${year}`;
 }
+
+//generate Challan Doc Id
+export const generateChallanDocId = (month: number, year: string): string => {
+  const challanId = "CHALLAN" + makeDoubleDigit(month.toString()) + year;
+  return challanId;
+};

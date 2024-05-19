@@ -115,7 +115,6 @@ export interface IStudentFeeChallan{
   createdBy?:string,
   paymentId:string,
   challanTitle:string,
-  monthYear:string,
   paymentStatus:string,
   paymentDueDate:string,
   monthlyFee:number,

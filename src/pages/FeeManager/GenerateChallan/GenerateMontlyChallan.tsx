@@ -25,12 +25,12 @@ import { useState } from "react";
 import { IStudentFeeChallan, StudentDetailsType } from "types/student";
 import {
   generateAlphanumericUUID,
+  generateChallanDocId,
   getChallanTitle,
   getPaymentDueDate,
-  makeDoubleDigit,
 } from "utilities/UtilitiesFunctions";
 import firebase from "firebase";
-import { FEE_TYPE_MONTHLY, paymentStatus } from "constants/index";
+import { paymentStatus } from "constants/index";
 import { enqueueSnackbar } from "notistack";
 
 type StudentFeeDataType = {
@@ -56,11 +56,8 @@ function GenerateMonthlyChallan() {
     // //Reset old state
     setStudentData([]);
 
-    const feeString =
-      "CHALLAN" +
-      makeDoubleDigit(selectedMonth!.toString()) +
-      selectedYear +
-      FEE_TYPE_MONTHLY;
+    const challanDocId = generateChallanDocId(selectedMonth!, selectedYear!);
+
     setLoading(true);
     db.collection("STUDENTS")
       .where("class", "==", selectedClass)
@@ -72,7 +69,7 @@ function GenerateMonthlyChallan() {
           documetSnap.forEach((snap) => {
             const docData = snap.data() as StudentDetailsType;
             if (docData.generatedChallans !== undefined) {
-              if (!docData.generatedChallans.includes(feeString)) {
+              if (!docData.generatedChallans.includes(challanDocId)) {
                 tempStudentArray.push({
                   studentData: docData,
                   isGenerated: false,
@@ -104,17 +101,9 @@ function GenerateMonthlyChallan() {
         enqueueSnackbar("Error" + e, { variant: "error" });
       });
   };
+
   const generateFee = () => {
-    //challan string
-    const monthYear = `${makeDoubleDigit(
-      selectedMonth!.toString()
-    )}${selectedYear}`;
-
-    const feeString = `CHALLAN${monthYear}`;
-
-    const feeChallanCode = `CHALLAN${makeDoubleDigit(
-      selectedMonth!.toString()
-    )}${selectedYear}M01`;
+    const challanDocId = generateChallanDocId(selectedMonth!, selectedYear!);
 
     if (studentData.length > 0) {
       const tempArr: StudentFeeDataType[] = [];
@@ -134,12 +123,11 @@ function GenerateMonthlyChallan() {
             const paymentData: IStudentFeeChallan = {
               docIdExt: extPaymentCollDOcId,
               studentId: student.studentData.id,
-              challanDocId: feeString,
+              challanDocId: challanDocId,
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               createdBy: "Admin",
               paymentId: "" + Math.floor(100000 + Math.random() * 900000),
               challanTitle: getChallanTitle(selectedMonth!, selectedYear!),
-              monthYear: monthYear,
               paymentStatus: paymentStatus.DEFAULT,
               paymentDueDate: paymentDueDate,
               monthlyFee: student.studentData.monthly_fee!,
@@ -154,7 +142,7 @@ function GenerateMonthlyChallan() {
               .collection("STUDENTS")
               .doc(student.studentData.id)
               .collection("PAYMENTS")
-              .doc(feeString);
+              .doc(challanDocId);
 
             var extPaymentCollRef = db
               .collection("PAYMENTS")
@@ -170,14 +158,14 @@ function GenerateMonthlyChallan() {
 
             if (student.studentData.generatedChallans) {
               var arrT = student.studentData.generatedChallans;
-              arrT.push(feeChallanCode);
+              arrT.push(challanDocId);
               // Update the document by appending the feeChallanCode string to the generatedChallans array
               batch.update(studentDocRef, {
                 generatedChallans: arrT,
               });
             } else {
               var arrTem: string[] = [];
-              arrTem.push(feeChallanCode);
+              arrTem.push(challanDocId);
               batch.update(studentDocRef, {
                 generatedChallans: arrTem,
               });

@@ -13,7 +13,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import { CurrencyRupee, Delete, Edit, MoreVert } from "@mui/icons-material";
+import { CurrencyRupee, Delete, MoreVert } from "@mui/icons-material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
 import { auth, db } from "../../firebase";
@@ -45,6 +45,9 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import { AnimatePresence, motion } from "framer-motion";
+import InstantPaymentModal from "components/Modals/InstantPaymentModal";
+import DiscountIcon from "@mui/icons-material/Discount";
+import DeleteChallanConfirmationDialog from "components/Modals/DeleteChallanConfirmationDialog";
 const SearchAnotherButton = () => {
   const historyRef = useNavigate();
   return (
@@ -75,7 +78,7 @@ function StudentFeeDetails() {
     useState<IStudentFeeChallanExtended | null>(null);
 
   const [loading, setLoading] = useState(false);
-  const historyRef = useNavigate();
+  // const historyRef = useNavigate();
   const location = useLocation();
 
   //Add Fee Consession Modal
@@ -120,6 +123,12 @@ function StudentFeeDetails() {
   const [recievedAmountPartPayment, setRecievedAmountPartPayment] =
     useState<number>();
   const [partPaymentComment, setPartPaymentComment] = useState<string>();
+
+  const [instantPaymentDialogOpen, setInstantPaymentDialogOpen] =
+    useState<boolean>(false);
+
+  const [showDeleteAuthenticationDialog, setShowDeleteAuthenticationDialog] =
+    useState<boolean>(false);
 
   // Calculate total feeConsession and totalPaidAmount
   const calculateTotals = () => {
@@ -287,7 +296,6 @@ function StudentFeeDetails() {
                 createdBy: data.createdBy,
                 paymentId: data.paymentId,
                 challanTitle: data.challanTitle,
-                monthYear: data.monthYear,
                 paymentStatus: data.paymentStatus,
                 paymentDueDate: data.paymentDueDate,
                 monthlyFee: data.monthlyFee,
@@ -353,7 +361,6 @@ function StudentFeeDetails() {
         challanTitle: selectedChallanDetails.challanTitle,
         docIdExt: selectedChallanDetails.docIdExt,
         monthlyFee: selectedChallanDetails.monthlyFee,
-        monthYear: selectedChallanDetails.monthYear,
         transportationFee: selectedChallanDetails.transportationFee,
         computerFee: selectedChallanDetails.computerFee,
         feeConsession: selectedChallanDetails.feeConsession,
@@ -379,7 +386,6 @@ function StudentFeeDetails() {
         challanTitle: selectedChallanDetails.challanTitle,
         docIdExt: selectedChallanDetails.docIdExt,
         monthlyFee: selectedChallanDetails.monthlyFee,
-        monthYear: selectedChallanDetails.monthYear,
         transportationFee: selectedChallanDetails.transportationFee,
         computerFee: selectedChallanDetails.computerFee,
         feeConsession: selectedChallanDetails.feeConsession,
@@ -535,9 +541,9 @@ function StudentFeeDetails() {
             <Button
               variant="soft"
               color="primary"
-              onClick={() => setAddArrearModalopen(true)}
+              onClick={() => setInstantPaymentDialogOpen(true)}
             >
-              Add Arrear
+              Instant Payment
             </Button>
 
             <Button variant="soft" startDecorator={<SettingsIcon />}></Button>
@@ -1082,26 +1088,30 @@ function StudentFeeDetails() {
         >
           <MenuItem>
             <ListItemIcon>
-              <PaymentIcon fontSize="small" />
-            </ListItemIcon>
-            Quick Payment
-          </MenuItem>
-          <Divider />
-          <MenuItem onClick={() => historyRef("/feeReciept")}>
-            <ListItemIcon>
               <PrintIcon fontSize="small" />
             </ListItemIcon>
-            Print Recipt
+            Print Reciept
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={() => setAddArrearModalopen(true)}>
+            <ListItemIcon>
+              <PaymentIcon fontSize="small" />
+            </ListItemIcon>
+            Add Fee Arrear
           </MenuItem>
           <Divider />
           <MenuItem onClick={() => setAddFeeConsessionModalOpen(true)}>
             <ListItemIcon>
-              <Edit fontSize="small" />
+              <DiscountIcon fontSize="small" />
             </ListItemIcon>
             Add Consession
           </MenuItem>
           <Divider />
-          <MenuItem>
+          <MenuItem
+            onClick={() => {
+              setShowDeleteAuthenticationDialog(true);
+            }}
+          >
             <ListItemIcon>
               <Delete fontSize="small" />
             </ListItemIcon>
@@ -1109,25 +1119,40 @@ function StudentFeeDetails() {
           </MenuItem>
         </Menu>
 
-        {/* <QuickPaymentModal
-          selectedRowData={selectedRow}
-          userPaymentData={location.state[0]}
-          modelOpen={modelOpen}
-          setModelOpen={setModelOpen}
-          paymentRemarks={paymentRemarks}
-          setPaymentRemarks={setPaymentRemarks}
-        /> */}
-
         <AddFeeConsessionModal
           open={addFeeConsessionModalOpen}
           setOpen={setAddFeeConsessionModalOpen}
           challanData={selectedRow!}
         />
+        {selectedRow ? (
+          <AddFeeArrearModal
+            open={addArrearModalOpen}
+            setOpen={setAddArrearModalopen}
+            studentId={selectedRow.studentId}
+            challanDocId={selectedRow.challanDocId}
+            paymentStatus={selectedRow.paymentStatus}
+            challanData={{
+              admissionFee: selectedRow.admissionFee || 0,
+              annualFee: selectedRow.annualFee || 0,
+              otherFee: selectedRow.otherFee || 0,
+              examFee: selectedRow.examFee || 0,
+            }}
+          />
+        ) : null}
 
-        <AddFeeArrearModal
-          open={addArrearModalOpen}
-          setOpen={setAddArrearModalopen}
+        <InstantPaymentModal
+          open={instantPaymentDialogOpen}
+          studentMasterData={location.state[0]}
+          setOpen={setInstantPaymentDialogOpen}
         />
+        {selectedRow ? (
+          <DeleteChallanConfirmationDialog
+            open={showDeleteAuthenticationDialog}
+            setOpen={setShowDeleteAuthenticationDialog}
+            studentId={selectedRow.studentId}
+            challanId={selectedRow.challanDocId}
+          />
+        ) : null}
       </LSPage>
     </PageContainer>
   );
