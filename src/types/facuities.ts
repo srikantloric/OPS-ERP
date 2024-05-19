@@ -1,18 +1,37 @@
 import firebase from "firebase";
 
-export type FacultyDetailsType = {
-  faculty_number: string;
-  faculty_address: string;
-  faculty_email: string;
-  faculty_gender: string;
-  faculty_pass: string;
-  faculty_phone: number;
-  faculty_qualification: string;
+export type FacultyAttendanceShema = {
+  isSmartAttendance?: boolean;
+
+  faculty_phone?: number;
+  comment?: string;
+ 
+  faculty_image?: string;
+  faculty_name: string;
   id: string;
-  faculty_image: string;
+  createdAt:
+    | firebase.firestore.Timestamp
+    | firebase.firestore.FieldValue
+    | Date;
+  attendanceDate: string;
+  attendanceStatus: string;
+
+  
+};
+export interface facultyAttendanceGlobalSchema {
+  totalAbsent?: number;
+  totalStudent?: number;
+  totalPresent?: number;
+  totalLeave?: number;
+  isSmartAttendance: boolean;
+  id: string;
+  createdAt?: firebase.firestore.Timestamp | Date;
+  comment: string;
+  attendanceDate?: string;
+  attendanceStatus: string;
+
   faculty_name: string;
 
-  created_at?: firebase.firestore.Timestamp | firebase.firestore.FieldValue;
-
-  generated_fee: string[];
-};
+  faculty_image: string;
+  faculty_phone: number;
+}

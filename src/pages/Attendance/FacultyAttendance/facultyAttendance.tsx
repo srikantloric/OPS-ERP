@@ -5,6 +5,7 @@ import { Divider, LinearProgress, Paper } from "@mui/material";
 import PageContainer from "components/Utils/PageContainer";
 // import firebase from "firebase";
 import SaveIcon from "@mui/icons-material/Save";
+import firebase from "firebase";
 
 import {
   Avatar,
@@ -28,18 +29,16 @@ import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
 import HeaderTitleCard from "components/Card/HeaderTitleCard";
 import LSPage from "components/Utils/LSPage";
 
-import { SCHOOL_CLASSES } from "config/schoolConfig";
+import { FacultyAttendanceShema } from "types/facuities";
+import { enqueueSnackbar } from "notistack";
+import { db } from "../../../firebase";
 
-import { FacultyDetailsType } from "types/facuities";
-
-interface FacultyAttendanceType extends FacultyDetailsType {
+interface FacultyAttendanceType extends FacultyAttendanceShema {
   selected_option?: string | null;
   comment?: string;
 }
 
 export const FacultyAttendance = () => {
-  const [selectedClass, setSelectedClass] = useState<number | null>(null);
-
   const [FacultyData, setFacultyData] = useState<FacultyAttendanceType[]>([]);
   const [selectedDate, setSelectedDate] = useState<string>(getCurrentDate());
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -48,19 +47,12 @@ export const FacultyAttendance = () => {
   const [isSavingDone, setSavingDone] = useState<boolean>(false);
   const [messageText, setMessageText] = useState<string>("");
 
-  useEffect(()=>{
+  useEffect(() => {
     setLoading(false);
     setIsSaving(false);
     setSavingDone(false);
-    setMessageText("")
-  },[])
-
-  const filteredStudents = FacultyData.filter((facuities) => {
-    const isMatchedByName = facuities.faculty_name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    return isMatchedByName;
-  });
+    setMessageText("");
+  }, []);
 
   const handleRadioSelect = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -80,10 +72,119 @@ export const FacultyAttendance = () => {
     });
     setFacultyData(updatedStudent);
   };
+  const fetchFacuility = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (selectedDate === null) {
+      enqueueSnackbar("Please select date", { variant: "error" });
+    } else {
+      setLoading(true);
+      setFacultyData([]);
+      setMessageText("");
 
-  const handleAttendanceComment = (comment: string, studentId: string) => {
+      
+      const dateWithoutHypen: string[] = selectedDate.split("-");
+      const facultyAttendanceDocId = `${dateWithoutHypen[0]}${dateWithoutHypen[1]}${dateWithoutHypen[2]}`;
+      console.log(facultyAttendanceDocId)
+      const result = await db
+        .collection("FACULTY")
+        .doc(facultyAttendanceDocId)
+        .get();
+
+      if (result.exists) {
+        setMessageText(
+          "Attendance for this class already marked, you can again save with updated attendance."
+        );
+        console.log("ughknloytfuyvoyiu");
+      }
+
+      db.collection("FACULTIES").onSnapshot((documentSnap: any) => {
+        if (documentSnap.size > 0) {
+          let tempArr: FacultyAttendanceType[] = [];
+          documentSnap.forEach((faculty: any) => {
+            const resData = faculty.data() as FacultyAttendanceType;
+            resData["selected_option"] = "P";
+            resData["comment"] = "";
+            tempArr.push(resData);
+          });
+
+          setFacultyData(tempArr);
+          console.log(FacultyData);
+          setLoading(false);
+          setSavingDone(false);
+        } else {
+          enqueueSnackbar("No record found", {
+            variant: "info",
+          });
+          setLoading(false);
+        }
+      });
+    }
+  };
+  const filteredfaculty = FacultyData.filter((faculty) => {
+    const isMatchedByName = faculty.faculty_name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return isMatchedByName;
+  });
+  const handleSaveAttendance = async () => {
+    ///Building final attendance
+    let tempAttArr: FacultyAttendanceType[] = [];
+    let tempAttArrGlobalSave: FacultyAttendanceType[] = [];
+   
+
+    FacultyData.map((faculty) => {
+     
+
+      const attendanceDataForSave: FacultyAttendanceShema = {
+        isSmartAttendance: false,
+        faculty_name: faculty.faculty_name,
+        id: faculty.id,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        comment: faculty.comment,
+        attendanceDate: selectedDate,
+        attendanceStatus: faculty.selected_option!,
+      };
+      const attendanceDataForGlobalSave: FacultyAttendanceShema = {
+        isSmartAttendance: false,
+        id: faculty.id,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        comment: faculty.comment,
+        attendanceDate: selectedDate,
+        attendanceStatus: faculty.selected_option!,
+
+        faculty_name: faculty.faculty_name,
+
+        faculty_image: faculty.faculty_image,
+        faculty_phone: faculty.faculty_phone,
+      };
+      tempAttArr.push(attendanceDataForSave);
+      tempAttArrGlobalSave.push(attendanceDataForGlobalSave);
+    });
+
+    setIsSaving(true);
+
+    const dateWithoutHypen: string[] = selectedDate.split("-");
+    for (let item of tempAttArr) {
+      const facultyAttendanceDocId = `${dateWithoutHypen[0]}${dateWithoutHypen[1]}${dateWithoutHypen[2]}`;
+      await db
+        .collection("FACULTIES")
+        .doc(item.id)
+        .collection("ATTENDANCE")
+        .doc(facultyAttendanceDocId)
+        .set(item);
+        
+        
+        
+    }
+    
+
+    setSavingDone(true);
+    setIsSaving(false);
+    enqueueSnackbar("Attendance Saved Successfully!", { variant: "success" });
+  };
+  const handleAttendanceComment = (comment: string, id: string) => {
     const updatedStudents = FacultyData.map((item) =>
-      item.id === studentId ? { ...item, comment } : item
+      item.id === id ? { ...item, comment } : item
     );
     setFacultyData(updatedStudents);
   };
@@ -101,7 +202,7 @@ export const FacultyAttendance = () => {
           <Paper sx={{ p: 2, border: "1px solid var(--bs-gray-300)" }}>
             <Box
               component="form"
-              //               onSubmit={fetchstudent}
+              onSubmit={fetchFacuility}
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -120,25 +221,6 @@ export const FacultyAttendance = () => {
                   />
                   {/* <FormHelperText>This is a helper text.</FormHelperText> */}
                 </FormControl>
-                <FormControl>
-                  <FormLabel>Facuities</FormLabel>
-                  <Select
-                    required
-                    placeholder="Class"
-                    defaultValue={null}
-                    value={selectedClass}
-                    onChange={(e, val) => setSelectedClass(val)}
-                    sx={{ minWidth: 200 }}
-                  >
-                    {SCHOOL_CLASSES.map((item, i) => {
-                      return (
-                        <Option value={item.value} key={item.id}>
-                          {item.title}{" "}
-                        </Option>
-                      );
-                    })}
-                  </Select>
-                </FormControl>
               </div>
               <div style={{ display: "flex", gap: "10px" }}>
                 <Button sx={{ height: 20 }} type="submit">
@@ -148,7 +230,7 @@ export const FacultyAttendance = () => {
                   <Button
                     startDecorator={<SaveIcon />}
                     sx={{ height: 20 }}
-                    //   onClick={handleSaveAttendance}
+                    onClick={handleSaveAttendance}
                     color="success"
                     loading={isSaving}
                     disabled={isSavingDone}
@@ -205,7 +287,7 @@ export const FacultyAttendance = () => {
                     <thead>
                       <tr>
                         <th style={{ width: "150px" }}>ID</th>
-                        <th>Students</th>
+                        <th>Faculities</th>
                         <th>Action</th>
                         <th style={{ textAlign: "right", width: "190px" }}>
                           Comments
@@ -213,11 +295,11 @@ export const FacultyAttendance = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredStudents &&
-                        filteredStudents.map((faculty, i) => {
+                      {filteredfaculty &&
+                        filteredfaculty.map((faculty, i) => {
                           return (
                             <tr key={faculty.id}>
-                              <td>{faculty.faculty_number}</td>
+                              <td>{faculty.faculty_phone}</td>
                               <td>
                                 <div
                                   style={{

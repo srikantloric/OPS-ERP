@@ -29,4 +29,19 @@
 }
 .pageHeader svg:hover {
   background-color: var(--bs-gray-400);
+}
+
+.editBtn {
+  cursor: pointer;
+  height: 38px;
+  width: 30px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid rgb(255, 255, 255);
+  color: #fff;
+  background-color: var(--bs-primary);
+}
+
+.editBtn:hover {
+  background-color: var(--bs-secondary);
 }/*# sourceMappingURL=AddStudent.module.css.map */
