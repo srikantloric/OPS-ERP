@@ -1,5 +1,8 @@
 import firebase from "../firebase";
 
+
+export type IPaymentStatus = "UNPAID" | "PARTIAL" | "PAID"
+
 export interface IPaymentNL {
   challanId: string;
   paymentId:string;
@@ -9,7 +12,7 @@ export interface IPaymentNL {
   breakdown: { headerTitle: string; amount: number; amountPaid: number }[];
   recievedOn: firebase.firestore.Timestamp;
   recievedBy: string;
-  status: "UNPAID" | "PARTIAL" | "PAID";
+  status: IPaymentStatus
 }
 
 export interface IChallanHeaderType {

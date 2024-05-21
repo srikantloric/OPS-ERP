@@ -36,7 +36,12 @@ import Navbar from "components/Navbar/Navbar";
 import AddFeeArrearModal from "components/Modals/AddFeeArrearModal";
 import { FEE_HEADERS, paymentStatus } from "../../constants/index";
 import IndividualFeeDetailsHeader from "components/Headers/IndividualFeeDetailsHeader";
-import { IChallanHeaderType, IChallanNL, IPaymentNL } from "types/payment";
+import {
+  IChallanHeaderType,
+  IChallanNL,
+  IPaymentNL,
+  IPaymentStatus,
+} from "types/payment";
 import AddFeeConsessionModal from "components/Modals/AddFeeConsessionModal";
 import { MoneyRecive } from "iconsax-react";
 import {
@@ -300,7 +305,7 @@ function StudentFeeDetails() {
     }
   }, []);
 
-  const saveDataToDb = (data: IPaymentNL, isPartial: boolean) => {
+  const saveDataToDb = (data: IPaymentNL, pStatus: IPaymentStatus) => {
     setIsPaymentLoading(true);
     const batch = db.batch();
     const paymentCollRef = db
@@ -322,8 +327,8 @@ function StudentFeeDetails() {
 
     batch.update(challanDocRef, {
       feeHeaders: updatedFeeHeaders,
-      amountPaid: firebase.firestore.FieldValue.increment(data.amountPaid),
-      status: isPartial ? "PARTIAL" : "PAID",
+      amountPaid: data.amountPaid,
+      status: pStatus,
     });
 
     batch.set(paymentCollRef, data);
@@ -332,6 +337,9 @@ function StudentFeeDetails() {
       .commit()
       .then(() => {
         setIsPaymentLoading(false);
+        setRecievedAmountPartPayment(0)
+        setRecievedAmount(0)
+        setPartPaymentComment("")
         enqueueSnackbar("Payment Recieved Successfully!", {
           variant: "success",
         });
@@ -351,6 +359,16 @@ function StudentFeeDetails() {
           recievedAmountPartPayment!,
           true
         );
+
+        const totalPaidAmount = Number(
+          selectedChallanDetails.amountPaid + recievedAmountPartPayment!
+        );
+        const totalAmountDue = Number(selectedChallanDetails.totalAmount);
+
+        var pStatus: IPaymentStatus =
+          totalPaidAmount >= totalAmountDue ? "PAID" : "PARTIAL";
+        // console.log(pStatus)
+        // console.log(typeof(totalPaidAmount),typeof(totalAmountDue))
         const paymentDataForNL: IPaymentNL = {
           challanTitle: selectedChallanDetails.challanTitle,
           paymentId: generateAlphanumericUUID(8),
@@ -361,9 +379,9 @@ function StudentFeeDetails() {
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeader,
-          status: "PARTIAL",
+          status: pStatus,
         };
-        saveDataToDb(paymentDataForNL, true);
+        saveDataToDb(paymentDataForNL, pStatus);
       } else {
         // const feeHeadersList = createFeeHeaders(selectedChallanDetails);
         const updatedFeeHeader = distributePaidAmount(
@@ -383,7 +401,7 @@ function StudentFeeDetails() {
           breakdown: updatedFeeHeader,
           status: "PAID",
         };
-        saveDataToDb(paymentDataForNL, false);
+        saveDataToDb(paymentDataForNL, "PAID");
       }
     }
   };

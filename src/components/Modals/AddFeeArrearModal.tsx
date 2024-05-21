@@ -75,7 +75,7 @@ const AddFeeArrearModal: React.FC<Props> = ({
       const challanRef = db
         .collection("STUDENTS")
         .doc(studentId)
-        .collection("PAYMENTS")
+        .collection("CHALLANS")
         .doc(challanDocId);
 
       // Fetch the current challan document
