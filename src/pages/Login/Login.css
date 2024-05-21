@@ -46,16 +46,18 @@
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  justify-content: space-between;
   background-color: #fff;
+  flex-direction: column;
 }
 
 .logo {
   height: 100px;
   width: 100px;
+  padding: 10px;
+  margin: 10px;
   border-radius: 50%;
-  border: 1px solid var(--bs-orange);
+  border: 2px solid var(--bs-orange);
   -o-object-fit: cover;
      object-fit: cover;
 }
@@ -124,8 +126,13 @@
 }
 
 .footer-content {
-  position: absolute;
   bottom: 0;
   margin-bottom: 10px;
   font-size: 14px;
+}
+
+@media screen and (max-width: 1080px) {
+  .left-section {
+    display: none;
+  }
 }/*# sourceMappingURL=Login.css.map */

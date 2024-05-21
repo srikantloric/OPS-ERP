@@ -22,16 +22,16 @@ import { SCHOOL_CLASSES, SCHOOL_FEE_MONTHS } from "config/schoolConfig";
 import { db } from "../../../firebase";
 import { useState } from "react";
 
-import { IStudentFeeChallan, StudentDetailsType } from "types/student";
+import { StudentDetailsType } from "types/student";
 import {
-  generateAlphanumericUUID,
+  generateChallanDocId,
   getChallanTitle,
   getPaymentDueDate,
-  makeDoubleDigit,
 } from "utilities/UtilitiesFunctions";
 import firebase from "firebase";
-import { FEE_TYPE_MONTHLY, paymentStatus } from "constants/index";
 import { enqueueSnackbar } from "notistack";
+import { IChallanNL } from "types/payment";
+import { generateFeeHeadersForChallan } from "utilities/PaymentUtilityFunctions";
 
 type StudentFeeDataType = {
   studentData: StudentDetailsType;
@@ -56,11 +56,8 @@ function GenerateMonthlyChallan() {
     // //Reset old state
     setStudentData([]);
 
-    const feeString =
-      "CHALLAN" +
-      makeDoubleDigit(selectedMonth!.toString()) +
-      selectedYear +
-      FEE_TYPE_MONTHLY;
+    const challanDocId = generateChallanDocId(selectedMonth!, selectedYear!);
+
     setLoading(true);
     db.collection("STUDENTS")
       .where("class", "==", selectedClass)
@@ -72,7 +69,7 @@ function GenerateMonthlyChallan() {
           documetSnap.forEach((snap) => {
             const docData = snap.data() as StudentDetailsType;
             if (docData.generatedChallans !== undefined) {
-              if (!docData.generatedChallans.includes(feeString)) {
+              if (!docData.generatedChallans.includes(challanDocId)) {
                 tempStudentArray.push({
                   studentData: docData,
                   isGenerated: false,
@@ -104,17 +101,9 @@ function GenerateMonthlyChallan() {
         enqueueSnackbar("Error" + e, { variant: "error" });
       });
   };
+
   const generateFee = () => {
-    //challan string
-    const monthYear = `${makeDoubleDigit(
-      selectedMonth!.toString()
-    )}${selectedYear}`;
-
-    const feeString = `CHALLAN${monthYear}`;
-
-    const feeChallanCode = `CHALLAN${makeDoubleDigit(
-      selectedMonth!.toString()
-    )}${selectedYear}M01`;
+    const challanDocId = generateChallanDocId(selectedMonth!, selectedYear!);
 
     if (studentData.length > 0) {
       const tempArr: StudentFeeDataType[] = [];
@@ -123,94 +112,85 @@ function GenerateMonthlyChallan() {
 
       studentData.forEach(async (student) => {
         if (!student.isGenerated) {
-          // Create payment entry in subcollection 'PAYMENTS'
-          const extPaymentCollDOcId = generateAlphanumericUUID(30);
+          //challan
+          const { totalFeeAmount, feeHeaderList } =
+            generateFeeHeadersForChallan(student.studentData);
 
-          if (
-            student.studentData.monthly_fee !== undefined &&
-            student.studentData.transportation_fee !== undefined &&
-            student.studentData.computer_fee !== undefined
-          ) {
-            const paymentData: IStudentFeeChallan = {
-              docIdExt: extPaymentCollDOcId,
-              studentId: student.studentData.id,
-              challanDocId: feeString,
-              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-              createdBy: "Admin",
-              paymentId: "" + Math.floor(100000 + Math.random() * 900000),
-              challanTitle: getChallanTitle(selectedMonth!, selectedYear!),
-              monthYear: monthYear,
-              paymentStatus: paymentStatus.DEFAULT,
-              paymentDueDate: paymentDueDate,
-              monthlyFee: student.studentData.monthly_fee!,
-              computerFee: student.studentData.computer_fee!,
-              lateFine: lateFine,
-              transportationFee: student.studentData.transportation_fee!,
-            };
+          const challan: IChallanNL = {
+            challanTitle: getChallanTitle(selectedMonth!, selectedYear!),
+            studentId: student.studentData.id,
+            challanId: challanDocId,
+            feeHeaders: feeHeaderList,
+            totalAmount: totalFeeAmount,
+            amountPaid: 0,
+            status: "UNPAID",
+            createdBy: "Admin",
+            createdOn: firebase.firestore.Timestamp.fromDate(new Date()),
+            dueDate: firebase.firestore.Timestamp.fromDate(
+              new Date(paymentDueDate)
+            ),
+            feeDiscount: student.studentData.fee_discount || 0,
+            lateFine: lateFine,
+            feeConsession:0
+          };
 
-            var batch = db.batch();
+          var batch = db.batch();
 
-            var studentPaymentRef = db
-              .collection("STUDENTS")
-              .doc(student.studentData.id)
-              .collection("PAYMENTS")
-              .doc(feeString);
+          var studentPaymentRef = db
+            .collection("STUDENTS")
+            .doc(student.studentData.id)
+            .collection("CHALLANS")
+            .doc(challanDocId);
 
-            var extPaymentCollRef = db
-              .collection("PAYMENTS")
-              .doc(extPaymentCollDOcId);
+          batch.set(studentPaymentRef, challan);
 
-            batch.set(studentPaymentRef, paymentData);
-            batch.set(extPaymentCollRef, paymentData);
+          // Update generatedFees array in STUDENTS document
+          var studentDocRef = db
+            .collection("STUDENTS")
+            .doc(student.studentData.id);
 
-            // Update generatedFees array in STUDENTS document
-            var studentDocRef = db
-              .collection("STUDENTS")
-              .doc(student.studentData.id);
-
-            if (student.studentData.generatedChallans) {
-              var arrT = student.studentData.generatedChallans;
-              arrT.push(feeChallanCode);
-              // Update the document by appending the feeChallanCode string to the generatedChallans array
-              batch.update(studentDocRef, {
-                generatedChallans: arrT,
-              });
-            } else {
-              var arrTem: string[] = [];
-              arrTem.push(feeChallanCode);
-              batch.update(studentDocRef, {
-                generatedChallans: arrTem,
-              });
-            }
-            // Push the Promise returned by batch.commit() into the promises array
-            promises.push(
-              new Promise((resolve, reject) => {
-                // Commit the batch
-                batch
-                  .commit()
-                  .then(() => {
-                    const successData: StudentFeeDataType = {
-                      isGenerated: true,
-                      studentData: student.studentData,
-                      errorLog: "Generated successfully",
-                    };
-                    tempArr.push(successData);
-                    resolve();
-                  })
-                  .catch((error) => {
-                    console.error("Error during batch commit:", error);
-                    reject(error);
-                  });
-              })
-            );
+          if (student.studentData.generatedChallans) {
+            var arrT = student.studentData.generatedChallans;
+            arrT.push(challanDocId);
+            // Update the document by appending the feeChallanCode string to the generatedChallans array
+            batch.update(studentDocRef, {
+              generatedChallans: arrT,
+            });
           } else {
-            const failureData: StudentFeeDataType = {
-              isGenerated: false,
-              studentData: student.studentData,
-              errorLog: "Monthly/Computer/Trans. not found",
-            };
-            tempArr.push(failureData);
+            var arrTem: string[] = [];
+            arrTem.push(challanDocId);
+            batch.update(studentDocRef, {
+              generatedChallans: arrTem,
+            });
           }
+          // Push the Promise returned by batch.commit() into the promises array
+          promises.push(
+            new Promise((resolve, reject) => {
+              // Commit the batch
+              batch
+                .commit()
+                .then(() => {
+                  const successData: StudentFeeDataType = {
+                    isGenerated: true,
+                    studentData: student.studentData,
+                    errorLog: "Generated successfully",
+                  };
+                  tempArr.push(successData);
+                  resolve();
+                })
+                .catch((error) => {
+                  console.error("Error during batch commit:", error);
+                  reject(error);
+                });
+            })
+          );
+        } else {
+          const failureData: StudentFeeDataType = {
+            isGenerated: false,
+            studentData: student.studentData,
+            errorLog: "Monthly/Computer/Trans. not found",
+          };
+          tempArr.push(failureData);
         }
       });
       // Wait for all Promises (batch commits) to resolve

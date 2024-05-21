@@ -9,27 +9,15 @@ import {
   SCISSOR_ICON,
 } from "./Base64Url";
 import {
-    SCHOOL_ACCOUNTANT,
+  SCHOOL_ACCOUNTANT,
   SCHOOL_ADDRESS,
   SCHOOL_CONTACT,
   SCHOOL_EMAIL,
   SCHOOL_NAME,
 } from "config/schoolConfig";
 import { StudentDetailsType } from "types/student";
-
-type FeeGeneratorPropType = {
-  reciept_no: number;
-  reciept_date: string;
-  student_data: StudentDetailsType;
-  fee_months: string[];
-  fee_type_detail: feeTypes[];
-  total_fee:number
-};
-
-interface feeTypes {
-  name: string;
-  value: number;
-}
+import { IChallanHeaderType } from "types/payment";
+import { getClassNameByValue } from "./UtilitiesFunctions";
 
 const fetchQrCode = async () => {
   const res = await fetch(
@@ -48,9 +36,31 @@ const fetchQrCode = async () => {
   return data.qrImageBase64;
 };
 
-export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
-  console.log(props);
-  if (props.student_data) {
+interface Props {
+  studentMasterData: StudentDetailsType;
+  feeHeaders: IChallanHeaderType[];
+  challanMonths: string[];
+  totalAmount: number;
+  totalPaidAmount: number;
+  paidAmount: number;
+  discountAmount: number;
+  recieptId: string;
+  recieptDate: string;
+}
+
+export const GenerateFeeReciept = async ({
+  studentMasterData,
+  feeHeaders,
+  challanMonths,
+  totalAmount,
+  totalPaidAmount,
+  paidAmount,
+  discountAmount,
+  recieptDate,
+  recieptId,
+}: Props) => {
+  console.log(studentMasterData);
+  if (studentMasterData) {
     //Page Size
     const pHeight = 210;
     const pWidth = 148.5;
@@ -232,13 +242,13 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
     doc.rect(pBorderPaddOffsetX, 46.5, pWidth - pBorderPadd * 2 + 1, 6, "F");
     doc.setTextColor("#000");
     doc.setFontSize(8);
-    doc.text("Reciept No: 663", pBorderPadd + 3, 50.5);
-    doc.text("Reciept No: 663", pBorderPaddOffsetX + 3, 50.5);
-    doc.text("Date : 18/03/2024", pWidth - pBorderPadd - 2, 50.5, {
+    doc.text("Reciept No: " + recieptId, pBorderPadd + 3, 50.5);
+    doc.text("Reciept No: " + recieptId, pBorderPaddOffsetX + 3, 50.5);
+    doc.text("Date : " + recieptDate, pWidth - pBorderPadd - 2, 50.5, {
       align: "right",
     });
     doc.text(
-      "Date : 18/03/2024",
+      "Date/Time : " + recieptDate,
       pBorderPaddOffsetX + pWidth - pBorderPadd * 2,
       50.5,
       {
@@ -253,18 +263,18 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
     let studentDetailsStartY = 58;
 
     doc.text(
-      "Name: " + props.student_data.student_name.toLocaleUpperCase(),
+      "Name: " + studentMasterData.student_name.toLocaleUpperCase(),
       pBorderPadd + 3,
       studentDetailsStartY
     );
     doc.text(
-      "Name: " + props.student_data.student_name.toLocaleUpperCase(),
+      "Name: " + studentMasterData.student_name.toLocaleUpperCase(),
       pBorderPaddOffsetX + 3,
       studentDetailsStartY
     );
 
     doc.text(
-      "Class : " + props.student_data.class,
+      "Class : " + getClassNameByValue(studentMasterData.class!),
       pWidth - pBorderPadd - 2,
       studentDetailsStartY,
       {
@@ -272,7 +282,7 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       }
     );
     doc.text(
-      "Class : " + props.student_data.class,
+      "Class : " + getClassNameByValue(studentMasterData.class!),
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       studentDetailsStartY,
       {
@@ -281,17 +291,17 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
     );
 
     doc.text(
-      "Father Name: " + props.student_data.father_name,
+      "Father Name: " + studentMasterData.father_name,
       pBorderPadd + 3,
       studentDetailsStartY + 4.5
     );
     doc.text(
-      "Father Name: " + props.student_data.father_name,
+      "Father Name: " + studentMasterData.father_name,
       pBorderPaddOffsetX + 3,
       studentDetailsStartY + 4.5
     );
     doc.text(
-      "DOB : " + props.student_data.dob,
+      "DOB : " + studentMasterData.dob,
       pWidth - pBorderPadd - 2,
       studentDetailsStartY + 4.5,
       {
@@ -299,7 +309,7 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       }
     );
     doc.text(
-      "DOB : " + props.student_data.dob,
+      "DOB : " + studentMasterData.dob,
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       studentDetailsStartY + 4.5,
       {
@@ -307,57 +317,57 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       }
     );
     doc.text(
-      "Phone No: " + props.student_data.contact_number,
+      "Phone No: " + studentMasterData.contact_number,
       pBorderPadd + 3,
       studentDetailsStartY + 8.5
     );
     doc.text(
-      "Phone No: " + props.student_data.contact_number,
+      "Phone No: " + studentMasterData.contact_number,
       pBorderPaddOffsetX + 3,
       studentDetailsStartY + 8.5
     );
     doc.text(
-      "Roll No: " + props.student_data.class_roll,
+      "Roll No: " + studentMasterData.class_roll,
       pWidth - pBorderPadd - 2,
       studentDetailsStartY + 8.5,
       { align: "right" }
     );
     doc.text(
-      "Roll No: " + props.student_data.class_roll,
+      "Roll No: " + studentMasterData.class_roll,
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       studentDetailsStartY + 8.5,
       { align: "right" }
     );
     doc.text(
-      "Section -" + props.student_data.section,
+      "Section -" + studentMasterData.section,
       pWidth - pBorderPadd - 2,
       studentDetailsStartY + 12.5,
       { align: "right" }
     );
     doc.text(
-      "Section -" + props.student_data.section,
+      "Section -" + studentMasterData.section,
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       studentDetailsStartY + 12.5,
       { align: "right" }
     );
     doc.text(
-      "Reg. No : " + props.student_data.admission_no,
+      "Reg. No : " + studentMasterData.admission_no,
       pBorderPadd + 3,
       studentDetailsStartY + 12.5
     );
     doc.text(
-      "Reg. No : " + props.student_data.admission_no,
+      "Reg. No : " + studentMasterData.admission_no,
       pBorderPaddOffsetX + 3,
       studentDetailsStartY + 12.5
     );
 
     doc.text(
-      "Address : " + props.student_data.address,
+      "Address : " + studentMasterData.address,
       pBorderPadd + 3,
       studentDetailsStartY + 16.5
     );
     doc.text(
-      "Address : " + props.student_data.address,
+      "Address : " + studentMasterData.address,
       pBorderPaddOffsetX + 3,
       studentDetailsStartY + 16.5
     );
@@ -381,14 +391,16 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       feeSectionStartPointY - 6
     );
 
+    const feeMonthsString = challanMonths.join(", ");
+
     doc.text(
-      "Fee Months : JAN, FEB",
+      "Fee Months : " + feeMonthsString,
       pBorderPadd + 3,
       feeSectionStartPointY - 2
     );
 
     doc.text(
-      "Fee Months : JAN, FEB",
+      "Fee Months : " + feeMonthsString,
       pBorderPaddOffsetX + 3,
       feeSectionStartPointY - 2
     );
@@ -432,12 +444,11 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
 
     doc.text("Particular", pBorderPadd + 3, feeSectionStartPointY + 4);
     doc.text("Particular", pBorderPaddOffsetX + 3, feeSectionStartPointY + 4);
-    doc.text("Fee Amount", pBorderPadd + 40, feeSectionStartPointY + 4);
-    doc.text("Fee Amount", pBorderPaddOffsetX + 40, feeSectionStartPointY + 4);
-    doc.text("Discount", pWidth - pWidth / 4 - 28, feeSectionStartPointY + 4);
+
+    doc.text("Fee Amount", pWidth - pWidth / 4 - 35, feeSectionStartPointY + 4);
     doc.text(
-      "Discount",
-      pBorderPaddOffsetX + pWidth - pWidth / 4 - 28,
+      "Fee Amount",
+      pBorderPaddOffsetX + pWidth - pWidth / 4 - 35,
       feeSectionStartPointY + 4
     );
 
@@ -462,36 +473,70 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
     doc.setTextColor("#000");
 
     let feeTypeLayoutHeight = 1;
-    props.fee_type_detail.forEach((item, i) => {
+    // Determine the number of iterations needed to draw at least four rows
+    const rowCount = Math.max(3, feeHeaders.length);
+
+    for (let i = 0; i < rowCount; i++) {
+      const item = feeHeaders[i] || {
+        headerTitle: "",
+        amountPaid: 0,
+        amount: 0,
+      };
       feeTypeLayoutHeight = feeSectionStartPointY + (i + 2) * 6;
-      doc.text(item.name, pBorderPadd + 3, feeTypeLayoutHeight);
-      doc.text(item.name, pBorderPaddOffsetX + 3, feeTypeLayoutHeight);
-      doc.text(
-        item.value.toString(),
-        pWidth - pBorderPadd - 3,
-        feeTypeLayoutHeight,
-        { align: "right" }
-      );
-      doc.text(
-        item.value.toString(),
-        pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
-        feeTypeLayoutHeight,
-        { align: "right" }
-      );
 
-      doc.text("0", pBorderPadd + 22 + 29, feeTypeLayoutHeight, {
-        align: "center",
-      });
-      doc.text("0", pBorderPaddOffsetX + 22 + 29, feeTypeLayoutHeight, {
-        align: "center",
-      });
-      doc.text("0", pBorderPadd + 22 + 29 + 38, feeTypeLayoutHeight, {
-        align: "center",
-      });
-      doc.text("0", pBorderPaddOffsetX + 22 + 29 + 38, feeTypeLayoutHeight, {
-        align: "center",
-      });
+      // Draw fee header title and amounts for each row
+      doc.text(item.headerTitle, pBorderPadd + 3, feeTypeLayoutHeight);
+      doc.text(item.headerTitle, pBorderPaddOffsetX + 3, feeTypeLayoutHeight);
 
+      if (item.amountPaid) {
+        doc.text(
+          "Rs. " + item.amountPaid,
+          pWidth - pBorderPadd - 3,
+          feeTypeLayoutHeight,
+          { align: "right" }
+        );
+        doc.text(
+          "Rs. " + item.amountPaid,
+          pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+          feeTypeLayoutHeight,
+          { align: "right" }
+        );
+      } else {
+        doc.text("", pWidth - pBorderPadd - 3, feeTypeLayoutHeight, {
+          align: "right",
+        });
+        doc.text(
+          "",
+          pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+          feeTypeLayoutHeight,
+          { align: "right" }
+        );
+      }
+      ////amount
+
+      if (item.amount) {
+        doc.text(
+          "Rs. " + item.amount.toString(),
+          pBorderPadd + 22 + 29 + 38,
+          feeTypeLayoutHeight,
+          { align: "center" }
+        );
+        doc.text(
+          "Rs. " + item.amount.toString(),
+          pBorderPaddOffsetX + 22 + 29 + 38,
+          feeTypeLayoutHeight,
+          { align: "center" }
+        );
+      } else {
+        doc.text("", pBorderPadd + 22 + 29 + 38, feeTypeLayoutHeight, {
+          align: "center",
+        });
+        doc.text("", pBorderPaddOffsetX + 22 + 29 + 38, feeTypeLayoutHeight, {
+          align: "center",
+        });
+      }
+
+      // Draw horizontal lines for each row
       doc.setDrawColor("#cbc9c9");
       doc.line(
         pBorderPadd,
@@ -505,20 +550,7 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
         pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 - 1),
         feeTypeLayoutHeight + 2
       );
-    });
-
-    doc.line(
-      pWidth / 4,
-      feeSectionStartPointY + 6,
-      pWidth / 4,
-      feeTypeLayoutHeight + 10
-    );
-    doc.line(
-      pBorderPaddOffsetX + pWidth / 4,
-      feeSectionStartPointY + 6,
-      pBorderPaddOffsetX + pWidth / 4,
-      feeTypeLayoutHeight + 10
-    );
+    }
 
     doc.line(
       pWidth / 2,
@@ -540,9 +572,9 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       feeTypeLayoutHeight + 10
     );
     doc.line(
-      pBorderPaddOffsetX + pWidth - pWidth / 4,
+      pBorderPaddOffsetX + pWidth - pWidth / 4 - 7,
       feeSectionStartPointY + 6,
-      pBorderPaddOffsetX + pWidth - pWidth / 4,
+      pBorderPaddOffsetX + pWidth - pWidth / 4 - 7,
       feeTypeLayoutHeight + 10
     );
 
@@ -560,31 +592,48 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       feeTypeLayoutHeight + 10
     );
 
-    doc.text("Total-", pBorderPadd + 15, feeTypeLayoutHeight + 7);
-    doc.text("Total-", pBorderPaddOffsetX + 22, feeTypeLayoutHeight + 7);
-
     //fee amount total
-    doc.text("2000", pBorderPadd + 22 + 29, feeTypeLayoutHeight + 7, {
+    doc.text("Grand Total", pBorderPadd + 22 + 29, feeTypeLayoutHeight + 7, {
       align: "center",
-    });
-    doc.text("2000", pBorderPaddOffsetX + 22 + 29, feeTypeLayoutHeight + 7, {
-      align: "center",
-    });
-
-    ///fee discount total
-    doc.text("0", pBorderPadd + 22 + 29 + 38, feeTypeLayoutHeight + 7, {
-      align: "center",
-    });
-    doc.text("0", pBorderPaddOffsetX + 22 + 29 + 38, feeTypeLayoutHeight + 7, {
-      align: "center",
-    });
-
-    //totoal paid amount
-    doc.text("2000", pWidth - pBorderPadd - 3, feeTypeLayoutHeight + 7, {
-      align: "right",
     });
     doc.text(
-      "2000",
+      "Grand Total",
+      pBorderPaddOffsetX + 22 + 29,
+      feeTypeLayoutHeight + 7,
+      {
+        align: "center",
+      }
+    );
+
+    //total Amount
+    doc.text(
+      "Rs." + totalAmount,
+      pBorderPadd + 22 + 29 + 38,
+      feeTypeLayoutHeight + 7,
+      {
+        align: "center",
+      }
+    );
+    doc.text(
+      "Rs." + totalAmount,
+      pBorderPaddOffsetX + 22 + 29 + 38,
+      feeTypeLayoutHeight + 7,
+      {
+        align: "center",
+      }
+    );
+
+    //totoal paid amount
+    doc.text(
+      "Rs." + paidAmount,
+      pWidth - pBorderPadd - 3,
+      feeTypeLayoutHeight + 7,
+      {
+        align: "right",
+      }
+    );
+    doc.text(
+      "Rs." + paidAmount,
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       feeTypeLayoutHeight + 7,
       {
@@ -605,46 +654,96 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       feeTypeLayoutHeight + 17
     );
 
-    doc.setFont("Poppins", "semibold");
     doc.text(
-      "Total Paid Amount: Rs."+props.total_fee,
+      "Discount: Rs." + discountAmount,
       pWidth - pBorderPadd - 3,
       feeTypeLayoutHeight + 14.5,
       { align: "right" }
     );
     doc.text(
-      "Total Paid Amount: Rs."+props.total_fee,
+      "Discount: Rs." + discountAmount,
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       feeTypeLayoutHeight + 14.5,
       { align: "right" }
     );
 
+    /////Total paid amount
+    doc.setFont("Poppins", "semibold");
+    doc.text(
+      "Total Paid Amount: Rs." + totalPaidAmount,
+      pWidth - pBorderPadd - 3,
+      feeTypeLayoutHeight + 21,
+      { align: "right" }
+    );
+    doc.text(
+      "Total Paid Amount: Rs." + totalPaidAmount,
+      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+      feeTypeLayoutHeight + 21,
+      { align: "right" }
+    );
+    doc.line(
+      pBorderPadd,
+      feeTypeLayoutHeight + 23,
+      pWidth - pBorderPadd,
+      feeTypeLayoutHeight + 23
+    );
+
+    doc.line(
+      pBorderPaddOffsetX,
+      feeTypeLayoutHeight + 23,
+      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 - 1),
+      feeTypeLayoutHeight + 23
+    );
+    //////////////
+
     doc.setFont("Poppins", "normal");
 
     const feeRemarkAndAccOffY = feeTypeLayoutHeight + 40;
 
-    doc.text("Remark:  ", pBorderPadd + 3, feeRemarkAndAccOffY);
-    doc.text("Remark:  ", pBorderPaddOffsetX + 3, feeRemarkAndAccOffY);
+    doc.setFontSize(8);
+    var maxWidth = 100; // Set the maximum width in PDF units (e.g., points)
+    var text =
+      "This is a computer-generated document. No signature is required. The fee receipt can be easily downloaded by scanning the QR code.";
 
+    // Split text into lines based on maxWidth
+    var lines = doc.splitTextToSize(text, maxWidth);
+
+    // Add each line to the document
+    lines.forEach((line: any, index: number) => {
+      doc.text(line, pBorderPadd + 25, pHeight - pBorderPadd - 17 + index * 6);
+    });
+
+    // Repeat for the second block of text
+    lines.forEach((line: any, index: number) => {
+      doc.text(
+        line,
+        pBorderPaddOffsetX + 25,
+        pHeight - pBorderPadd - 17 + index * 6
+      );
+    });
     //Accountant Details
-    doc.text(SCHOOL_ACCOUNTANT, pWidth - pBorderPadd - 10, feeRemarkAndAccOffY-10, {
+    doc.text(
+      SCHOOL_ACCOUNTANT,
+      pWidth - pBorderPadd - 10,
+      feeRemarkAndAccOffY - 5,
+      {
         align: "right",
-      });
+      }
+    );
 
-    doc.text("Accountant", pWidth - pBorderPadd - 10, feeRemarkAndAccOffY, {
+    doc.text("Accountant", pWidth - pBorderPadd - 13, feeRemarkAndAccOffY, {
       align: "right",
     });
 
-
     doc.text(
-        SCHOOL_ACCOUNTANT,
-        pBorderPaddOffsetX + pWidth - pBorderPadd - 10 - 3,
-        feeRemarkAndAccOffY-10,
-        { align: "right" }
-      );
+      SCHOOL_ACCOUNTANT,
+      pBorderPaddOffsetX + pWidth - pBorderPadd - 15,
+      feeRemarkAndAccOffY - 5,
+      { align: "right" }
+    );
     doc.text(
       "Accountant",
-      pBorderPaddOffsetX + pWidth - pBorderPadd - 10 - 3,
+      pBorderPaddOffsetX + pWidth - pBorderPadd - 17,
       feeRemarkAndAccOffY,
       { align: "right" }
     );
@@ -668,13 +767,13 @@ export const GenerateFeeReciept = async (props: FeeGeneratorPropType) => {
       20
     );
 
-    const textLines = doc.splitTextToSize(
-      "Note : Students must pay their fees by the 10th of each month to avoid a late fine of RS. 20.00.",
-      65
-    );
+    // const textLines = doc.splitTextToSize(
+    //   "Note : Students must pay their fees by the 10th of each month to avoid a late fine of RS. 20.00.",
+    //   65
+    // );
 
-    doc.text(textLines, pBorderPadd + 25, pHeight - 26);
-    doc.text(textLines, pBorderPaddOffsetX + 25, pHeight - 26);
+    // doc.text(textLines, pBorderPadd + 25, pHeight - 26);
+    // doc.text(textLines, pBorderPaddOffsetX + 25, pHeight - 26);
     doc.setFontSize(6);
     doc.text("Scan to download.", pBorderPadd + 3, pHeight - pBorderPadd - 3);
     doc.text(
