@@ -56,7 +56,13 @@ import { AnimatePresence, motion } from "framer-motion";
 import InstantPaymentModal from "components/Modals/InstantPaymentModal";
 import DiscountIcon from "@mui/icons-material/Discount";
 import DeleteChallanConfirmationDialog from "components/Modals/DeleteChallanConfirmationDialog";
-import { distributePaidAmount } from "utilities/PaymentUtilityFunctions";
+import {
+  distributePaidAmount,
+  extractChallanIdsAndHeaders,
+  generateRandomSixDigitNumber,
+} from "utilities/PaymentUtilityFunctions";
+import { GenerateFeeReciept } from "utilities/GenerateFeeReciept";
+import { StudentDetailsType } from "types/student";
 const SearchAnotherButton = () => {
   const historyRef = useNavigate();
   return (
@@ -337,9 +343,9 @@ function StudentFeeDetails() {
       .commit()
       .then(() => {
         setIsPaymentLoading(false);
-        setRecievedAmountPartPayment(0)
-        setRecievedAmount(0)
-        setPartPaymentComment("")
+        setRecievedAmountPartPayment(0);
+        setRecievedAmount(0);
+        setPartPaymentComment("");
         enqueueSnackbar("Payment Recieved Successfully!", {
           variant: "success",
         });
@@ -380,6 +386,7 @@ function StudentFeeDetails() {
           recievedOn: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeader,
           status: pStatus,
+          feeConsession: selectedChallanDetails.feeConsession,
         };
         saveDataToDb(paymentDataForNL, pStatus);
       } else {
@@ -400,6 +407,7 @@ function StudentFeeDetails() {
           recievedOn: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeader,
           status: "PAID",
+          feeConsession: selectedChallanDetails.feeConsession,
         };
         saveDataToDb(paymentDataForNL, "PAID");
       }
@@ -432,6 +440,70 @@ function StudentFeeDetails() {
           handlePaymentRecieveButton(e, true);
         }
       }
+    }
+  };
+
+  const generateCurrentFeeReciept = async () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set time to midnight
+    const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+
+    const db = firebase.firestore();
+    console.log(location.state[0].id);
+    const paymentsRef = db
+      .collection("STUDENTS")
+      .doc(location.state[0].id)
+      .collection("PAYMENTS");
+    const query = paymentsRef.where("recievedOn", ">=", todayTimestamp);
+
+    try {
+      const snapshot = await query.get();
+      console.log(snapshot.size);
+      const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
+        ...(doc.data() as IPaymentNL),
+      }));
+      console.log(paymentsData);
+
+      const {
+        challanMonthYear,
+        feeHeaders,
+        totalAmount,
+        totalPaidAmount,
+        discountAmount,
+        paidAmount,
+      } = extractChallanIdsAndHeaders(paymentsData);
+
+      const recieptId = generateRandomSixDigitNumber().toString();
+      const recieptDate = new Date().toLocaleString();
+
+      const url = await GenerateFeeReciept({
+        challanMonths: challanMonthYear,
+        feeHeaders: feeHeaders,
+        studentMasterData: location.state[0] as StudentDetailsType,
+        totalAmount: totalAmount,
+        totalPaidAmount: totalPaidAmount,
+        paidAmount: paidAmount,
+        discountAmount: discountAmount,
+        recieptId: recieptId,
+        recieptDate: recieptDate,
+      });
+
+      // Create a hidden iframe
+      if (url) {
+        const iframe: HTMLIFrameElement = document.createElement("iframe");
+        iframe.style.display = "none";
+        iframe.src = url!;
+
+        iframe.onload = () => {
+          iframe.contentWindow?.print();
+        };
+
+        document.body.appendChild(iframe);
+      } else {
+        alert("erro");
+      }
+    } catch (error) {
+      console.error("Error fetching payments:", error);
     }
   };
 
@@ -474,7 +546,11 @@ function StudentFeeDetails() {
               Instant Payment
             </Button>
 
-            <Button variant="soft" startDecorator={<Print />}></Button>
+            <Button
+              variant="soft"
+              startDecorator={<Print />}
+              onClick={generateCurrentFeeReciept}
+            ></Button>
             <Button variant="soft" startDecorator={<SettingsIcon />}></Button>
           </Box>
         </Box>

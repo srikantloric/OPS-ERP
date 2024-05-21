@@ -1,8 +1,8 @@
 export const SCHOOL_NAME = "Orient Public School"
 export const SCHOOL_ADDRESS = "Patardih, Nawdiha, Jamua, Giridih, Jharkhand - 815312"
-export const SCHOOL_CONTACT = "+91-7979080633"
+export const SCHOOL_CONTACT = "+91-9973669863, +91-9608108499,+91-6299820529"
 export const SCHOOL_EMAIL = "contact@orientpublicschool.org"
-export const SCHOOL_ACCOUNTANT = ''
+export const SCHOOL_ACCOUNTANT = 'Umakant Verma'
 
 
 

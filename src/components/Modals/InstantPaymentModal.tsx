@@ -16,7 +16,7 @@ import {
   Stack,
   Typography,
 } from "@mui/joy";
-import { FEE_HEADERS, paymentStatus } from "../../constants/index";
+import { FEE_HEADERS } from "../../constants/index";
 import { Additem } from "iconsax-react";
 import { useEffect, useState } from "react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -26,9 +26,11 @@ import {
   generateChallanDocId,
   getChallanTitle,
 } from "utilities/UtilitiesFunctions";
-import { IStudentFeeChallanExtended, StudentDetailsType } from "types/student";
+import { StudentDetailsType } from "types/student";
 import { enqueueSnackbar } from "notistack";
 import firebase, { db } from "../../firebase";
+import { generateFeeHeadersForChallanWithMarkedAsPaid } from "utilities/PaymentUtilityFunctions";
+import { IChallanHeaderType, IChallanNL, IPaymentNL } from "types/payment";
 
 interface Props {
   open: boolean;
@@ -115,129 +117,184 @@ const InstantPaymentModal: React.FC<Props> = ({
     setTotalFee(totalFee);
   }, [feeDetail]);
 
-  const generateFeeChallan = () => {
+  const fetchStudentMasterData = async (studentId: string) => {
+    return await db.collection("STUDENTS").doc(studentId).get();
+  };
+
+  const generateFeeChallan = async () => {
     if (studentMasterData) {
-      const challanString = generateChallanDocId(selectedMonth, selectedYear);
+      const res = await fetchStudentMasterData(studentMasterData.id);
 
-      var isAlreadyGenerated: boolean = false;
+      if (res.exists) {
+        console.log(res.data());
+        const studentMasterDataUpdated = res.data() as StudentDetailsType;
 
-      if (studentMasterData.generatedChallans) {
-        isAlreadyGenerated =
-          studentMasterData.generatedChallans.includes(challanString);
-      }
+        const challanDocId = generateChallanDocId(selectedMonth, selectedYear);
 
-      const challanId = Math.floor(100000 + Math.random() * 900000).toString();
+        var isAlreadyGenerated: boolean = false;
 
-      if (!isAlreadyGenerated) {
-        setLoading(true);
-        const extPaymentCollDOcId = generateAlphanumericUUID(30);
-        const paymentCollData: IStudentFeeChallanExtended = {
-          docIdExt: extPaymentCollDOcId,
-          studentId: studentMasterData.id,
-          challanDocId: challanString,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          createdBy: "Admin",
-          paymentId: challanId,
-          challanTitle: getChallanTitle(selectedMonth!, selectedYear!),
-          paymentStatus: isMarkedAsPaid
-            ? paymentStatus.PAID
-            : paymentStatus.DEFAULT,
-          paymentDueDate: "9999/12/31",
-          monthlyFee: feeDetail.monthlyFee,
-          computerFee: feeDetail.computerFee,
-          transportationFee: feeDetail.transportationFee,
-          lateFine: feeDetail.lateFine,
-          paidAmount: isMarkedAsPaid ? totalFee : 0,
-        };
-
-        if (feeDetail.admissionFee) {
-          paymentCollData["admissionFee"] = feeDetail.admissionFee;
-        }
-        if (feeDetail.annualFee) {
-          paymentCollData["annualFee"] = feeDetail.annualFee;
-        }
-        if (feeDetail.examFee) {
-          paymentCollData["examFee"] = feeDetail.examFee;
-        }
-        if (feeDetail.otherFee) {
-          paymentCollData["otherFee"] = feeDetail.otherFee;
+        if (studentMasterDataUpdated.generatedChallans) {
+          isAlreadyGenerated =
+            studentMasterDataUpdated.generatedChallans.includes(challanDocId);
         }
 
-        //save data to db
-        var batch = db.batch();
+        if (!isAlreadyGenerated) {
+          // setLoading(true);
 
-        var studentPaymentRef = db
-          .collection("STUDENTS")
-          .doc(studentMasterData.id)
-          .collection("PAYMENTS")
-          .doc(challanString);
+          const { totalFeeAmount, feeHeaderList } =
+            generateFeeHeadersForChallanWithMarkedAsPaid(
+              studentMasterDataUpdated,
+              isMarkedAsPaid
+            );
 
-        var extPaymentCollRef = db
-          .collection("PAYMENTS")
-          .doc(extPaymentCollDOcId);
+          console.log(totalFeeAmount);
 
-        var studentDocRef = db.collection("STUDENTS").doc(studentMasterData.id);
+          var additionalFeeHeaders: IChallanHeaderType[] = [];
+          const feeTypes = [
+            { headerTitle: "admissionFee", amount: feeDetail.admissionFee },
+            { headerTitle: "annualFee", amount: feeDetail.annualFee },
+            { headerTitle: "examFee", amount: feeDetail.examFee },
+            { headerTitle: "otherFee", amount: feeDetail.otherFee },
+          ];
 
-        ///updating generatedChallans field
-        if (studentMasterData.generatedChallans) {
-          var arrT = studentMasterData.generatedChallans;
-          arrT.push(challanString);
-          // Update the document by appending the feeChallanCode string to the generatedChallans array
-          batch.update(studentDocRef, {
-            generatedChallans: arrT,
+          feeTypes.forEach((feeType) => {
+            if (feeType.amount) {
+              additionalFeeHeaders.push({
+                headerTitle: feeType.headerTitle,
+                amount: feeType.amount,
+                amountPaid: isMarkedAsPaid ? feeType.amount : 0,
+              });
+            }
           });
-        } else {
-          var arrTem: string[] = [];
-          arrTem.push(challanString);
-          batch.update(studentDocRef, {
-            generatedChallans: arrTem,
-          });
-        }
 
-        if (feeDetail.feeConsession) {
-          var feeConsessionLogRef = db
-            .collection("STUDENTS")
-            .doc(studentMasterData.id)
-            .collection("CONSESSION_LOG")
-            .doc();
-          //preparing data for consession log
-          const consesionLogData = {
-            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-            createdBy: "admin",
-            challanId: challanString,
-            paymentId: challanId,
-            consessionAmount: feeDetail.feeConsession,
-            dueAmountBeforeConsession: 0,
-            consessionNarration: "Not Available",
-            consessionAuthPerson: "Instant Pay",
+          const finalFeeHeader: IChallanHeaderType[] =
+            feeHeaderList.concat(additionalFeeHeaders);
+
+          console.log("FEE HEADER", finalFeeHeader);
+          const challanTitle = getChallanTitle(selectedMonth!, selectedYear!);
+
+          const challan: IChallanNL = {
+            challanTitle: challanTitle,
+            studentId: studentMasterDataUpdated.id,
+            challanId: challanDocId,
+            feeHeaders: finalFeeHeader,
+            totalAmount: totalFee,
+            amountPaid: isMarkedAsPaid ? totalFee : 0,
+            status: isMarkedAsPaid ? "PAID" : "UNPAID",
+            createdBy: "Admin",
+            createdOn: firebase.firestore.Timestamp.fromDate(new Date()),
+            dueDate: firebase.firestore.Timestamp.fromDate(
+              new Date("9999-12-31")
+            ),
+            feeDiscount: studentMasterDataUpdated.fee_discount || 0,
+            lateFine: feeDetail.lateFine,
+            feeConsession: feeDetail.feeConsession,
           };
-          batch.set(feeConsessionLogRef, consesionLogData);
-        }
 
-        batch.set(studentPaymentRef, paymentCollData);
-        batch.set(extPaymentCollRef, paymentCollData);
+          console.log(challan);
 
-        batch
-          .commit()
-          .then(() => {
-            setOpen(false);
-            setLoading(false);
-            enqueueSnackbar("Payment Recieved Successfully :)", {
-              variant: "success",
+          // save data to db
+          var batch = db.batch();
+
+          var challanDocRef = db
+            .collection("STUDENTS")
+            .doc(studentMasterDataUpdated.id)
+            .collection("CHALLANS")
+            .doc(challanDocId);
+
+          var studentDocRef = db
+            .collection("STUDENTS")
+            .doc(studentMasterDataUpdated.id);
+
+          ///updating generatedChallans field
+          if (studentMasterDataUpdated.generatedChallans) {
+            var arrT = studentMasterDataUpdated.generatedChallans;
+            arrT.push(challanDocId);
+            // Update the document by appending the feeChallanCode string to the generatedChallans array
+            batch.update(studentDocRef, {
+              generatedChallans: arrT,
             });
-          })
-          .catch((e) => {
-            setLoading(false);
-            enqueueSnackbar("Something went wrong!" + e, { variant: "error" });
+          } else {
+            var arrTem: string[] = [];
+            arrTem.push(challanDocId);
+            batch.update(studentDocRef, {
+              generatedChallans: arrTem,
+            });
+          }
+
+          if (feeDetail.feeConsession) {
+            var feeConsessionLogRef = db
+              .collection("STUDENTS")
+              .doc(studentMasterDataUpdated.id)
+              .collection("CONSESSION_LOG")
+              .doc();
+            //preparing data for consession log
+            const consesionLogData = {
+              createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+              createdBy: "admin",
+              challanId: challanDocId,
+              consessionAmount: feeDetail.feeConsession,
+              dueAmountBeforeConsession: 0,
+              consessionNarration: "Not Available",
+              consessionAuthPerson: "Instant Pay",
+            };
+            batch.set(feeConsessionLogRef, consesionLogData);
+          }
+
+          batch.set(challanDocRef, challan);
+
+          ///If marked as paid then save it to payment collection as well
+          if (isMarkedAsPaid) {
+            const paymentCollRef = db
+              .collection("STUDENTS")
+              .doc(studentMasterDataUpdated.id)
+              .collection("PAYMENTS")
+              .doc();
+
+            const paymentDataForNL: IPaymentNL = {
+              challanTitle: challanTitle,
+              paymentId: generateAlphanumericUUID(8),
+              studentId: studentMasterDataUpdated.id,
+              challanId: challanDocId,
+              amountPaid: totalFee,
+              recievedBy: "Admin",
+              recievedOn: firebase.firestore.Timestamp.now(),
+              breakdown: finalFeeHeader,
+              status: "PAID",
+              feeConsession: feeDetail.feeConsession,
+            };
+
+            batch.set(paymentCollRef, paymentDataForNL);
+          }
+
+          batch
+            .commit()
+            .then(() => {
+              setOpen(false);
+              setLoading(false);
+              enqueueSnackbar("Payment Recieved Successfully :)", {
+                variant: "success",
+              });
+            })
+            .catch((e) => {
+              setLoading(false);
+              enqueueSnackbar("Something went wrong!" + e, {
+                variant: "error",
+              });
+            });
+        } else {
+          setLoading(false);
+          enqueueSnackbar("Fee Challan Already Exist for this Month & Year .", {
+            variant: "error",
           });
+        }
       } else {
-        setLoading(false);
-        enqueueSnackbar("Fee Challan Already Exist for this Month & Year .", {
+        enqueueSnackbar("Unable to fetch student details!", {
           variant: "error",
         });
       }
     } else {
-      enqueueSnackbar("Unable to fetch student details!", { variant: "error" });
+      enqueueSnackbar("Failed to fetch student data!", { variant: "error" });
     }
   };
 
