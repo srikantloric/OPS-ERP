@@ -17,6 +17,7 @@ import {
 } from "config/schoolConfig";
 import { StudentDetailsType } from "types/student";
 import { IChallanHeaderType } from "types/payment";
+import { getClassNameByValue } from "./UtilitiesFunctions";
 
 const fetchQrCode = async () => {
   const res = await fetch(
@@ -247,7 +248,7 @@ export const GenerateFeeReciept = async ({
       align: "right",
     });
     doc.text(
-      "Date : " + recieptDate,
+      "Date/Time : " + recieptDate,
       pBorderPaddOffsetX + pWidth - pBorderPadd * 2,
       50.5,
       {
@@ -273,7 +274,7 @@ export const GenerateFeeReciept = async ({
     );
 
     doc.text(
-      "Class : " + studentMasterData.class,
+      "Class : " + getClassNameByValue(studentMasterData.class!),
       pWidth - pBorderPadd - 2,
       studentDetailsStartY,
       {
@@ -281,7 +282,7 @@ export const GenerateFeeReciept = async ({
       }
     );
     doc.text(
-      "Class : " + studentMasterData.class,
+      "Class : " + getClassNameByValue(studentMasterData.class!),
       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
       studentDetailsStartY,
       {
@@ -699,7 +700,7 @@ export const GenerateFeeReciept = async ({
 
     const feeRemarkAndAccOffY = feeTypeLayoutHeight + 40;
 
-    doc.setFontSize(8)
+    doc.setFontSize(8);
     var maxWidth = 100; // Set the maximum width in PDF units (e.g., points)
     var text =
       "This is a computer-generated document. No signature is required. The fee receipt can be easily downloaded by scanning the QR code.";
