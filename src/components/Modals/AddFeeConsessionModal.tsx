@@ -15,16 +15,17 @@ import {
   Typography,
 } from "@mui/joy";
 import { Additem } from "iconsax-react";
-import { IStudentFeeChallanExtended } from "types/student";
+// import { IStudentFeeChallanExtended } from "types/student";
 import { useState } from "react";
 import { enqueueSnackbar } from "notistack";
 import { db } from "../../firebase";
 import firebase from "../../firebase";
+import { IChallanNL } from "types/payment";
 
 interface Props {
   open: boolean;
   setOpen: (val: boolean) => void;
-  challanData: IStudentFeeChallanExtended;
+  challanData: IChallanNL;
 }
 
 const AddFeeConsessionModal: React.FC<Props> = ({
@@ -56,8 +57,8 @@ const AddFeeConsessionModal: React.FC<Props> = ({
       var challanRef = db
         .collection("STUDENTS")
         .doc(challanData.studentId)
-        .collection("PAYMENTS")
-        .doc(challanData.challanDocId);
+        .collection("CHALLANS")
+        .doc(challanData.challanId);
 
       var consessionLogRef = db
         .collection("STUDENTS")
@@ -69,8 +70,8 @@ const AddFeeConsessionModal: React.FC<Props> = ({
       const consesionLogData = {
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
         createdBy: "admin",
-        challanId: challanData.challanDocId,
-        paymentId: challanData.paymentId,
+        challanId: challanData.challanId,
+        // paymentId: challanData.challanId,
         consessionAmount: consessionAmount,
         dueAmountBeforeConsession: challanData.totalDue,
         consessionNarration: consessionNarration,
@@ -87,11 +88,12 @@ const AddFeeConsessionModal: React.FC<Props> = ({
           });
           setLoading(false);
           setOpen(false);
-          setConsessionAmount(0)
-          setConsessionAuthPerson(null)
-          setConsessionNarration("")
+          setConsessionAmount(0);
+          setConsessionAuthPerson(null);
+          setConsessionNarration("");
         })
         .catch((e) => {
+          enqueueSnackbar("Error while adding consession!",{variant:"error"})
           setLoading(false);
         });
     }
@@ -142,7 +144,7 @@ const AddFeeConsessionModal: React.FC<Props> = ({
           <thead>
             <tr>
               <td>Challan Id</td>
-              <td>{challanData && challanData.paymentId}</td>
+              <td>{challanData && challanData.challanId}</td>
             </tr>
             <tr>
               <td>Due Amount</td>
@@ -150,7 +152,7 @@ const AddFeeConsessionModal: React.FC<Props> = ({
             </tr>
             <tr>
               <td>Payment Due Date</td>
-              <td>{challanData && challanData.paymentDueDate}</td>
+              <td>{challanData && challanData.dueDate.toDate().toString()}</td>
             </tr>
           </thead>
         </Table>
@@ -206,8 +208,11 @@ const AddFeeConsessionModal: React.FC<Props> = ({
             />
             {/* <FormHelperText>This is a helper text.</FormHelperText> */}
           </FormControl>
-                  
-          <Typography mt="8px" level="body-sm" color="primary">Note : If consession already applied, then it will reset previous one and current consession will start reflecting.</Typography>        
+
+          <Typography mt="8px" level="body-sm" color="primary">
+            Note : If consession already applied, then it will reset previous
+            one and current consession will start reflecting.
+          </Typography>
           <Stack
             direction="row"
             justifyContent="end"

@@ -13,10 +13,10 @@ import {
   MenuItem,
 } from "@mui/material";
 import ControlPointIcon from "@mui/icons-material/ControlPoint";
-import { CurrencyRupee, Delete, MoreVert } from "@mui/icons-material";
+import { CurrencyRupee, Delete, MoreVert, Print } from "@mui/icons-material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { auth, db } from "../../firebase";
+import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
 import {
   Box,
@@ -36,10 +36,13 @@ import Navbar from "components/Navbar/Navbar";
 import AddFeeArrearModal from "components/Modals/AddFeeArrearModal";
 import { FEE_HEADERS, paymentStatus } from "../../constants/index";
 import IndividualFeeDetailsHeader from "components/Headers/IndividualFeeDetailsHeader";
-import { IStudentFeeChallanExtended } from "types/student";
+import { IChallanHeaderType, IChallanNL, IPaymentNL } from "types/payment";
 import AddFeeConsessionModal from "components/Modals/AddFeeConsessionModal";
 import { MoneyRecive } from "iconsax-react";
-import { getCurrentDate } from "utilities/UtilitiesFunctions";
+import {
+  generateAlphanumericUUID,
+  getCurrentDate,
+} from "utilities/UtilitiesFunctions";
 import firebase from "../../firebase";
 import SettingsIcon from "@mui/icons-material/Settings";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
@@ -48,6 +51,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import InstantPaymentModal from "components/Modals/InstantPaymentModal";
 import DiscountIcon from "@mui/icons-material/Discount";
 import DeleteChallanConfirmationDialog from "components/Modals/DeleteChallanConfirmationDialog";
+import { distributePaidAmount } from "utilities/PaymentUtilityFunctions";
 const SearchAnotherButton = () => {
   const historyRef = useNavigate();
   return (
@@ -71,11 +75,10 @@ interface ITotalFeeHeader {
 }
 
 function StudentFeeDetails() {
-  const [feeDetails, setFeeDetails] = useState<IStudentFeeChallanExtended[]>(
-    []
-  );
-  const [selectedRow, setSelectedRow] =
-    useState<IStudentFeeChallanExtended | null>(null);
+  // const [feeDetails, setFeeDetails] = useState<IStudentFeeChallanExtended[]>(
+  //   []
+  // );
+  const [selectedRow, setSelectedRow] = useState<IChallanNL | null>(null);
 
   const [loading, setLoading] = useState(false);
   // const historyRef = useNavigate();
@@ -102,15 +105,13 @@ function StudentFeeDetails() {
   const [feeCollectionDate, setFeeCollectionDate] = useState<string | null>(
     null
   );
-  const [feeChallans, setFeeChallans] = useState<IStudentFeeChallanExtended[]>(
-    []
-  );
+  const [feeChallans, setFeeChallans] = useState<IChallanNL[]>([]);
 
   const [selectedChallan, setSelectedChallan] = useState<string | null>(null);
   const [recievedAmount, setRecievedAmount] = useState<number | null>(null);
 
   const [selectedChallanDetails, setSelectedChallanDetails] =
-    useState<IStudentFeeChallanExtended | null>(null);
+    useState<IChallanNL | null>(null);
 
   const [isPaymentLoading, setIsPaymentLoading] = useState<boolean>(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<
@@ -130,15 +131,18 @@ function StudentFeeDetails() {
   const [showDeleteAuthenticationDialog, setShowDeleteAuthenticationDialog] =
     useState<boolean>(false);
 
+  ///////////////
+  const [challanList, setChallanList] = useState<IChallanNL[]>([]);
+
   // Calculate total feeConsession and totalPaidAmount
   const calculateTotals = () => {
     let totalConsession = 0;
     let totalPaid = 0;
     let totalDueAmount = 0;
 
-    feeDetails.forEach((row) => {
+    challanList.forEach((row) => {
       totalConsession += row.feeConsession || 0;
-      totalPaid += row.paidAmount || 0;
+      totalPaid += row.amountPaid || 0;
       totalDueAmount += row.totalDue || 0;
     });
 
@@ -151,18 +155,24 @@ function StudentFeeDetails() {
 
   useEffect(() => {
     calculateTotals();
-  }, [feeDetails]);
+  }, [challanList]);
 
   const handleMenuClick = (
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
-    rowData: IStudentFeeChallanExtended
+    rowData: IChallanNL
   ) => {
     setAnchorEll(event.target as HTMLAnchorElement);
     setSelectedRow(rowData);
   };
 
   function sum(
-    column:
+    column: "totalDue" | "lateFine" | "feeConsession" | "amountPaid"
+  ) {
+    return challanList.reduce((acc, row) => acc + row[column]!, 0);
+  }
+
+  function sumAmountByHeaderTitle(
+    headerTitle:
       | "monthlyFee"
       | "transportationFee"
       | "computerFee"
@@ -170,16 +180,42 @@ function StudentFeeDetails() {
       | "admissionFee"
       | "otherFee"
       | "annualFee"
-      | "totalDue"
-      | "lateFine"
-      | "feeConsession"
-      | "paidAmount"
-  ) {
-    return feeDetails.reduce((acc, row) => acc + row[column]!, 0);
+  ): number {
+    return challanList.reduce((totalSum, challan) => {
+      const header = challan.feeHeaders.find(
+        (h) => h.headerTitle === headerTitle
+      );
+      return header ? totalSum + header.amount : totalSum;
+    }, 0);
   }
 
-  const calculatedLateFine = (lateFee: number, dueDate: string): number => {
-    const dueDateFormated = new Date(dueDate);
+  const handleMenuClose = () => {
+    setAnchorEll(null);
+  };
+  //Eof Menu State
+
+  useEffect(() => {
+    var tempArr: IChallanNL[] = [];
+    challanList.map((item) => {
+      if (item.status !== "PAID") {
+        tempArr.push(item);
+      }
+    });
+    setFeeChallans(tempArr);
+  }, [challanList]);
+
+  useEffect(() => {
+    if (selectedChallan) {
+      const challanFee = challanList
+        .filter((item, index) => item.challanId === selectedChallan)
+        .at(0);
+      setRecievedAmount(challanFee?.totalDue!);
+      setSelectedChallanDetails(challanFee!);
+    }
+  }, [selectedChallan, challanList]);
+
+  const calculateLateFine = (lateFee: number, dueDate: Date): number => {
+    const dueDateFormated = dueDate;
     const currentDate = new Date();
     let lateFine = 0;
     if (currentDate >= dueDateFormated) {
@@ -188,28 +224,32 @@ function StudentFeeDetails() {
     return lateFine;
   };
 
-  const handleMenuClose = () => {
-    setAnchorEll(null);
+  const calculateTotalDueAmount = (challan: IChallanNL): number => {
+    var totalDue: number = 0;
+    const totalFeeHeaderAmount = challan.feeHeaders.reduce(
+      (total, feeHeader) => {
+        return total + Number(feeHeader.amount);
+      },
+      0
+    );
+
+    totalDue += totalFeeHeaderAmount;
+    if (challan.lateFine) {
+      const lateFine: number = calculateLateFine(
+        challan.lateFine,
+        challan.dueDate.toDate()
+      );
+      totalDue += lateFine;
+    }
+
+    if (challan.feeConsession) {
+      totalDue -= challan.feeConsession;
+    }
+    if (challan.amountPaid) {
+      totalDue -= challan.amountPaid;
+    }
+    return totalDue;
   };
-  //Eof Menu State
-
-  useEffect(() => {
-    var tempArr: IStudentFeeChallanExtended[] = [];
-    feeDetails.map((item) => {
-      if (item.paymentStatus !== "PAID") {
-        tempArr.push(item);
-      }
-    });
-    setFeeChallans(tempArr);
-  }, [feeDetails]);
-
-  useEffect(() => {
-    const challanFee = feeChallans
-      .filter((item, index) => item.challanDocId === selectedChallan)
-      .at(0);
-    setRecievedAmount(challanFee?.totalDue!);
-    setSelectedChallanDetails(challanFee!);
-  }, [selectedChallan, feeDetails]);
 
   useEffect(() => {
     //Initialize fee collection Items
@@ -228,99 +268,20 @@ function StudentFeeDetails() {
       const dbSubscription = db
         .collection("STUDENTS")
         .doc(location.state[0].id)
-        .collection("PAYMENTS")
-        .orderBy("createdAt", "desc")
+        .collection("CHALLANS")
+        .orderBy("createdOn", "desc")
         .onSnapshot((snapshot) => {
           if (snapshot.docs) {
-            var feeArr: IStudentFeeChallanExtended[] = [];
+            // var feeArr: IStudentFeeChallanExtended[] = [];
+
+            var challans: IChallanNL[] = [];
             snapshot.forEach((doc) => {
-              const data = doc.data() as IStudentFeeChallanExtended;
+              const challan = doc.data() as IChallanNL;
 
-              if (data.admissionFee == undefined) {
-                data["admissionFee"] = 0;
-              }
-              if (data.examFee == undefined) {
-                data["examFee"] = 0;
-              }
-              if (data.annualFee == undefined) {
-                data["annualFee"] = 0;
-              }
-              if (data.monthlyFee == undefined) {
-                data["monthlyFee"] = 0;
-              }
-              if (data.computerFee == undefined) {
-                data["computerFee"] = 0;
-              }
-              if (data.transportationFee == undefined) {
-                data["transportationFee"] = 0;
-              }
-              if (data.otherFee == undefined) {
-                data["otherFee"] = 0;
-              }
-              if (data.feeConsession == undefined) {
-                data["feeConsession"] = 0;
-              }
-              if (data.paidAmount == undefined) {
-                data["paidAmount"] = 0;
-              }
-
-              const totalCalculatedDue =
-                data.monthlyFee +
-                data.admissionFee! +
-                data.annualFee! +
-                data.computerFee +
-                data.examFee! +
-                data.otherFee! +
-                data.transportationFee +
-                calculatedLateFine(data.lateFine, data.paymentDueDate) -
-                data.feeConsession! -
-                data.paidAmount;
-
-              const sumOfHeaders =
-                data.monthlyFee +
-                data.admissionFee! +
-                data.annualFee! +
-                data.computerFee +
-                data.examFee! +
-                data.otherFee! +
-                data.transportationFee +
-                calculatedLateFine(data.lateFine, data.paymentDueDate) -
-                data.feeConsession!;
-
-              //prepare data
-              const queryResult: IStudentFeeChallanExtended = {
-                docIdExt: data.docIdExt,
-                studentId: data.studentId,
-                challanDocId: data.challanDocId,
-                createdAt: data.createdAt,
-                createdBy: data.createdBy,
-                paymentId: data.paymentId,
-                challanTitle: data.challanTitle,
-                paymentStatus: data.paymentStatus,
-                paymentDueDate: data.paymentDueDate,
-                monthlyFee: data.monthlyFee,
-                lateFine: calculatedLateFine(
-                  data.lateFine,
-                  data.paymentDueDate
-                ),
-                transportationFee: data.transportationFee,
-                computerFee: data.computerFee,
-                admissionFee: data.admissionFee,
-                examFee: data.examFee,
-                annualFee: data.annualFee,
-                otherFee: data.otherFee,
-                paidAmount: data.paidAmount,
-
-                totalDue: totalCalculatedDue,
-
-                feeConsession: data.feeConsession,
-                sumOfHeaders: sumOfHeaders,
-              };
-
-              // console.log(queryResult);
-              feeArr.push(queryResult);
+              challan["totalDue"] = calculateTotalDueAmount(challan);
+              challans.push(challan);
             });
-            setFeeDetails(feeArr);
+            setChallanList(challans);
             setLoading(false);
           } else {
             setLoading(false);
@@ -339,152 +300,101 @@ function StudentFeeDetails() {
     }
   }, []);
 
+  const saveDataToDb = (data: IPaymentNL, isPartial: boolean) => {
+    setIsPaymentLoading(true);
+    const batch = db.batch();
+    const paymentCollRef = db
+      .collection("STUDENTS")
+      .doc(data.studentId)
+      .collection("PAYMENTS")
+      .doc();
+
+    //update challan
+    const challanDocRef = db
+      .collection("STUDENTS")
+      .doc(data.studentId)
+      .collection("CHALLANS")
+      .doc(data.challanId);
+
+    //data for challan update
+
+    const updatedFeeHeaders: IChallanHeaderType[] = data.breakdown;
+
+    batch.update(challanDocRef, {
+      feeHeaders: updatedFeeHeaders,
+      amountPaid: firebase.firestore.FieldValue.increment(data.amountPaid),
+      status: isPartial ? "PARTIAL" : "PAID",
+    });
+
+    batch.set(paymentCollRef, data);
+
+    batch
+      .commit()
+      .then(() => {
+        setIsPaymentLoading(false);
+        enqueueSnackbar("Payment Recieved Successfully!", {
+          variant: "success",
+        });
+      })
+      .catch((e) => {
+        console.log(e);
+        setIsPaymentLoading(false);
+        enqueueSnackbar("Something went wrong!", { variant: "error" });
+      });
+  };
+
+  const recievePayment = (partialPayment: boolean) => {
+    if (selectedChallanDetails) {
+      if (partialPayment) {
+        const updatedFeeHeader = distributePaidAmount(
+          selectedChallanDetails,
+          recievedAmountPartPayment!,
+          true
+        );
+        const paymentDataForNL: IPaymentNL = {
+          challanTitle: selectedChallanDetails.challanTitle,
+          paymentId: generateAlphanumericUUID(8),
+          studentId: selectedChallanDetails.studentId,
+          challanId: selectedChallanDetails.challanId,
+          amountPaid:
+            selectedChallanDetails.amountPaid + recievedAmountPartPayment!,
+          recievedBy: "Admin",
+          recievedOn: firebase.firestore.Timestamp.now(),
+          breakdown: updatedFeeHeader,
+          status: "PARTIAL",
+        };
+        saveDataToDb(paymentDataForNL, true);
+      } else {
+        // const feeHeadersList = createFeeHeaders(selectedChallanDetails);
+        const updatedFeeHeader = distributePaidAmount(
+          selectedChallanDetails,
+          recievedAmount!,
+          true
+        );
+
+        const paymentDataForNL: IPaymentNL = {
+          challanTitle: selectedChallanDetails.challanTitle,
+          paymentId: generateAlphanumericUUID(8),
+          challanId: selectedChallanDetails.challanId,
+          studentId: selectedChallanDetails.studentId,
+          amountPaid: selectedChallanDetails.amountPaid + recievedAmount!,
+          recievedBy: "Admin",
+          recievedOn: firebase.firestore.Timestamp.now(),
+          breakdown: updatedFeeHeader,
+          status: "PAID",
+        };
+        saveDataToDb(paymentDataForNL, false);
+      }
+    }
+  };
+
   const handlePaymentRecieveButton = async (
     e: React.FormEvent<HTMLFormElement>,
     partialPayment: boolean
   ) => {
     e.preventDefault();
-
     if (selectedChallanDetails) {
-      setIsPaymentLoading(true);
-      const batch = db.batch();
-      //Update payment Data and save to external payment collection
-      const externalPaymentCollData: IStudentFeeChallanExtended = {
-        paidAmount: recievedAmount!,
-        totalDue: selectedChallanDetails.totalDue,
-        paymentStatus: "PAID",
-        paymentRecievedBy: auth.currentUser?.email || "admin",
-        paymentRecievedDate: feeCollectionDate!,
-        paymentId: selectedChallanDetails.paymentId,
-        studentId: selectedChallanDetails.studentId,
-        challanDocId: selectedChallanDetails.challanDocId,
-        challanTitle: selectedChallanDetails.challanTitle,
-        docIdExt: selectedChallanDetails.docIdExt,
-        monthlyFee: selectedChallanDetails.monthlyFee,
-        transportationFee: selectedChallanDetails.transportationFee,
-        computerFee: selectedChallanDetails.computerFee,
-        feeConsession: selectedChallanDetails.feeConsession,
-        admissionFee: selectedChallanDetails.admissionFee,
-        otherFee: selectedChallanDetails.otherFee,
-        paymentDueDate: selectedChallanDetails.paymentDueDate,
-        challanCreationDate: selectedChallanDetails.createdAt,
-        challanCreatedBy: selectedChallanDetails.createdBy,
-        lateFine: selectedChallanDetails.lateFine,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-      };
-
-      //Partial payment
-      const partialPaymentData = {
-        paidAmount: recievedAmountPartPayment,
-        totalDue: selectedChallanDetails.totalDue,
-        paymentStatus: "PARTIAL",
-        paymentRecievedBy: auth.currentUser?.email || "admin",
-        paymentRecievedDate: feeCollectionDate!,
-        paymentId: selectedChallanDetails.paymentId,
-        studentId: selectedChallanDetails.studentId,
-        challanDocId: selectedChallanDetails.challanDocId,
-        challanTitle: selectedChallanDetails.challanTitle,
-        docIdExt: selectedChallanDetails.docIdExt,
-        monthlyFee: selectedChallanDetails.monthlyFee,
-        transportationFee: selectedChallanDetails.transportationFee,
-        computerFee: selectedChallanDetails.computerFee,
-        feeConsession: selectedChallanDetails.feeConsession,
-        admissionFee: selectedChallanDetails.admissionFee,
-        otherFee: selectedChallanDetails.otherFee,
-        paymentDueDate: selectedChallanDetails.paymentDueDate,
-        challanCreationDate: selectedChallanDetails.createdAt,
-        challanCreatedBy: selectedChallanDetails.createdBy,
-        lateFine: selectedChallanDetails.lateFine,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        partialPaymentComment: partPaymentComment,
-      };
-
-      const extPaymentCollRef = db
-        .collection("PAYMENTS")
-        .doc(selectedChallanDetails.docIdExt);
-      batch.update(extPaymentCollRef, externalPaymentCollData);
-
-      /// Prepare data for challan change log
-      const challanChangeLogRef = db
-        .collection("STUDENTS")
-        .doc(selectedChallanDetails.studentId)
-        .collection("PAYMENTS")
-        .doc(selectedChallanDetails.challanDocId)
-        .collection("PAYMENT_HISTORY")
-        .doc();
-
-      // const challanLogData = {
-      //   changedOn: firebase.firestore.FieldValue.serverTimestamp(),
-      //   changedBy: auth.currentUser?.email || "admin",
-      // };
-
-      if (partialPayment) {
-        batch.set(challanChangeLogRef, partialPaymentData);
-      } else {
-        batch.set(challanChangeLogRef, externalPaymentCollData);
-      }
-
-      ///Prep data for challan data update
-      const challanDetailRef = db
-        .collection("STUDENTS")
-        .doc(selectedChallanDetails.studentId)
-        .collection("PAYMENTS")
-        .doc(selectedChallanDetails.challanDocId);
-
-      const res = await challanDetailRef.get();
-      let paidAmountInDb = null;
-      if (res.exists) {
-        if (res.data()!.paidAmount) {
-          paidAmountInDb = res.data()!.paidAmount;
-        } else {
-          paidAmountInDb = 0;
-        }
-      }
-      console.log("SUm of Headers", selectedChallanDetails.sumOfHeaders);
-      console.log("paid amoint", paidAmountInDb + recievedAmountPartPayment);
-
-      const challanDetailUpdateData = {
-        paidAmount: recievedAmount!,
-        paymentStatus: "PAID",
-        paymentRecievedBy: auth.currentUser?.email || "admin",
-      };
-
-      ///calculate total due
-
-      //partial payment
-      const challanDetailUpdateDataPartialPayment = {
-        paidAmount: paidAmountInDb! + recievedAmountPartPayment!,
-        paymentStatus:
-          selectedChallanDetails.sumOfHeaders ===
-          paidAmountInDb + recievedAmountPartPayment
-            ? "PAID"
-            : "PARTIAL",
-        paymentRecievedBy: auth.currentUser?.email || "admin",
-      };
-
-      if (partialPayment) {
-        batch.update(challanDetailRef, challanDetailUpdateDataPartialPayment);
-      } else {
-        batch.update(challanDetailRef, challanDetailUpdateData);
-      }
-      // setIsPaymentLoading(false);
-      batch
-        .commit()
-        .then(() => {
-          setRecievedAmount(null);
-          enqueueSnackbar("Payment recieved successfully!", {
-            variant: "success",
-          });
-          setIsPaymentLoading(false);
-        })
-        .catch((e) => {
-          enqueueSnackbar("Failed to recieve payment!", { variant: "error" });
-          setIsPaymentLoading(false);
-        });
-    } else {
-      enqueueSnackbar("Something went wrong with challan !", {
-        variant: "error",
-      });
+      recievePayment(partialPayment);
     }
   };
 
@@ -546,6 +456,7 @@ function StudentFeeDetails() {
               Instant Payment
             </Button>
 
+            <Button variant="soft" startDecorator={<Print />}></Button>
             <Button variant="soft" startDecorator={<SettingsIcon />}></Button>
           </Box>
         </Box>
@@ -593,7 +504,7 @@ function StudentFeeDetails() {
                 {feeChallans.length > 0 ? (
                   feeChallans.map((item) => {
                     return (
-                      <Option value={item.challanDocId}>
+                      <Option value={item.challanId}>
                         Fee Challan ({item.challanTitle})
                       </Option>
                     );
@@ -679,7 +590,7 @@ function StudentFeeDetails() {
                 <Chip sx={{ p: "5px", ml: "5px", pl: "10px", pr: "10px" }}>
                   You have select{" "}
                   <span style={{ color: "var(--bs-danger2)", margin: "5px" }}>
-                    Challan ID: {selectedChallanDetails?.paymentId}
+                    Challan ID: {selectedChallanDetails?.challanId}
                   </span>
                   for month of
                   <span style={{ color: "var(--bs-danger2)", margin: "5px" }}>
@@ -878,36 +789,68 @@ function StudentFeeDetails() {
               </tr>
             </thead>
             <tbody>
-              {feeDetails.length != 0 ? (
-                feeDetails.map((item) => {
+              {challanList.length != 0 ? (
+                challanList.map((item) => {
+                  const monthlyFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "monthlyFee"
+                  );
+                  const computerFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "computerFee"
+                  );
+                  const transportationFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "transportationFee"
+                  );
+                  const examFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "examFee"
+                  );
+                  const annualFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "annualFee"
+                  );
+                  const admissionFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "admissionFee"
+                  );
+                  const otherFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "otherFee"
+                  );
+
                   return (
                     <>
                       <tr>
                         {/* <td>{item.paymentId}</td> */}
                         <td>{item.challanTitle}</td>
-                        <td>{item.monthlyFee}</td>
+                        <td>
+                          {monthlyFeeHeader ? monthlyFeeHeader.amount : 0}
+                        </td>
                         <td>{item.lateFine}</td>
-                        <td>{item.transportationFee}</td>
-                        <td>{item.computerFee}</td>
-                        <td>{item.examFee}</td>
-                        <td>{item.annualFee}</td>
-                        <td>{item.admissionFee}</td>
-                        <td>{item.otherFee}</td>
-                        <td>{item.paidAmount}</td>
+                        <td>
+                          {transportationFeeHeader
+                            ? transportationFeeHeader.amount
+                            : 0}
+                        </td>
+                        <td>
+                          {computerFeeHeader ? computerFeeHeader.amount : 0}
+                        </td>
+                        <td>{examFeeHeader ? examFeeHeader.amount : 0}</td>
+                        <td>{annualFeeHeader ? annualFeeHeader.amount : 0}</td>
+                        <td>
+                          {admissionFeeHeader ? admissionFeeHeader.amount : 0}
+                        </td>
+                        <td>{otherFeeHeader ? otherFeeHeader.amount : 0}</td>
+                        <td>{item.amountPaid}</td>
                         <td>{item.feeConsession}</td>
                         <td>{item.totalDue}</td>
                         <td>
                           <Box
                             sx={{
                               background:
-                                item.paymentStatus === paymentStatus.PAID
+                                item.status === paymentStatus.PAID
                                   ? "var(--bs-success)"
                                   : "var(--bs-danger)",
                               color: "#fff",
                               textAlign: "center",
                             }}
                           >
-                            {item.paymentStatus}
+                            {item.status}
                           </Box>
                         </td>
                         <td>
@@ -953,7 +896,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("monthlyFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("monthlyFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -969,7 +912,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("transportationFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("transportationFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -977,7 +920,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("computerFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("computerFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -985,7 +928,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("examFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("examFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -993,7 +936,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("annualFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("annualFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -1001,7 +944,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("admissionFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("admissionFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -1009,7 +952,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("otherFee").toFixed(0)}
+                  {sumAmountByHeaderTitle("otherFee").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -1017,7 +960,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("paidAmount").toFixed(0)}
+                  {sum("amountPaid").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -1129,13 +1072,26 @@ function StudentFeeDetails() {
             open={addArrearModalOpen}
             setOpen={setAddArrearModalopen}
             studentId={selectedRow.studentId}
-            challanDocId={selectedRow.challanDocId}
-            paymentStatus={selectedRow.paymentStatus}
+            challanDocId={selectedRow.challanId}
+            paymentStatus={selectedRow.status}
+            feeHeader={selectedRow.feeHeaders}
             challanData={{
-              admissionFee: selectedRow.admissionFee || 0,
-              annualFee: selectedRow.annualFee || 0,
-              otherFee: selectedRow.otherFee || 0,
-              examFee: selectedRow.examFee || 0,
+              admissionFee:
+                selectedRow.feeHeaders.find(
+                  (header) => header.headerTitle === "admissionFee"
+                )?.amount || 0,
+              annualFee:
+                selectedRow.feeHeaders.find(
+                  (header) => header.headerTitle === "annualFee"
+                )?.amount || 0,
+              otherFee:
+                selectedRow.feeHeaders.find(
+                  (header) => header.headerTitle === "otherFee"
+                )?.amount || 0,
+              examFee:
+                selectedRow.feeHeaders.find(
+                  (header) => header.headerTitle === "examFee"
+                )?.amount || 0,
             }}
           />
         ) : null}
@@ -1150,7 +1106,7 @@ function StudentFeeDetails() {
             open={showDeleteAuthenticationDialog}
             setOpen={setShowDeleteAuthenticationDialog}
             studentId={selectedRow.studentId}
-            challanId={selectedRow.challanDocId}
+            challanId={selectedRow.challanId}
           />
         ) : null}
       </LSPage>

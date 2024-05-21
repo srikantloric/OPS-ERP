@@ -139,3 +139,4 @@ export interface IStudentFeeChallanExtended extends IStudentFeeChallan {
   paymentRecivedDate?:string,
   sumOfHeaders?:number,
 }
+

@@ -15,6 +15,7 @@ import { Additem } from "iconsax-react";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
+import { IChallanHeaderType, IChallanNL } from "types/payment";
 
 interface IAddArrearInputTypes {
   examFee: number;
@@ -29,6 +30,7 @@ interface Props {
   studentId: string;
   challanData: IAddArrearInputTypes;
   paymentStatus: string;
+  feeHeader: IChallanHeaderType[];
 }
 
 interface IAddArrearInputTypes extends Record<string, number> {}
@@ -40,6 +42,7 @@ const AddFeeArrearModal: React.FC<Props> = ({
   studentId,
   challanDocId,
   paymentStatus,
+  feeHeader,
 }) => {
   const [feeHeaderData, setFeeHeaderData] = useState<IAddArrearInputTypes>({
     examFee: 0,
@@ -62,42 +65,116 @@ const AddFeeArrearModal: React.FC<Props> = ({
     setTotalAmount(total);
   }, [feeHeaderData]);
 
+  async function updateFeeHeaders(
+    studentId: string,
+    challanId: string,
+    newHeaders: IChallanHeaderType[]
+  ): Promise<void> {
+    try {
+      // Reference to the specific challan document
+      const challanRef = db
+        .collection("STUDENTS")
+        .doc(studentId)
+        .collection("PAYMENTS")
+        .doc(challanDocId);
+
+      // Fetch the current challan document
+      const challanDoc = await challanRef.get();
+      if (!challanDoc.exists) {
+        throw new Error("Challan not found");
+      }
+
+      // Get the current data
+      const challanData = challanDoc.data() as IChallanNL;
+      const { feeHeaders } = challanData;
+
+      // Create a map of existing headers for quick lookup
+      const feeHeadersMap = new Map(
+        feeHeaders.map((header) => [header.headerTitle, header])
+      );
+
+      // Update the headers
+      newHeaders.forEach((newHeader) => {
+        if (feeHeadersMap.has(newHeader.headerTitle)) {
+          // Header exists, update the amount
+          const existingHeader = feeHeadersMap.get(newHeader.headerTitle);
+          if (existingHeader) {
+            existingHeader.amount = newHeader.amount;
+            existingHeader.amountPaid = newHeader.amountPaid;
+          }
+        } else {
+          // Header does not exist, append the new header
+          feeHeadersMap.set(newHeader.headerTitle, newHeader);
+        }
+      });
+
+      // Convert the map back to an array
+      const updatedFeeHeaders = Array.from(feeHeadersMap.values());
+
+      let pStatus = "";
+
+      switch (paymentStatus) {
+        case "PAID":
+        case "PARTIAL":
+          pStatus = "PARTIAL";
+          break;
+        case "UNPAID":
+          pStatus = "UNPAID";
+          break;
+        default:
+          pStatus = "";
+      }
+
+      // Update the document with the modified feeHeaders array
+      await challanRef.update({
+        feeHeaders: updatedFeeHeaders,
+        status: pStatus,
+        // Optionally update totalAmount or other fields as necessary
+      });
+      enqueueSnackbar("Fee Header Updated Successfully!", {
+        variant: "success",
+      });
+      setOpen(false);
+    } catch (error) {
+      enqueueSnackbar("Failed to upload!" + error, { variant: "error" });
+    }
+  }
+
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-   
-    let pStatus = "";
 
-    switch (paymentStatus) {
-      case "PAID":
-      case "PARTIAL":
-        pStatus = "PARTIAL";
-        break;
-      case "UNPAID":
-        pStatus = "UNPAID";
-        break;
-      default:
-        pStatus = ""; 
+    var feeHeaderList: IChallanHeaderType[] = [];
+
+    if (feeHeaderData.admissionFee) {
+      feeHeaderList.push({
+        headerTitle: "admissionFee",
+        amountPaid: 0,
+        amount: feeHeaderData.admissionFee,
+      });
+    }
+    if (feeHeaderData.examFee) {
+      feeHeaderList.push({
+        headerTitle: "examFee",
+        amountPaid: 0,
+        amount: feeHeaderData.examFee,
+      });
+    }
+    if (feeHeaderData.annualFee) {
+      feeHeaderList.push({
+        headerTitle: "annualFee",
+        amountPaid: 0,
+        amount: feeHeaderData.annualFee,
+      });
+    }
+    if (feeHeaderData.otherFee) {
+      feeHeaderList.push({
+        headerTitle: "otherFee",
+        amountPaid: 0,
+        amount: feeHeaderData.otherFee,
+      });
     }
 
-    const finalUpdateData = {
-      ...feeHeaderData,
-      paymentStatus: pStatus,
-    };
-
-    db.collection("STUDENTS")
-      .doc(studentId)
-      .collection("PAYMENTS")
-      .doc(challanDocId)
-      .update(finalUpdateData)
-      .then(() => {
-        setOpen(false)
-        enqueueSnackbar("Header Added Successfully !", { variant: "success" });
-      })
-      .catch((e) => {
-        enqueueSnackbar("Failed to update fee details!" + e, {
-          variant: "error",
-        });
-      });
+    updateFeeHeaders(studentId, challanDocId, feeHeaderList);
   };
 
   return (
