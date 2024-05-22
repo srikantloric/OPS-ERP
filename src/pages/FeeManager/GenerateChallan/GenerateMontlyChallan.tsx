@@ -114,7 +114,7 @@ function GenerateMonthlyChallan() {
         if (!student.isGenerated) {
           //challan
           const { totalFeeAmount, feeHeaderList } =
-            generateFeeHeadersForChallan(student.studentData);
+            generateFeeHeadersForChallan(student.studentData, lateFine);
 
           const challan: IChallanNL = {
             challanTitle: getChallanTitle(selectedMonth!, selectedYear!),
@@ -130,8 +130,7 @@ function GenerateMonthlyChallan() {
               new Date(paymentDueDate)
             ),
             feeDiscount: student.studentData.fee_discount || 0,
-            lateFine: lateFine,
-            feeConsession:0
+            feeConsession: 0,
           };
 
           var batch = db.batch();

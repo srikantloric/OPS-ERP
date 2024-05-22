@@ -33,7 +33,6 @@ export interface IChallanNL {
   createdOn: firebase.firestore.Timestamp;
   feeDiscount: number;
   dueDate: firebase.firestore.Timestamp;
-  lateFine: number;
   feeConsession: number;
   totalDue?: number;
 }
