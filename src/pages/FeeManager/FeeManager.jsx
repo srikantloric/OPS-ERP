@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import LSPage from "../../components/Utils/LSPage";
 import PropTypes from "prop-types";
@@ -69,6 +69,7 @@ function FeeManager() {
 
   const [searchList, setSearchList] = useState([]);
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const searchBoxRef = useRef(null);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
@@ -126,6 +127,12 @@ function FeeManager() {
     }
   };
 
+  useEffect(() => {
+   console.log("error")
+   console.log(searchBoxRef)
+      searchBoxRef.current.focus();
+  }, []);
+
   return (
     <PageContainer>
       <Navbar />
@@ -167,11 +174,13 @@ function FeeManager() {
             >
               <Box component="form" onSubmit={handleNextPageBtn} sx={{display:"flex",alignItems:"center",justifyContent:"center"}}>
                 <Autocomplete
+                  ref={searchBoxRef}
                   id="country-select-demo"
                   color="primary"
                   onChange={(e, val) => {
                     setSelectedDoc(val && val.id);
                   }}
+                  
                   placeholder="Search with Student ID/Admission No"
                   sx={{ width: "450px", m: "10px" }}
                   options={searchList}
