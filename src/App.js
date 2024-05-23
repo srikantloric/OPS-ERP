@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom";
 import "./App.css";
 import Login from "./pages/Login/Login";
 import { routesConfig } from "./components/Utils/RoutesConfig";
-import { useState, lazy } from "react";
+import { useState, lazy, useEffect } from "react";
 import SideBarContext from "./context/SidebarContext";
 
 //Layouts
@@ -24,6 +24,10 @@ import AddEnquire from "pages/Admission/AddEnquriStudent";
 import { FacultyAttendance } from "pages/Attendance/FacultyAttendance/facultyAttendance";
 import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
 import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
+import {
+  SearchDialogProvider,
+  useSearchDialog,
+} from "context/SearchDialogContext";
 
 const StudentProfilePictureUpdater = Loadable(
   lazy(() => import("pages/ProfileUpdater/StudentProfilePictureUpdater"))
@@ -60,78 +64,83 @@ function App() {
     setIsActive(status);
   };
 
-  // console.log(useFlags())
+
 
   return (
     <SideBarContext.Provider value={{ isActive, toggle, setSidebarOpen }}>
       <AuthProvider>
-        <Suspense>
-          <Routes>
-            <Route path="/" element={<DashboardLayout />}>
-              {routeItems}
-              <Route path="students/add-students" element={<AddStudent />} />
+        <SearchDialogProvider>
+          <Suspense>
+            <Routes>
+              <Route path="/" element={<DashboardLayout />}>
+                {routeItems}
+                <Route path="students/add-students" element={<AddStudent />} />
+                <Route
+                  path="students/update-student/:id"
+                  element={<UpdateStudent />}
+                />
+                <Route
+                  path="students/Admission-students/add-students/:id"
+                  element={<AddEnquire />}
+                />
+                <Route
+                  path="students/Admission-students"
+                  element={<AdmissionEnquiry />}
+                />
+
+                <Route
+                  path="students/view-students"
+                  element={<ViewStudents />}
+                />
+
+                <Route path="/view-faculties" element={<UnderConstruction />} />
+                <Route path="/Faculties/:id" element={<FacultyDetail />} />
+                <Route path="/add-faculty" element={<UnderConstruction />} />
+                <Route
+                  path="/FeeManagement/FeeDetails/:id"
+                  element={<StudentFeeDetails />}
+                />
+                <Route
+                  path="accountings/generate-monthly-fee"
+                  element={<GenerateMonthlyChallan />}
+                />
+                <Route
+                  path="accountings/generate-custom-fee"
+                  element={<GenerateMonthlyChallan />}
+                />
+                <Route
+                  path="attendance/show-student-attendance"
+                  element={<ViewAttendance />}
+                />
+                <Route
+                  path="attendance/mark-manual-attendance"
+                  element={<ManualAttendance />}
+                />
+                <Route
+                  path="attendance/generate-attendance-qr"
+                  element={<GenerateQrSticker />}
+                />
+                <Route
+                  path="attendance/Facuities"
+                  element={<FacultyAttendance />}
+                />
+                <Route
+                  path="/students/profile/:id"
+                  element={<ViewStudentProfile />}
+                />
+                <Route path="feeReciept" element={<FeeReceipt />} />
+              </Route>
               <Route
-                path="students/update-student/:id"
-                element={<UpdateStudent />}
-              />
-              <Route
-                path="students/Admission-students/add-students/:id"
-                element={<AddEnquire />}
-              />
-              <Route
-                path="students/Admission-students"
-                element={<AdmissionEnquiry />}
+                path="update-student-profile-picture"
+                element={<StudentProfilePictureUpdater />}
               />
 
-              <Route path="students/view-students" element={<ViewStudents />} />
-
-              <Route path="/view-faculties" element={<UnderConstruction />} />
-              <Route path="/Faculties/:id" element={<FacultyDetail />} />
-              <Route path="/add-faculty" element={<UnderConstruction />} />
-              <Route
-                path="/FeeManagement/FeeDetails/:id"
-                element={<StudentFeeDetails />}
-              />
-              <Route
-                path="accountings/generate-monthly-fee"
-                element={<GenerateMonthlyChallan />}
-              />
-              <Route
-                path="accountings/generate-custom-fee"
-                element={<GenerateMonthlyChallan />}
-              />
-              <Route
-                path="attendance/show-student-attendance"
-                element={<ViewAttendance />}
-              />
-              <Route
-                path="attendance/mark-manual-attendance"
-                element={<ManualAttendance />}
-              />
-              <Route
-                path="attendance/generate-attendance-qr"
-                element={<GenerateQrSticker />}
-              />
-              <Route
-                path="attendance/Facuities"
-                element={<FacultyAttendance />}
-              />
-              <Route
-                path="/students/profile/:id"
-                element={<ViewStudentProfile />}
-              />
-              <Route path="feeReciept" element={<FeeReceipt />} />
-            </Route>
-            <Route
-              path="update-student-profile-picture"
-              element={<StudentProfilePictureUpdater />}
-            />
-
-            <Route path="/login" element={<AuthenticationLayout />}>
-              <Route index element={<Login />} />
-            </Route>
-          </Routes>
-        </Suspense>
+              <Route path="/login" element={<AuthenticationLayout />}>
+                <Route index element={<Login />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </SearchDialogProvider>
       </AuthProvider>
     </SideBarContext.Provider>
   );

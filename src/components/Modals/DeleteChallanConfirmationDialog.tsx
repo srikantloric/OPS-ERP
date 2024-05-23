@@ -38,7 +38,7 @@ const DeleteChallanConfirmationDialog: React.FC<Props> = ({
       if (studentId && challanId) {
         db.collection("STUDENTS")
           .doc(studentId)
-          .collection("PAYMENTS")
+          .collection("CHALLANS")
           .doc(challanId)
           .delete()
           .then(() => {
