@@ -25,9 +25,9 @@ function DashboardLayout() {
   }, [openDialog]);
   return (
     <LSContainer>
+      <SearchDialog/>
       <Sidebar />
       <Outlet/>
-      <SearchDialog/>
     </LSContainer>
   );
 }
