@@ -167,6 +167,14 @@ const InstantPaymentModal: React.FC<Props> = ({
             }
           });
 
+          if (feeDetail.lateFine) {
+            additionalFeeHeaders.push({
+              amount: feeDetail.lateFine,
+              headerTitle: "lateFee",
+              amountPaid: isMarkedAsPaid ? feeDetail.lateFine : 0,
+            });
+          }
+
           const finalFeeHeader: IChallanHeaderType[] =
             feeHeaderList.concat(additionalFeeHeaders);
 
@@ -187,7 +195,6 @@ const InstantPaymentModal: React.FC<Props> = ({
               new Date("9999-12-31")
             ),
             feeDiscount: studentMasterDataUpdated.fee_discount || 0,
-            lateFine: feeDetail.lateFine,
             feeConsession: feeDetail.feeConsession,
           };
 

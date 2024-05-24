@@ -9,7 +9,6 @@ import {
   SCISSOR_ICON,
 } from "./Base64Url";
 import {
-  SCHOOL_ACCOUNTANT,
   SCHOOL_ADDRESS,
   SCHOOL_CONTACT,
   SCHOOL_EMAIL,
@@ -46,6 +45,7 @@ interface Props {
   discountAmount: number;
   recieptId: string;
   recieptDate: string;
+  accountantName:string;
 }
 
 export const GenerateFeeReciept = async ({
@@ -58,6 +58,7 @@ export const GenerateFeeReciept = async ({
   discountAmount,
   recieptDate,
   recieptId,
+  accountantName
 }: Props) => {
   console.log(studentMasterData);
   if (studentMasterData) {
@@ -723,29 +724,23 @@ export const GenerateFeeReciept = async ({
     });
     //Accountant Details
     doc.text(
-      SCHOOL_ACCOUNTANT,
-      pWidth - pBorderPadd - 10,
+      accountantName,
+      pWidth - pBorderPadd - 22,
       feeRemarkAndAccOffY - 5,
-      {
-        align: "right",
-      }
+   
     );
 
-    doc.text("Accountant", pWidth - pBorderPadd - 13, feeRemarkAndAccOffY, {
-      align: "right",
-    });
+    doc.text("Accountant", pWidth - pBorderPadd - 23, feeRemarkAndAccOffY);
 
     doc.text(
-      SCHOOL_ACCOUNTANT,
-      pBorderPaddOffsetX + pWidth - pBorderPadd - 15,
+      accountantName,
+      pBorderPaddOffsetX + pWidth - pBorderPadd - 28,
       feeRemarkAndAccOffY - 5,
-      { align: "right" }
     );
     doc.text(
       "Accountant",
-      pBorderPaddOffsetX + pWidth - pBorderPadd - 17,
+      pBorderPaddOffsetX + pWidth - pBorderPadd - 29,
       feeRemarkAndAccOffY,
-      { align: "right" }
     );
 
     const qr = await fetchQrCode();

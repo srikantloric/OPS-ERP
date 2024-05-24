@@ -48,7 +48,10 @@ interface StudentData {
   transportation_fee?: number;
 }
 
-export function generateFeeHeadersForChallan(student: StudentDetailsType): {
+export function generateFeeHeadersForChallan(
+  student: StudentDetailsType,
+  lateFee: number
+): {
   feeHeaderList: IChallanHeaderType[];
   totalFeeAmount: number;
 } {
@@ -72,6 +75,14 @@ export function generateFeeHeadersForChallan(student: StudentDetailsType): {
       totalFeeAmount += Number(feeAmount);
     }
   });
+  if (lateFee !== undefined && lateFee !== null && lateFee !== 0) {
+    feeHeaderList.push({
+      headerTitle: "lateFee",
+      amount: lateFee,
+      amountPaid: 0,
+    });
+    totalFeeAmount += Number(lateFee);
+  }
 
   return { feeHeaderList, totalFeeAmount };
 }
@@ -174,6 +185,16 @@ const formatHeaderTitle = (title: string): string => {
       return "Transportation Fee";
     case "computerFee":
       return "Computer Fee";
+    case "lateFee":
+      return "Late Fine";
+    case "annualFee":
+      return "Annual Fee";
+    case "admissionFee":
+      return "Admission Fee";
+    case "otherFee":
+      return "Other Fee";
+    case "examFee":
+      return "Exam Fee";
     // Add other cases as necessary
     default:
       return title;
@@ -229,7 +250,6 @@ export const extractChallanIdsAndHeaders = (
     discountAmount,
   };
 };
-
 
 ///random 6 digit no
 export const generateRandomSixDigitNumber = (): number => {

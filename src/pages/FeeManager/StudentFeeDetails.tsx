@@ -63,6 +63,7 @@ import {
 } from "utilities/PaymentUtilityFunctions";
 import { GenerateFeeReciept } from "utilities/GenerateFeeReciept";
 import { StudentDetailsType } from "types/student";
+import ModalLoader from "components/Loader/ModalLoader";
 const SearchAnotherButton = () => {
   const historyRef = useNavigate();
   return (
@@ -142,6 +143,8 @@ function StudentFeeDetails() {
   const [showDeleteAuthenticationDialog, setShowDeleteAuthenticationDialog] =
     useState<boolean>(false);
 
+  const [isGeneratingFeeReciept, setIsGeneratingFeeReciept] = useState(false);
+
   ///////////////
   const [challanList, setChallanList] = useState<IChallanNL[]>([]);
 
@@ -176,9 +179,7 @@ function StudentFeeDetails() {
     setSelectedRow(rowData);
   };
 
-  function sum(
-    column: "totalDue" | "lateFine" | "feeConsession" | "amountPaid"
-  ) {
+  function sum(column: "totalDue" | "feeConsession" | "amountPaid") {
     return challanList.reduce((acc, row) => acc + row[column]!, 0);
   }
 
@@ -191,6 +192,7 @@ function StudentFeeDetails() {
       | "admissionFee"
       | "otherFee"
       | "annualFee"
+      | "lateFine"
   ): number {
     return challanList.reduce((totalSum, challan) => {
       const header = challan.feeHeaders.find(
@@ -225,33 +227,33 @@ function StudentFeeDetails() {
     }
   }, [selectedChallan, challanList]);
 
-  const calculateLateFine = (lateFee: number, dueDate: Date): number => {
-    const dueDateFormated = dueDate;
-    const currentDate = new Date();
-    let lateFine = 0;
-    if (currentDate >= dueDateFormated) {
-      lateFine = lateFee;
-    }
-    return lateFine;
-  };
+  // const calculateLateFine = (lateFee: number, dueDate: Date): number => {
+  //   const dueDateFormated = dueDate;
+  //   const currentDate = new Date();
+  //   let lateFine = 0;
+  //   if (currentDate >= dueDateFormated) {
+  //     lateFine = lateFee;
+  //   }
+  //   return lateFine;
+  // };
 
   const calculateTotalDueAmount = (challan: IChallanNL): number => {
     var totalDue: number = 0;
+
     const totalFeeHeaderAmount = challan.feeHeaders.reduce(
       (total, feeHeader) => {
         return total + Number(feeHeader.amount);
       },
       0
     );
-
     totalDue += totalFeeHeaderAmount;
-    if (challan.lateFine) {
-      const lateFine: number = calculateLateFine(
-        challan.lateFine,
-        challan.dueDate.toDate()
-      );
-      totalDue += lateFine;
-    }
+    // if (challan.lateFine) {
+    //   const lateFine: number = calculateLateFine(
+    //     challan.lateFine,
+    //     challan.dueDate.toDate()
+    //   );
+    //   totalDue += lateFine;
+    // }
 
     if (challan.feeConsession) {
       totalDue -= challan.feeConsession;
@@ -444,6 +446,7 @@ function StudentFeeDetails() {
   };
 
   const generateCurrentFeeReciept = async () => {
+    setIsGeneratingFeeReciept(true);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set time to midnight
     const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
@@ -455,6 +458,7 @@ function StudentFeeDetails() {
       .doc(location.state[0].id)
       .collection("PAYMENTS");
     const query = paymentsRef.where("recievedOn", ">=", todayTimestamp);
+    const recieptConfigRef = db.collection("CONFIG").doc("RECIEPT_CONFIG");
 
     try {
       const snapshot = await query.get();
@@ -462,7 +466,13 @@ function StudentFeeDetails() {
       const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
         ...(doc.data() as IPaymentNL),
       }));
-      console.log(paymentsData);
+
+      const recieptSnap = await recieptConfigRef.get();
+
+      let accountantName: string = "";
+      if (recieptSnap.exists) {
+        accountantName = recieptSnap.data()?.accountantName;
+      }
 
       const {
         challanMonthYear,
@@ -486,6 +496,7 @@ function StudentFeeDetails() {
         discountAmount: discountAmount,
         recieptId: recieptId,
         recieptDate: recieptDate,
+        accountantName: accountantName,
       });
 
       // Create a hidden iframe
@@ -493,6 +504,7 @@ function StudentFeeDetails() {
         const iframe: HTMLIFrameElement = document.createElement("iframe");
         iframe.style.display = "none";
         iframe.src = url!;
+        setIsGeneratingFeeReciept(false);
 
         iframe.onload = () => {
           iframe.contentWindow?.print();
@@ -906,6 +918,9 @@ function StudentFeeDetails() {
                   const otherFeeHeader = item.feeHeaders.find(
                     (header) => header.headerTitle === "otherFee"
                   );
+                  const lateFeeHeader = item.feeHeaders.find(
+                    (header) => header.headerTitle === "lateFee"
+                  );
 
                   return (
                     <>
@@ -915,7 +930,7 @@ function StudentFeeDetails() {
                         <td>
                           {monthlyFeeHeader ? monthlyFeeHeader.amount : 0}
                         </td>
-                        <td>{item.lateFine}</td>
+                        <td>{lateFeeHeader ? lateFeeHeader.amount : 0}</td>
                         <td>
                           {transportationFeeHeader
                             ? transportationFeeHeader.amount
@@ -998,7 +1013,7 @@ function StudentFeeDetails() {
                     color: "#fff",
                   }}
                 >
-                  {sum("lateFine").toFixed(0)}
+                  {sumAmountByHeaderTitle("lateFine").toFixed(0)}
                 </th>
                 <th
                   style={{
@@ -1203,6 +1218,8 @@ function StudentFeeDetails() {
             challanId={selectedRow.challanId}
           />
         ) : null}
+
+        <ModalLoader loading={isGeneratingFeeReciept} />
       </LSPage>
     </PageContainer>
   );

@@ -14,7 +14,7 @@ function ModalLoader({loading}) {
               >
                 <CircularProgress sx={{ mr: "14px" }} />
                 <Typography sx={{ display: "flex", alignItems: "center" }}>
-                  Loading...
+                  Generating Fee Reciept...
                 </Typography>
               </div>
             </ModalDialog>

@@ -21,6 +21,7 @@ import {
 } from "@tabler/icons-react";
 import { Logout, Settings } from "@mui/icons-material";
 import { auth } from "../../firebase";
+import { useSearchDialog } from "context/SearchDialogContext";
 
 function Navbar() {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
@@ -34,6 +35,8 @@ function Navbar() {
     setAnchorEl(null);
   };
   /////
+
+  const { isOpen, openDialog } = useSearchDialog();
 
   const notificationsLabel = (count) => {
     if (count === 0) {
@@ -88,7 +91,7 @@ function Navbar() {
             </IconButton>
           </Tooltip>
 
-          <div className="search-box">
+          <div className="search-box" onClick={() => openDialog()}>
             <IconSearch className="search-iconn" size={28} />
             <span>Search..</span>
             <div>Ctrl+K</div>

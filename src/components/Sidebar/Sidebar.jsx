@@ -27,6 +27,7 @@ function Sidebar() {
   };
 
   return (
+    
     <motion.div
       variants={Sidebar_Animation}
       animate={status.isActive ? "open" : "closed"}
