@@ -951,7 +951,7 @@ function StudentFeeDetails() {
               </tr>
             </thead>
             <tbody>
-              {challanList.length != 0 ? (
+              {challanList.length !== 0 ? (
                 challanList.map((item) => {
                   const monthlyFeeHeader = item.feeHeaders.find(
                     (header) => header.headerTitle === "monthlyFee"
