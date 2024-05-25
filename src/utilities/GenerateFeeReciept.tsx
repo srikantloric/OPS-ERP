@@ -45,7 +45,8 @@ interface Props {
   discountAmount: number;
   recieptId: string;
   recieptDate: string;
-  accountantName:string;
+  accountantName: string;
+  totalDueAmount:number
 }
 
 export const GenerateFeeReciept = async ({
@@ -58,7 +59,8 @@ export const GenerateFeeReciept = async ({
   discountAmount,
   recieptDate,
   recieptId,
-  accountantName
+  accountantName,
+  totalDueAmount
 }: Props) => {
   console.log(studentMasterData);
   if (studentMasterData) {
@@ -374,7 +376,7 @@ export const GenerateFeeReciept = async ({
     );
 
     //line before fee month details
-    const feeSectionStartPointY = 88;
+    const feeSectionStartPointY = 85;
 
     doc.setDrawColor("#949494");
     doc.setFont("Poppins", "normal");
@@ -446,10 +448,32 @@ export const GenerateFeeReciept = async ({
     doc.text("Particular", pBorderPadd + 3, feeSectionStartPointY + 4);
     doc.text("Particular", pBorderPaddOffsetX + 3, feeSectionStartPointY + 4);
 
-    doc.text("Fee Amount", pWidth - pWidth / 4 - 35, feeSectionStartPointY + 4);
+
+    const col1StartX = pWidth / 2 - 3;
+    const col1StartXCopy = pWidth / 2 - 10;
+
+    const col2StartX = col1StartX + col1StartX / 3-2;
+    const col2StartXCopy = col1StartX + col1StartX / 3 - 8;
+
+    const col3StartX = pWidth - pWidth / 4 + 6;
+    const col3StartXCopy = pBorderPaddOffsetX + pWidth - pWidth / 4;
+
+    doc.text("Fee", col1StartX+3, feeSectionStartPointY + 4, {
+      align: "left",
+    });
     doc.text(
-      "Fee Amount",
-      pBorderPaddOffsetX + pWidth - pWidth / 4 - 35,
+      "Fee",
+      pBorderPaddOffsetX + col1StartXCopy+2,
+      feeSectionStartPointY + 4,
+      {
+        align: "left",
+      }
+    );
+
+    doc.text("Prev. Due", col2StartX, feeSectionStartPointY + 4);
+    doc.text(
+      "Prev. Due",
+      pBorderPaddOffsetX + col2StartXCopy,
       feeSectionStartPointY + 4
     );
 
@@ -475,9 +499,9 @@ export const GenerateFeeReciept = async ({
 
     let feeTypeLayoutHeight = 1;
     // Determine the number of iterations needed to draw at least four rows
-    const rowCount = Math.max(3, feeHeaders.length);
+    // const rowCount = Math.max(2, feeHeaders.length);
 
-    for (let i = 0; i < rowCount; i++) {
+    for (let i = 0; i < feeHeaders.length; i++) {
       const item = feeHeaders[i] || {
         headerTitle: "",
         amountPaid: 0,
@@ -489,56 +513,54 @@ export const GenerateFeeReciept = async ({
       doc.text(item.headerTitle, pBorderPadd + 3, feeTypeLayoutHeight);
       doc.text(item.headerTitle, pBorderPaddOffsetX + 3, feeTypeLayoutHeight);
 
-      if (item.amountPaid) {
-        doc.text(
-          "Rs. " + item.amountPaid,
-          pWidth - pBorderPadd - 3,
-          feeTypeLayoutHeight,
-          { align: "right" }
-        );
-        doc.text(
-          "Rs. " + item.amountPaid,
-          pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
-          feeTypeLayoutHeight,
-          { align: "right" }
-        );
-      } else {
-        doc.text("", pWidth - pBorderPadd - 3, feeTypeLayoutHeight, {
-          align: "right",
-        });
-        doc.text(
-          "",
-          pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
-          feeTypeLayoutHeight,
-          { align: "right" }
-        );
-      }
-      ////amount
+      ///Start of Fee Amount
+      doc.text("Rs. " + item.amount, col1StartX+3, feeTypeLayoutHeight, {
+        align: "left",
+      });
+      doc.text(
+        "Rs. " + item.amount,
+        pBorderPaddOffsetX + col1StartXCopy+2,
+        feeTypeLayoutHeight,
+        { align: "left" }
+      );
+      ///End of Fee Amount
 
-      if (item.amount) {
-        doc.text(
-          "Rs. " + item.amount.toString(),
-          pBorderPadd + 22 + 29 + 38,
-          feeTypeLayoutHeight,
-          { align: "center" }
-        );
-        doc.text(
-          "Rs. " + item.amount.toString(),
-          pBorderPaddOffsetX + 22 + 29 + 38,
-          feeTypeLayoutHeight,
-          { align: "center" }
-        );
-      } else {
-        doc.text("", pBorderPadd + 22 + 29 + 38, feeTypeLayoutHeight, {
-          align: "center",
-        });
-        doc.text("", pBorderPaddOffsetX + 22 + 29 + 38, feeTypeLayoutHeight, {
-          align: "center",
-        });
-      }
+      //start of due amount
+      doc.text(
+        "Rs. " +item.amountDue,
+        col2StartX+3,
+        feeTypeLayoutHeight,
+        { align: "left" }
+      );
+      doc.text(
+        "Rs. " + item.amountDue,
+        pBorderPaddOffsetX + col2StartXCopy+3,
+        feeTypeLayoutHeight,
+        { align: "left" }
+      );
+      
+      //end of due amount
 
+      //start of paid amount
+      doc.text(
+        "Rs. " + item.amountPaid,
+        pWidth - pBorderPadd - 3,
+        feeTypeLayoutHeight,
+        { align: "right" }
+      );
+      doc.text(
+        "Rs. " + item.amountPaid,
+        pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+        feeTypeLayoutHeight,
+        { align: "right" }
+      );
+      //end of paid amount
+      
+      
+      
       // Draw horizontal lines for each row
       doc.setDrawColor("#cbc9c9");
+
       doc.line(
         pBorderPadd,
         feeTypeLayoutHeight + 2,
@@ -553,32 +575,57 @@ export const GenerateFeeReciept = async ({
       );
     }
 
+    ///start of column fee amount line
+
     doc.line(
-      pWidth / 2,
+      col1StartX,
       feeSectionStartPointY + 6,
-      pWidth / 2,
+      col1StartX,
       feeTypeLayoutHeight + 10
     );
     doc.line(
-      pBorderPaddOffsetX + pWidth / 2,
+      pBorderPaddOffsetX + col1StartXCopy,
       feeSectionStartPointY + 6,
-      pBorderPaddOffsetX + pWidth / 2,
+      pBorderPaddOffsetX + col1StartXCopy,
+      feeTypeLayoutHeight + 10
+    );
+    ///end of column fee amount line
+
+    ///start of DUe amount column
+
+    
+
+    doc.line(
+      col2StartX,
+      feeSectionStartPointY + 6,
+      col2StartX,
+      feeTypeLayoutHeight + 10
+    );
+    doc.line(
+      pBorderPaddOffsetX + col2StartXCopy,
+      feeSectionStartPointY + 6,
+      pBorderPaddOffsetX + col2StartXCopy,
+      feeTypeLayoutHeight + 10
+    );
+    ///end of due amount column
+
+    //start of paid amount column
+
+ 
+    doc.line(
+      col3StartX,
+      feeSectionStartPointY + 6,
+      col3StartX,
+      feeTypeLayoutHeight + 10
+    );
+    doc.line(
+      col3StartXCopy,
+      feeSectionStartPointY + 6,
+      col3StartXCopy,
       feeTypeLayoutHeight + 10
     );
 
-    doc.line(
-      pWidth - pWidth / 4,
-      feeSectionStartPointY + 6,
-      pWidth - pWidth / 4,
-      feeTypeLayoutHeight + 10
-    );
-    doc.line(
-      pBorderPaddOffsetX + pWidth - pWidth / 4 - 7,
-      feeSectionStartPointY + 6,
-      pBorderPaddOffsetX + pWidth - pWidth / 4 - 7,
-      feeTypeLayoutHeight + 10
-    );
-
+    //end of paid amount column
     doc.line(
       pBorderPadd,
       feeTypeLayoutHeight + 10,
@@ -609,18 +656,35 @@ export const GenerateFeeReciept = async ({
     //total Amount
     doc.text(
       "Rs." + totalAmount,
-      pBorderPadd + 22 + 29 + 38,
+      col1StartX+3,
       feeTypeLayoutHeight + 7,
       {
-        align: "center",
+        align: "left",
       }
     );
     doc.text(
       "Rs." + totalAmount,
-      pBorderPaddOffsetX + 22 + 29 + 38,
+      pBorderPaddOffsetX +col1StartX-3,
       feeTypeLayoutHeight + 7,
       {
-        align: "center",
+        align: "left",
+      }
+    );
+    //total Due
+    doc.text(
+      "Rs." + totalDueAmount,
+      col2StartX+3,
+      feeTypeLayoutHeight + 7,
+      {
+        align: "left",
+      }
+    );
+    doc.text(
+      "Rs." + totalDueAmount,
+      pBorderPaddOffsetX + col2StartXCopy+3,
+      feeTypeLayoutHeight + 7,
+      {
+        align: "left",
       }
     );
 
@@ -635,7 +699,7 @@ export const GenerateFeeReciept = async ({
     );
     doc.text(
       "Rs." + paidAmount,
-      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2),
       feeTypeLayoutHeight + 7,
       {
         align: "right",
@@ -699,7 +763,7 @@ export const GenerateFeeReciept = async ({
 
     doc.setFont("Poppins", "normal");
 
-    const feeRemarkAndAccOffY = feeTypeLayoutHeight + 40;
+    const feeRemarkAndAccOffY = feeTypeLayoutHeight + 35;
 
     doc.setFontSize(8);
     var maxWidth = 100; // Set the maximum width in PDF units (e.g., points)
@@ -726,8 +790,7 @@ export const GenerateFeeReciept = async ({
     doc.text(
       accountantName,
       pWidth - pBorderPadd - 22,
-      feeRemarkAndAccOffY - 5,
-   
+      feeRemarkAndAccOffY - 5
     );
 
     doc.text("Accountant", pWidth - pBorderPadd - 23, feeRemarkAndAccOffY);
@@ -735,12 +798,12 @@ export const GenerateFeeReciept = async ({
     doc.text(
       accountantName,
       pBorderPaddOffsetX + pWidth - pBorderPadd - 28,
-      feeRemarkAndAccOffY - 5,
+      feeRemarkAndAccOffY - 5
     );
     doc.text(
       "Accountant",
       pBorderPaddOffsetX + pWidth - pBorderPadd - 29,
-      feeRemarkAndAccOffY,
+      feeRemarkAndAccOffY
     );
 
     const qr = await fetchQrCode();

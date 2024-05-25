@@ -1,8 +1,14 @@
-import { IChallanHeaderType, IChallanNL, IPaymentNL } from "types/payment";
+import {
+  IChallanHeaderType,
+  IChallanHeaderTypeForChallan,
+  IChallanNL,
+  IPaymentNL,
+} from "types/payment";
 import { StudentDetailsType } from "types/student";
 
 ////Create Fee Header with paidAmount
-export function distributePaidAmount(
+
+export function distributePaidAmountForTransaction(
   challan: IChallanNL,
   receivedAmount: number,
   isPartialPayment: boolean
@@ -10,36 +16,119 @@ export function distributePaidAmount(
   const updatedFeeHeaders: IChallanHeaderType[] = challan.feeHeaders.map(
     (header) => ({
       ...header,
+      amountPaidTotal: header.amountPaidTotal, // Initialize totalAmountPaid with existing amountPaid
+      amountDue: header.amount - header.amountPaidTotal, // Initialize amountDue
+      amountPaid: 0, // Reset amountPaid for current payment
     })
   );
 
   if (isPartialPayment) {
     let remainingAmount = receivedAmount;
 
-    // Sort headers by priority: let's assume priority is based on the order they appear
     for (let header of updatedFeeHeaders) {
-      const amountDue = header.amount - header.amountPaid;
+      const amountDue = header.amount - header.amountPaidTotal;
       if (amountDue > 0) {
-        // Only consider headers with remaining due
         if (remainingAmount >= amountDue) {
-          header.amountPaid += amountDue;
+          header.amountPaid = amountDue;
+          header.amountPaidTotal += amountDue;
           remainingAmount -= amountDue;
         } else {
-          header.amountPaid += remainingAmount;
+          header.amountPaid = remainingAmount;
+          header.amountPaidTotal += remainingAmount;
           remainingAmount = 0;
-          break; // No more amount to distribute
         }
       }
+      header.amountDue = header.amount - header.amountPaidTotal; // Update amountDue after payment distribution
     }
   } else {
-    // Full payment scenario
     updatedFeeHeaders.forEach((header) => {
-      header.amountPaid = header.amount; // Set amountPaid to the full amount
+      header.amountPaid = header.amount - header.amountPaidTotal; // Set amountPaid to the remaining due amount
+      header.amountPaidTotal = header.amount; // Set totalAmountPaid to the full amount
+      header.amountDue = 0; // Full payment clears the due amount
     });
   }
 
   return updatedFeeHeaders;
 }
+
+export function distributePaidAmountForChallan(
+  challan: IChallanNL,
+  receivedAmount: number,
+  isPartialPayment: boolean
+): IChallanHeaderTypeForChallan[] {
+  const updatedFeeHeaders: IChallanHeaderTypeForChallan[] =
+    challan.feeHeaders.map((header) => ({
+      ...header,
+      amountDue: header.amount - header.amountPaidTotal, // Initialize amountDue
+    }));
+
+  if (isPartialPayment) {
+    let remainingAmount = receivedAmount;
+
+    // Sort headers by priority: let's assume priority is based on the order they appear
+    for (let header of updatedFeeHeaders) {
+      const amountDue = header.amount - header.amountPaidTotal;
+      if (amountDue > 0) {
+        // Only consider headers with remaining due
+        if (remainingAmount >= amountDue) {
+          header.amountPaidTotal += amountDue;
+          remainingAmount -= amountDue;
+        } else {
+          header.amountPaidTotal += remainingAmount;
+          remainingAmount = 0;
+        }
+      }
+      // Ensure this line is called within the loop
+      header.amountDue = header.amount - header.amountPaidTotal; // Update amountDue after payment distribution
+    }
+  } else {
+    // Full payment scenario
+    updatedFeeHeaders.forEach((header) => {
+      header.amountPaidTotal = header.amount; // Set amountPaid to the full amount
+      header.amountDue = 0; // Full payment clears the due amount
+    });
+  }
+
+  return updatedFeeHeaders;
+}
+// export function distributePaidAmount(
+//   challan: IChallanNL,
+//   receivedAmount: number,
+//   isPartialPayment: boolean
+// ): IChallanHeaderType[] {
+//   const updatedFeeHeaders: IChallanHeaderType[] = challan.feeHeaders.map(
+//     (header) => ({
+//       ...header,
+//     })
+//   );
+
+//   if (isPartialPayment) {
+//     let remainingAmount = receivedAmount;
+
+//     // Sort headers by priority: let's assume priority is based on the order they appear
+//     for (let header of updatedFeeHeaders) {
+//       const amountDue = header.amount - header.amountPaid;
+//       if (amountDue > 0) {
+//         // Only consider headers with remaining due
+//         if (remainingAmount >= amountDue) {
+//           header.amountPaid += amountDue;
+//           remainingAmount -= amountDue;
+//         } else {
+//           header.amountPaid += remainingAmount;
+//           remainingAmount = 0;
+//           break; // No more amount to distribute
+//         }
+//       }
+//     }
+//   } else {
+//     // Full payment scenario
+//     updatedFeeHeaders.forEach((header) => {
+//       header.amountPaid = header.amount; // Set amountPaid to the full amount
+//     });
+//   }
+
+//   return updatedFeeHeaders;
+// }
 
 ///generate Monthly Fee Challan
 interface StudentData {
@@ -52,10 +141,10 @@ export function generateFeeHeadersForChallan(
   student: StudentDetailsType,
   lateFee: number
 ): {
-  feeHeaderList: IChallanHeaderType[];
+  feeHeaderList: IChallanHeaderTypeForChallan[];
   totalFeeAmount: number;
 } {
-  const feeHeaderList: IChallanHeaderType[] = [];
+  const feeHeaderList: IChallanHeaderTypeForChallan[] = [];
   let totalFeeAmount: number = 0;
 
   const fees = [
@@ -70,7 +159,8 @@ export function generateFeeHeadersForChallan(
       feeHeaderList.push({
         headerTitle: fee.title,
         amount: feeAmount,
-        amountPaid: 0,
+        amountDue: 0,
+        amountPaidTotal: 0,
       });
       totalFeeAmount += Number(feeAmount);
     }
@@ -79,7 +169,8 @@ export function generateFeeHeadersForChallan(
     feeHeaderList.push({
       headerTitle: "lateFee",
       amount: lateFee,
-      amountPaid: 0,
+      amountDue: 0,
+      amountPaidTotal: 0,
     });
     totalFeeAmount += Number(lateFee);
   }
@@ -109,6 +200,8 @@ export function generateFeeHeadersForChallanWithMarkedAsPaid(
       feeHeaderList.push({
         headerTitle: fee.title,
         amount: feeAmount,
+        amountDue: 0,
+        amountPaidTotal: isMarkedAsPaid ? feeAmount : 0,
         amountPaid: isMarkedAsPaid ? feeAmount : 0,
       });
       totalFeeAmount += Number(feeAmount);
@@ -208,6 +301,7 @@ interface ChallanIdsAndHeaders {
   totalAmount: number;
   discountAmount: number;
   totalPaidAmount: number;
+  totalDueAmount:number
 }
 export const extractChallanIdsAndHeaders = (
   payments: IPaymentNL[]
@@ -218,6 +312,7 @@ export const extractChallanIdsAndHeaders = (
   let totalAmount = 0;
   let discountAmount = 0;
   let totalPaidAmount = 0;
+  let totalDueAmount = 0;
 
   payments.forEach((payment) => {
     const formattedDate = formatChallanDate(payment.challanId);
@@ -233,13 +328,19 @@ export const extractChallanIdsAndHeaders = (
           )} - ${formattedDate}`,
           amount: item.amount,
           amountPaid: item.amountPaid,
+          amountDue: item.amountDue,
+          amountPaidTotal: 0,
         });
         // Increment totalPaidAmount and totalAmount
         paidAmount += item.amountPaid;
         totalAmount += item.amount;
+        totalDueAmount += item.amountDue;
       });
     }
   });
+
+  console.log("Total Paid Amount", totalPaidAmount);
+  console.log("Total AMount", totalAmount);
 
   return {
     challanMonthYear,
@@ -248,6 +349,7 @@ export const extractChallanIdsAndHeaders = (
     totalAmount,
     totalPaidAmount,
     discountAmount,
+    totalDueAmount
   };
 };
 

@@ -162,7 +162,9 @@ const InstantPaymentModal: React.FC<Props> = ({
               additionalFeeHeaders.push({
                 headerTitle: feeType.headerTitle,
                 amount: feeType.amount,
-                amountPaid: isMarkedAsPaid ? feeType.amount : 0,
+                amountDue: 0,
+                amountPaidTotal:isMarkedAsPaid ? feeType.amount : 0,
+                amountPaid:isMarkedAsPaid ? feeType.amount : 0,
               });
             }
           });
@@ -171,7 +173,9 @@ const InstantPaymentModal: React.FC<Props> = ({
             additionalFeeHeaders.push({
               amount: feeDetail.lateFine,
               headerTitle: "lateFee",
-              amountPaid: isMarkedAsPaid ? feeDetail.lateFine : 0,
+              amountDue: 0,
+              amountPaidTotal:isMarkedAsPaid ? feeDetail.lateFine : 0,
+              amountPaid:isMarkedAsPaid ? feeDetail.lateFine : 0,
             });
           }
 

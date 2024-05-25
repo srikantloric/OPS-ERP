@@ -15,7 +15,7 @@ import { Additem } from "iconsax-react";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
-import { IChallanHeaderType, IChallanNL } from "types/payment";
+import { IChallanHeaderType, IChallanHeaderTypeForChallan, IChallanNL } from "types/payment";
 
 interface IAddArrearInputTypes {
   examFee: number;
@@ -30,7 +30,7 @@ interface Props {
   studentId: string;
   challanData: IAddArrearInputTypes;
   paymentStatus: string;
-  feeHeader: IChallanHeaderType[];
+  feeHeader: IChallanHeaderTypeForChallan[];
 }
 
 interface IAddArrearInputTypes extends Record<string, number> {}
@@ -100,7 +100,7 @@ const AddFeeArrearModal: React.FC<Props> = ({
           const existingHeader = feeHeadersMap.get(newHeader.headerTitle);
           if (existingHeader) {
             existingHeader.amount = newHeader.amount;
-            existingHeader.amountPaid = newHeader.amountPaid;
+            existingHeader.amountPaidTotal = newHeader.amountPaid;
           }
         } else {
           // Header does not exist, append the new header
@@ -150,6 +150,8 @@ const AddFeeArrearModal: React.FC<Props> = ({
         headerTitle: "admissionFee",
         amountPaid: 0,
         amount: feeHeaderData.admissionFee,
+        amountDue: 0,
+        amountPaidTotal:0
       });
     }
     if (feeHeaderData.examFee) {
@@ -157,6 +159,8 @@ const AddFeeArrearModal: React.FC<Props> = ({
         headerTitle: "examFee",
         amountPaid: 0,
         amount: feeHeaderData.examFee,
+        amountDue: 0,
+        amountPaidTotal:0
       });
     }
     if (feeHeaderData.annualFee) {
@@ -164,6 +168,8 @@ const AddFeeArrearModal: React.FC<Props> = ({
         headerTitle: "annualFee",
         amountPaid: 0,
         amount: feeHeaderData.annualFee,
+        amountDue: 0,
+        amountPaidTotal:0
       });
     }
     if (feeHeaderData.otherFee) {
@@ -171,6 +177,8 @@ const AddFeeArrearModal: React.FC<Props> = ({
         headerTitle: "otherFee",
         amountPaid: 0,
         amount: feeHeaderData.otherFee,
+        amountDue: 0,
+        amountPaidTotal:0
       });
     }
 
