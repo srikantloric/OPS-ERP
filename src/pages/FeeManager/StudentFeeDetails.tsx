@@ -16,7 +16,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import { CurrencyRupee, Delete, MoreVert, Print } from "@mui/icons-material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { db } from "../../firebase";
+import { db} from "../../firebase";
 import { enqueueSnackbar } from "notistack";
 import {
   Box,
@@ -37,14 +37,16 @@ import AddFeeArrearModal from "components/Modals/AddFeeArrearModal";
 import { FEE_HEADERS, paymentStatus } from "../../constants/index";
 import IndividualFeeDetailsHeader from "components/Headers/IndividualFeeDetailsHeader";
 import {
-  IChallanHeaderType,
+  IChallanHeaderTypeForChallan,
   IChallanNL,
   IPaymentNL,
+  IPaymentNLForChallan,
   IPaymentStatus,
 } from "types/payment";
 import AddFeeConsessionModal from "components/Modals/AddFeeConsessionModal";
 import { MoneyRecive } from "iconsax-react";
 import {
+  formatedDate,
   generateAlphanumericUUID,
   getCurrentDate,
 } from "utilities/UtilitiesFunctions";
@@ -57,7 +59,8 @@ import InstantPaymentModal from "components/Modals/InstantPaymentModal";
 import DiscountIcon from "@mui/icons-material/Discount";
 import DeleteChallanConfirmationDialog from "components/Modals/DeleteChallanConfirmationDialog";
 import {
-  distributePaidAmount,
+  distributePaidAmountForChallan,
+  distributePaidAmountForTransaction,
   extractChallanIdsAndHeaders,
   generateRandomSixDigitNumber,
 } from "utilities/PaymentUtilityFunctions";
@@ -313,33 +316,40 @@ function StudentFeeDetails() {
     }
   }, []);
 
-  const saveDataToDb = (data: IPaymentNL, pStatus: IPaymentStatus) => {
+  const saveDataToDb = (
+    paymentObjForPayment: IPaymentNL,
+    paymentObjForChallan: IPaymentNLForChallan,
+    pStatus: IPaymentStatus
+  ) => {
     setIsPaymentLoading(true);
     const batch = db.batch();
     const paymentCollRef = db
       .collection("STUDENTS")
-      .doc(data.studentId)
+      .doc(paymentObjForPayment.studentId)
       .collection("PAYMENTS")
       .doc();
+    const paymentCollRefOL = db.collection("PAYMENTS").doc();
 
     //update challan
     const challanDocRef = db
       .collection("STUDENTS")
-      .doc(data.studentId)
+      .doc(paymentObjForChallan.studentId)
       .collection("CHALLANS")
-      .doc(data.challanId);
+      .doc(paymentObjForChallan.challanId);
 
     //data for challan update
 
-    const updatedFeeHeaders: IChallanHeaderType[] = data.breakdown;
+    const updatedFeeHeaders: IChallanHeaderTypeForChallan[] =
+      paymentObjForChallan.breakdown;
 
     batch.update(challanDocRef, {
       feeHeaders: updatedFeeHeaders,
-      amountPaid: data.amountPaid,
+      amountPaid: paymentObjForChallan.amountPaid,
       status: pStatus,
     });
 
-    batch.set(paymentCollRef, data);
+    batch.set(paymentCollRef, paymentObjForPayment);
+    batch.set(paymentCollRefOL, paymentObjForPayment);
 
     batch
       .commit()
@@ -362,12 +372,16 @@ function StudentFeeDetails() {
   const recievePayment = (partialPayment: boolean) => {
     if (selectedChallanDetails) {
       if (partialPayment) {
-        const updatedFeeHeader = distributePaidAmount(
+        const updatedFeeHeaderForPayment = distributePaidAmountForTransaction(
           selectedChallanDetails,
           recievedAmountPartPayment!,
           true
         );
-
+        const updatedFeeHeaderForChallan = distributePaidAmountForChallan(
+          selectedChallanDetails,
+          recievedAmountPartPayment!,
+          true
+        );
         const totalPaidAmount = Number(
           selectedChallanDetails.amountPaid + recievedAmountPartPayment!
         );
@@ -375,9 +389,21 @@ function StudentFeeDetails() {
 
         var pStatus: IPaymentStatus =
           totalPaidAmount >= totalAmountDue ? "PAID" : "PARTIAL";
-        // console.log(pStatus)
-        // console.log(typeof(totalPaidAmount),typeof(totalAmountDue))
-        const paymentDataForNL: IPaymentNL = {
+
+        const paymentDataForPayment: IPaymentNL = {
+          challanTitle: selectedChallanDetails.challanTitle,
+          paymentId: generateAlphanumericUUID(8),
+          studentId: selectedChallanDetails.studentId,
+          challanId: selectedChallanDetails.challanId,
+          amountPaid: recievedAmountPartPayment!,
+          recievedBy: "Admin",
+          recievedOn: firebase.firestore.Timestamp.now(),
+          breakdown: updatedFeeHeaderForPayment,
+          status: pStatus,
+          feeConsession: selectedChallanDetails.feeConsession,
+        };
+
+        const paymentDataForChallan: IPaymentNLForChallan = {
           challanTitle: selectedChallanDetails.challanTitle,
           paymentId: generateAlphanumericUUID(8),
           studentId: selectedChallanDetails.studentId,
@@ -386,20 +412,38 @@ function StudentFeeDetails() {
             selectedChallanDetails.amountPaid + recievedAmountPartPayment!,
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
-          breakdown: updatedFeeHeader,
+          breakdown: updatedFeeHeaderForChallan,
           status: pStatus,
           feeConsession: selectedChallanDetails.feeConsession,
         };
-        saveDataToDb(paymentDataForNL, pStatus);
+
+        saveDataToDb(paymentDataForPayment, paymentDataForChallan, pStatus);
       } else {
         // const feeHeadersList = createFeeHeaders(selectedChallanDetails);
-        const updatedFeeHeader = distributePaidAmount(
+        const updatedFeeHeaderForPayment = distributePaidAmountForTransaction(
+          selectedChallanDetails,
+          recievedAmount!,
+          true
+        );
+        const updatedFeeHeaderForChallan = distributePaidAmountForChallan(
           selectedChallanDetails,
           recievedAmount!,
           true
         );
 
-        const paymentDataForNL: IPaymentNL = {
+        const paymentDataForPayment: IPaymentNL = {
+          challanTitle: selectedChallanDetails.challanTitle,
+          paymentId: generateAlphanumericUUID(8),
+          challanId: selectedChallanDetails.challanId,
+          studentId: selectedChallanDetails.studentId,
+          amountPaid: recievedAmount!,
+          recievedBy: "Admin",
+          recievedOn: firebase.firestore.Timestamp.now(),
+          breakdown: updatedFeeHeaderForPayment,
+          status: "PAID",
+          feeConsession: selectedChallanDetails.feeConsession,
+        };
+        const paymentDataForChallan: IPaymentNLForChallan = {
           challanTitle: selectedChallanDetails.challanTitle,
           paymentId: generateAlphanumericUUID(8),
           challanId: selectedChallanDetails.challanId,
@@ -407,11 +451,11 @@ function StudentFeeDetails() {
           amountPaid: selectedChallanDetails.amountPaid + recievedAmount!,
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
-          breakdown: updatedFeeHeader,
+          breakdown: updatedFeeHeaderForChallan,
           status: "PAID",
           feeConsession: selectedChallanDetails.feeConsession,
         };
-        saveDataToDb(paymentDataForNL, "PAID");
+        saveDataToDb(paymentDataForPayment, paymentDataForChallan, "PAID");
       }
     }
   };
@@ -445,6 +489,8 @@ function StudentFeeDetails() {
     }
   };
 
+
+
   const generateCurrentFeeReciept = async () => {
     setIsGeneratingFeeReciept(true);
     const today = new Date();
@@ -452,7 +498,6 @@ function StudentFeeDetails() {
     const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
 
     const db = firebase.firestore();
-    console.log(location.state[0].id);
     const paymentsRef = db
       .collection("STUDENTS")
       .doc(location.state[0].id)
@@ -462,59 +507,71 @@ function StudentFeeDetails() {
 
     try {
       const snapshot = await query.get();
-      console.log(snapshot.size);
-      const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
-        ...(doc.data() as IPaymentNL),
-      }));
+      if (snapshot.size > 0) {
+        const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
+          ...(doc.data() as IPaymentNL),
+        }));
 
-      const recieptSnap = await recieptConfigRef.get();
+        const recieptSnap = await recieptConfigRef.get();
 
-      let accountantName: string = "";
-      if (recieptSnap.exists) {
-        accountantName = recieptSnap.data()?.accountantName;
-      }
+        let accountantName: string = "";
+        if (recieptSnap.exists) {
+          accountantName = recieptSnap.data()?.accountantName;
+        }
 
-      const {
-        challanMonthYear,
-        feeHeaders,
-        totalAmount,
-        totalPaidAmount,
-        discountAmount,
-        paidAmount,
-      } = extractChallanIdsAndHeaders(paymentsData);
+        const {
+          challanMonthYear,
+          feeHeaders,
+          totalAmount,
+          totalPaidAmount,
+          discountAmount,
+          paidAmount,
+          totalDueAmount,
+        } = extractChallanIdsAndHeaders(paymentsData);
 
-      const recieptId = generateRandomSixDigitNumber().toString();
-      const recieptDate = new Date().toLocaleString();
+        const recieptId = generateRandomSixDigitNumber().toString();
+        const recieptDate = formatedDate(new Date(), "dd/MM/YYYY hh:mm:ss");
 
-      const url = await GenerateFeeReciept({
-        challanMonths: challanMonthYear,
-        feeHeaders: feeHeaders,
-        studentMasterData: location.state[0] as StudentDetailsType,
-        totalAmount: totalAmount,
-        totalPaidAmount: totalPaidAmount,
-        paidAmount: paidAmount,
-        discountAmount: discountAmount,
-        recieptId: recieptId,
-        recieptDate: recieptDate,
-        accountantName: accountantName,
-      });
+        const url = await GenerateFeeReciept({
+          challanMonths: challanMonthYear,
+          feeHeaders: feeHeaders,
+          studentMasterData: location.state[0] as StudentDetailsType,
+          totalAmount: totalAmount,
+          totalDueAmount: totalDueAmount,
+          totalPaidAmount: totalPaidAmount,
+          paidAmount: paidAmount,
+          discountAmount: discountAmount,
+          recieptId: recieptId,
+          recieptDate: recieptDate,
+          accountantName: accountantName,
+        });
 
-      // Create a hidden iframe
-      if (url) {
-        const iframe: HTMLIFrameElement = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = url!;
-        setIsGeneratingFeeReciept(false);
+       
 
-        iframe.onload = () => {
-          iframe.contentWindow?.print();
-        };
+        // Create a hidden iframe
+        if (url) {
+          const iframe: HTMLIFrameElement = document.createElement("iframe");
+          iframe.style.display = "none";
+          iframe.src = url!;
+          setIsGeneratingFeeReciept(false);
 
-        document.body.appendChild(iframe);
+          iframe.onload = () => {
+            iframe.contentWindow?.print();
+          };
+
+          document.body.appendChild(iframe);
+        } else {
+          alert("erro");
+        }
       } else {
-        alert("erro");
+        setIsGeneratingFeeReciept(false);
+        enqueueSnackbar("No fee reciept found, please pay fee and try again", {
+          variant: "info",
+        });
       }
     } catch (error) {
+      setIsGeneratingFeeReciept(false);
+      enqueueSnackbar("Something went wrong", { variant: "error" });
       console.error("Error fetching payments:", error);
     }
   };
@@ -895,7 +952,7 @@ function StudentFeeDetails() {
               </tr>
             </thead>
             <tbody>
-              {challanList.length != 0 ? (
+              {challanList.length !== 0 ? (
                 challanList.map((item) => {
                   const monthlyFeeHeader = item.feeHeaders.find(
                     (header) => header.headerTitle === "monthlyFee"
