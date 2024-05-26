@@ -34,6 +34,7 @@ interface Props {
   recieptDate: string;
   accountantName: string;
   totalDueAmount: number;
+  recieptGeneratorServerUrl:string
 }
 
 export const GenerateFeeReciept = async ({
@@ -48,6 +49,7 @@ export const GenerateFeeReciept = async ({
   recieptId,
   accountantName,
   totalDueAmount,
+  recieptGeneratorServerUrl
 }: Props) => {
   if (studentMasterData) {
     //Page Size
@@ -773,7 +775,7 @@ export const GenerateFeeReciept = async ({
       feeRemarkAndAccOffY
     );
 
-    const recieptString = `https://us-central1-orient-public-school.cloudfunctions.net/generatePdf/${recieptId}`;
+    const recieptString = `${recieptGeneratorServerUrl}${recieptId}`;
 
     console.log(recieptString);
     const qr = await generateQRCodeBase64(recieptString);

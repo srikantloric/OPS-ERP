@@ -16,7 +16,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import { CurrencyRupee, Delete, MoreVert, Print } from "@mui/icons-material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { db} from "../../firebase";
+import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
 import {
   Box,
@@ -489,8 +489,6 @@ function StudentFeeDetails() {
     }
   };
 
-
-
   const generateCurrentFeeReciept = async () => {
     setIsGeneratingFeeReciept(true);
     const today = new Date();
@@ -515,8 +513,10 @@ function StudentFeeDetails() {
         const recieptSnap = await recieptConfigRef.get();
 
         let accountantName: string = "";
+        let recieptGeneratorServer: string = "";
         if (recieptSnap.exists) {
           accountantName = recieptSnap.data()?.accountantName;
+          recieptGeneratorServer = recieptSnap.data()?.recieptGeneratorServerUrl;
         }
 
         const {
@@ -544,9 +544,8 @@ function StudentFeeDetails() {
           recieptId: recieptId,
           recieptDate: recieptDate,
           accountantName: accountantName,
+          recieptGeneratorServerUrl: recieptGeneratorServer,
         });
-
-       
 
         // Create a hidden iframe
         if (url) {
