@@ -165,3 +165,18 @@ export const generateChallanDocId = (month: number, year: string): string => {
   const challanId = "CHALLAN" + makeDoubleDigit(month.toString()) + year;
   return challanId;
 };
+
+
+export function formatedDate(date: Date, format: string): string {
+  const pad = (n: number) => n < 10 ? '0' + n : n.toString();
+
+  const replacements: { [key: string]: string } = {
+      'dd': pad(date.getDate()),
+      'MM': pad(date.getMonth() + 1),
+      'YYYY': date.getFullYear().toString(),
+      'hh': pad(date.getHours()),
+      'mm': pad(date.getMinutes()),
+      'ss': pad(date.getSeconds())
+  };
+  return format.replace(/dd|MM|YYYY|hh|mm|ss/g, match => replacements[match]);
+}

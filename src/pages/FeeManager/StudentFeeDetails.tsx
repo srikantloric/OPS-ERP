@@ -16,7 +16,7 @@ import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import { CurrencyRupee, Delete, MoreVert, Print } from "@mui/icons-material";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { useLocation, useNavigate } from "react-router-dom";
-import { db } from "../../firebase";
+import { db} from "../../firebase";
 import { enqueueSnackbar } from "notistack";
 import {
   Box,
@@ -46,6 +46,7 @@ import {
 import AddFeeConsessionModal from "components/Modals/AddFeeConsessionModal";
 import { MoneyRecive } from "iconsax-react";
 import {
+  formatedDate,
   generateAlphanumericUUID,
   getCurrentDate,
 } from "utilities/UtilitiesFunctions";
@@ -488,6 +489,8 @@ function StudentFeeDetails() {
     }
   };
 
+
+
   const generateCurrentFeeReciept = async () => {
     setIsGeneratingFeeReciept(true);
     const today = new Date();
@@ -495,7 +498,6 @@ function StudentFeeDetails() {
     const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
 
     const db = firebase.firestore();
-    console.log(location.state[0].id);
     const paymentsRef = db
       .collection("STUDENTS")
       .doc(location.state[0].id)
@@ -528,10 +530,7 @@ function StudentFeeDetails() {
         } = extractChallanIdsAndHeaders(paymentsData);
 
         const recieptId = generateRandomSixDigitNumber().toString();
-        const recieptDate = new Date().toLocaleString();
-
-        console.log("gen,Total Due Amount", totalDueAmount);
-        console.log(feeHeaders);
+        const recieptDate = formatedDate(new Date(), "dd/MM/YYYY hh:mm:ss");
 
         const url = await GenerateFeeReciept({
           challanMonths: challanMonthYear,
@@ -546,6 +545,8 @@ function StudentFeeDetails() {
           recieptDate: recieptDate,
           accountantName: accountantName,
         });
+
+       
 
         // Create a hidden iframe
         if (url) {

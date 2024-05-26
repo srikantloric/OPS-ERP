@@ -16,24 +16,11 @@ import {
 } from "config/schoolConfig";
 import { StudentDetailsType } from "types/student";
 import { IChallanHeaderType } from "types/payment";
-import { getClassNameByValue } from "./UtilitiesFunctions";
-
-const fetchQrCode = async () => {
-  const res = await fetch(
-    "https://kqd8cfefra.execute-api.ap-south-1.amazonaws.com",
-    {
-      method: "POST",
-      body: JSON.stringify({
-        url: "www.example.com",
-      }),
-      headers: {
-        "Content-type": "application/json; charset=UTF-8",
-      },
-    }
-  );
-  const data = await res.json();
-  return data.qrImageBase64;
-};
+import {
+  generateQRCodeBase64,
+  getClassNameByValue,
+} from "./UtilitiesFunctions";
+import { db } from "../firebase";
 
 interface Props {
   studentMasterData: StudentDetailsType;
@@ -46,7 +33,7 @@ interface Props {
   recieptId: string;
   recieptDate: string;
   accountantName: string;
-  totalDueAmount:number
+  totalDueAmount: number;
 }
 
 export const GenerateFeeReciept = async ({
@@ -60,9 +47,8 @@ export const GenerateFeeReciept = async ({
   recieptDate,
   recieptId,
   accountantName,
-  totalDueAmount
+  totalDueAmount,
 }: Props) => {
-  console.log(studentMasterData);
   if (studentMasterData) {
     //Page Size
     const pHeight = 210;
@@ -448,22 +434,21 @@ export const GenerateFeeReciept = async ({
     doc.text("Particular", pBorderPadd + 3, feeSectionStartPointY + 4);
     doc.text("Particular", pBorderPaddOffsetX + 3, feeSectionStartPointY + 4);
 
-
     const col1StartX = pWidth / 2 - 3;
     const col1StartXCopy = pWidth / 2 - 10;
 
-    const col2StartX = col1StartX + col1StartX / 3-2;
+    const col2StartX = col1StartX + col1StartX / 3 - 2;
     const col2StartXCopy = col1StartX + col1StartX / 3 - 8;
 
     const col3StartX = pWidth - pWidth / 4 + 6;
     const col3StartXCopy = pBorderPaddOffsetX + pWidth - pWidth / 4;
 
-    doc.text("Fee", col1StartX+3, feeSectionStartPointY + 4, {
+    doc.text("Fee", col1StartX + 3, feeSectionStartPointY + 4, {
       align: "left",
     });
     doc.text(
       "Fee",
-      pBorderPaddOffsetX + col1StartXCopy+2,
+      pBorderPaddOffsetX + col1StartXCopy + 2,
       feeSectionStartPointY + 4,
       {
         align: "left",
@@ -514,31 +499,28 @@ export const GenerateFeeReciept = async ({
       doc.text(item.headerTitle, pBorderPaddOffsetX + 3, feeTypeLayoutHeight);
 
       ///Start of Fee Amount
-      doc.text("Rs. " + item.amount, col1StartX+3, feeTypeLayoutHeight, {
+      doc.text("Rs. " + item.amount, col1StartX + 3, feeTypeLayoutHeight, {
         align: "left",
       });
       doc.text(
         "Rs. " + item.amount,
-        pBorderPaddOffsetX + col1StartXCopy+2,
+        pBorderPaddOffsetX + col1StartXCopy + 2,
         feeTypeLayoutHeight,
         { align: "left" }
       );
       ///End of Fee Amount
 
       //start of due amount
-      doc.text(
-        "Rs. " +item.amountDue,
-        col2StartX+3,
-        feeTypeLayoutHeight,
-        { align: "left" }
-      );
+      doc.text("Rs. " + item.amountDue, col2StartX + 3, feeTypeLayoutHeight, {
+        align: "left",
+      });
       doc.text(
         "Rs. " + item.amountDue,
-        pBorderPaddOffsetX + col2StartXCopy+3,
+        pBorderPaddOffsetX + col2StartXCopy + 3,
         feeTypeLayoutHeight,
         { align: "left" }
       );
-      
+
       //end of due amount
 
       //start of paid amount
@@ -555,9 +537,7 @@ export const GenerateFeeReciept = async ({
         { align: "right" }
       );
       //end of paid amount
-      
-      
-      
+
       // Draw horizontal lines for each row
       doc.setDrawColor("#cbc9c9");
 
@@ -593,8 +573,6 @@ export const GenerateFeeReciept = async ({
 
     ///start of DUe amount column
 
-    
-
     doc.line(
       col2StartX,
       feeSectionStartPointY + 6,
@@ -611,7 +589,6 @@ export const GenerateFeeReciept = async ({
 
     //start of paid amount column
 
- 
     doc.line(
       col3StartX,
       feeSectionStartPointY + 6,
@@ -654,34 +631,24 @@ export const GenerateFeeReciept = async ({
     );
 
     //total Amount
+    doc.text("Rs." + totalAmount, col1StartX + 3, feeTypeLayoutHeight + 7, {
+      align: "left",
+    });
     doc.text(
       "Rs." + totalAmount,
-      col1StartX+3,
-      feeTypeLayoutHeight + 7,
-      {
-        align: "left",
-      }
-    );
-    doc.text(
-      "Rs." + totalAmount,
-      pBorderPaddOffsetX +col1StartX-3,
+      pBorderPaddOffsetX + col1StartX - 3,
       feeTypeLayoutHeight + 7,
       {
         align: "left",
       }
     );
     //total Due
+    doc.text("Rs." + totalDueAmount, col2StartX + 3, feeTypeLayoutHeight + 7, {
+      align: "left",
+    });
     doc.text(
       "Rs." + totalDueAmount,
-      col2StartX+3,
-      feeTypeLayoutHeight + 7,
-      {
-        align: "left",
-      }
-    );
-    doc.text(
-      "Rs." + totalDueAmount,
-      pBorderPaddOffsetX + col2StartXCopy+3,
+      pBorderPaddOffsetX + col2StartXCopy + 3,
       feeTypeLayoutHeight + 7,
       {
         align: "left",
@@ -699,7 +666,7 @@ export const GenerateFeeReciept = async ({
     );
     doc.text(
       "Rs." + paidAmount,
-      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2),
+      pBorderPaddOffsetX + pWidth - pBorderPadd * 2,
       feeTypeLayoutHeight + 7,
       {
         align: "right",
@@ -806,7 +773,10 @@ export const GenerateFeeReciept = async ({
       feeRemarkAndAccOffY
     );
 
-    const qr = await fetchQrCode();
+    const recieptString = `https://us-central1-orient-public-school.cloudfunctions.net/generatePdf/${recieptId}`;
+
+    console.log(recieptString);
+    const qr = await generateQRCodeBase64(recieptString);
     doc.addImage(
       qr,
       "jpeg",
@@ -883,8 +853,43 @@ export const GenerateFeeReciept = async ({
     // Create blob URL for the PDF
     const pdfBlob = doc.output("blob");
     const url = URL.createObjectURL(pdfBlob);
+
+    const feeReciept = {
+      challanMonths,
+      feeHeaders,
+      totalAmount,
+      totalPaidAmount,
+      discountAmount,
+      paidAmount,
+      totalDueAmount,
+      studentId: studentMasterData.id,
+      accountantName,
+    };
+
+    await uploadRecieptToDb(recieptId, recieptDate, feeReciept, recieptString);
+
     return url;
   } else {
     console.log("user data not found please refresh and try again...");
+  }
+};
+
+const uploadRecieptToDb = async (
+  recieptId: string,
+  recieptDate: string,
+  feeReciept: any,
+  recieptString: string
+) => {
+  try {
+    const recieptData = {
+      ...feeReciept,
+      recieptId,
+      recieptDate,
+      qrUrl: recieptString,
+    };
+    const recieptCollRef = db.collection("FEE_RECIEPTS").doc(recieptId);
+    await recieptCollRef.set(recieptData);
+  } catch (error) {
+    console.error("Error uploading file:", error);
   }
 };
