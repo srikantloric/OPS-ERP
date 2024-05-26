@@ -11,6 +11,7 @@ import {
   IconReceipt2,
   IconUsers,
   IconMoneybag,
+  IconSettings,
 } from "@tabler/icons-react";
 import AddStudent from "../../pages/Users/AddStudent";
 import UnderConstruction from "../../pages/Extras/UnderConstruction";
@@ -21,6 +22,7 @@ import FeeReceipt from "pages/FeeManager/FeeReceipt";
 import Transaction from "pages/Transaction/Transaction";
 import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
 import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
+import SettingsPage from "pages/Settings/SettingsPage";
 
 export const routesConfig = [
   {
@@ -181,5 +183,17 @@ export const routesConfig = [
     isCollapsable: false,
     isHeader: false,
     Component: UnderConstruction,
+  },
+  {
+    title: "Controls",
+    isHeader: true,
+  },
+  {
+    title: "Settings",
+    to: "/Settings",
+    icon: IconSettings,
+    isCollapsable: false,
+    isHeader: false,
+    Component: SettingsPage,
   },
 ];
