@@ -7,10 +7,13 @@ import {
   CardContent,
   Divider,
   FormControl,
+  FormHelperText,
   FormLabel,
   Grid,
   Input,
   Sheet,
+  Switch,
+  Textarea,
   Typography,
 } from "@mui/joy";
 import { db } from "../../../firebase";
@@ -23,6 +26,10 @@ function RecieptConfigurations() {
   const imageRef = useRef<HTMLImageElement>(new Image());
   const [updatingAccoutantName, setUpdatingAccountantName] =
     useState<boolean>(false);
+  const [messageText, setMessageText] = useState("");
+
+  const [showMessageOnReciept, setShowMessageOnReciept] =
+    useState<boolean>(false);
   useEffect(() => {
     imageRef.current.src = "./recieptPreviewImg.jpg"; // Update with your image path
     imageRef.current.onload = () => {
@@ -32,7 +39,7 @@ function RecieptConfigurations() {
 
   useEffect(() => {
     drawCanvas();
-  }, [accountantName]);
+  }, [accountantName,messageText]);
 
   const drawCanvas = () => {
     const canva = canvasRef.current;
@@ -45,7 +52,9 @@ function RecieptConfigurations() {
     ctx.font = "17px Poppins"; // Update font size and style as needed
     ctx.fillStyle = "#f33d2a";
     ctx.textAlign = "center"; // Update text color as needed
-    ctx.fillText(accountantName, 488, 155); // Update coordinates as needed
+    ctx.fillText(accountantName, 488, 165);
+    ctx.textAlign = "left"; // Update coordinates as needed
+    ctx.fillText(messageText, 20, 250); // Update coordinates as needed
   };
 
   useEffect(() => {
@@ -55,6 +64,7 @@ function RecieptConfigurations() {
       .then((doc) => {
         if (doc.exists) {
           setAccountantName(doc.data()!.accountantName);
+          drawCanvas();
         } else {
           enqueueSnackbar(
             "Error occured while fetching intial configuration for reciept!",
@@ -90,7 +100,7 @@ function RecieptConfigurations() {
 
   return (
     <Box>
-      <Sheet    
+      <Sheet
         sx={{
           display: "flex",
           justifyContent: "space-between",
@@ -99,7 +109,7 @@ function RecieptConfigurations() {
         }}
         variant="outlined"
       >
-        <Grid container justifyContent="space-between">
+        <Grid container gap="1rem">
           <Grid xs={12} md={5}>
             <Card
               variant="plain"
@@ -127,6 +137,43 @@ function RecieptConfigurations() {
                   />
                 </FormControl>
 
+                <FormControl
+                  orientation="horizontal"
+                  sx={{ width: 400, justifyContent: "space-between" }}
+                >
+                  <div>
+                    <FormLabel>Show Meesage</FormLabel>
+                    <FormHelperText sx={{ mt: 0 }}>
+                      It enables and disables the visibility of message.
+                    </FormHelperText>
+                  </div>
+                  <Switch
+                    checked={showMessageOnReciept}
+                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+                      setShowMessageOnReciept(event.target.checked)
+                    }
+                    color={showMessageOnReciept ? "success" : "neutral"}
+                    variant={showMessageOnReciept ? "solid" : "outlined"}
+                    endDecorator={showMessageOnReciept ? "On" : "Off"}
+                    slotProps={{
+                      endDecorator: {
+                        sx: {
+                          minWidth: 24,
+                        },
+                      },
+                    }}
+                  />
+                </FormControl>
+
+                <FormControl sx={{ gridColumn: "1/-1" }}>
+                  <FormLabel>Message Text</FormLabel>
+
+                  <Textarea
+                    minRows={2}
+                    onChange={(e) => setMessageText(e.target.value)}
+                  />
+                </FormControl>
+
                 <CardActions sx={{ gridColumn: "1/-1" }}>
                   <Button
                     variant="solid"
@@ -140,7 +187,7 @@ function RecieptConfigurations() {
               </CardContent>
             </Card>
           </Grid>
-          <Grid xs={12} md={6} ml="1rem">
+          <Grid xs={12} md={6}>
             <Box>
               <Typography level="title-md" mb={"0.5rem"}>
                 Reciept Preview
@@ -149,7 +196,7 @@ function RecieptConfigurations() {
                 ref={canvasRef}
                 width={600}
                 style={{ border: "1px solid var(--bs-gray-400)" }}
-                height={200}
+                height={300}
               />
             </Box>
           </Grid>
