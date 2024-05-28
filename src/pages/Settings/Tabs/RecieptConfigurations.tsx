@@ -39,7 +39,7 @@ function RecieptConfigurations() {
 
   useEffect(() => {
     drawCanvas();
-  }, [accountantName,messageText]);
+  }, [accountantName, messageText]);
 
   const drawCanvas = () => {
     const canva = canvasRef.current;
@@ -195,7 +195,10 @@ function RecieptConfigurations() {
               <canvas
                 ref={canvasRef}
                 width={600}
-                style={{ border: "1px solid var(--bs-gray-400)" }}
+                style={{
+                  border:"1px solid var(--bs-gray-400)",
+                  // boxShadow: "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 2px 6px 2px"
+                }}
                 height={300}
               />
             </Box>

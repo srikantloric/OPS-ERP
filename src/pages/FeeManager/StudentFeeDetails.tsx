@@ -123,7 +123,7 @@ function StudentFeeDetails() {
   const [feeChallans, setFeeChallans] = useState<IChallanNL[]>([]);
 
   const [selectedChallan, setSelectedChallan] = useState<string | null>(null);
-  const [recievedAmount, setRecievedAmount] = useState<number | null>(null);
+  const [recievedAmount, setRecievedAmount] = useState<number>(0);
 
   const [selectedChallanDetails, setSelectedChallanDetails] =
     useState<IChallanNL | null>(null);
@@ -250,13 +250,6 @@ function StudentFeeDetails() {
       0
     );
     totalDue += totalFeeHeaderAmount;
-    // if (challan.lateFine) {
-    //   const lateFine: number = calculateLateFine(
-    //     challan.lateFine,
-    //     challan.dueDate.toDate()
-    //   );
-    //   totalDue += lateFine;
-    // }
 
     if (challan.feeConsession) {
       totalDue -= challan.feeConsession;
@@ -347,6 +340,8 @@ function StudentFeeDetails() {
       amountPaid: paymentObjForChallan.amountPaid,
       status: pStatus,
     });
+    console.log(paymentObjForChallan);
+    console.log(paymentObjForPayment);
 
     batch.set(paymentCollRef, paymentObjForPayment);
     batch.set(paymentCollRefOL, paymentObjForPayment);
@@ -489,7 +484,7 @@ function StudentFeeDetails() {
     }
   };
 
-  const generateCurrentFeeReciept = async () => {
+  const generateCurrentFeeReciept = async (isMonthlyRecipet: boolean) => {
     setIsGeneratingFeeReciept(true);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set time to midnight
@@ -516,7 +511,8 @@ function StudentFeeDetails() {
         let recieptGeneratorServer: string = "";
         if (recieptSnap.exists) {
           accountantName = recieptSnap.data()?.accountantName;
-          recieptGeneratorServer = recieptSnap.data()?.recieptGeneratorServerUrl;
+          recieptGeneratorServer =
+            recieptSnap.data()?.recieptGeneratorServerUrl;
         }
 
         const {
@@ -560,7 +556,7 @@ function StudentFeeDetails() {
 
           document.body.appendChild(iframe);
         } else {
-          alert("erro");
+          alert("error");
         }
       } else {
         setIsGeneratingFeeReciept(false);
@@ -617,7 +613,7 @@ function StudentFeeDetails() {
             <Button
               variant="soft"
               startDecorator={<Print />}
-              onClick={generateCurrentFeeReciept}
+              onClick={() => generateCurrentFeeReciept(false)}
             ></Button>
             <Button variant="soft" startDecorator={<SettingsIcon />}></Button>
           </Box>
@@ -779,12 +775,14 @@ function StudentFeeDetails() {
                     <Input
                       variant="outlined"
                       color="primary"
-                      type="number"
+                      type="text"
                       required
                       placeholder="enter amount"
                       value={recievedAmountPartPayment}
                       onChange={(e) =>
-                        setRecievedAmountPartPayment(parseInt(e.target.value))
+                        setRecievedAmountPartPayment(
+                          parseInt(e.target.value) || 0
+                        )
                       }
                     ></Input>
                   </FormControl>
@@ -1194,7 +1192,7 @@ function StudentFeeDetails() {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <MenuItem>
+          <MenuItem onClick={() => generateCurrentFeeReciept(true)}>
             <ListItemIcon>
               <PrintIcon fontSize="small" />
             </ListItemIcon>

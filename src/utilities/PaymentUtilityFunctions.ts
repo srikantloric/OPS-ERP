@@ -22,6 +22,7 @@ export function distributePaidAmountForTransaction(
     })
   );
 
+  console.log(updatedFeeHeaders)
   if (isPartialPayment) {
     let remainingAmount = receivedAmount;
 
