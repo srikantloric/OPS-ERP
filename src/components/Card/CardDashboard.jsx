@@ -4,7 +4,7 @@ import { Grid } from "@mui/material";
 import { Box, Stack, Typography } from "@mui/joy";
 import { Money, MoneyRecive } from "iconsax-react";
 
-function CardDashboard({ headerTitle, subHeaderTitle, color, colorBottom }) {
+function CardDashboard({ headerTitle, subHeaderTitle, color, Icon }) {
   return (
     <>
       <Box
@@ -43,11 +43,11 @@ function CardDashboard({ headerTitle, subHeaderTitle, color, colorBottom }) {
           justifyContent="space-between"
           alignItems="center"
         >
-          <MoneyRecive size="32" color="#FFF" />
+          <Icon size="32" color="#FFF" opacity="0.7"/>
           <Stack gap={1} alignItems={"end"}>
             <Typography
               sx={{ color: "#fff", fontSize: "24px", fontWeight: "600" }}
-              level="title-lg"
+              level="h4"
             >
               {headerTitle}
             </Typography>

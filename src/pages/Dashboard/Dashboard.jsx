@@ -25,11 +25,22 @@ import {
   Divider,
   Grid,
   LinearProgress,
+  Sheet,
   Stack,
   Typography,
 } from "@mui/joy";
 import cardBack from "../../assets/widgets/img-dropbox-bg.svg";
-import { Card, Cloud, Simcard1, Sms } from "iconsax-react";
+import {
+  Card,
+  Cloud,
+  Money,
+  MoneyRecive,
+  MoneySend,
+  Profile2User,
+  Simcard1,
+  Sms,
+  WalletMoney,
+} from "iconsax-react";
 import { Avatar } from "@mui/material";
 
 Chart.register(CategoryScale);
@@ -81,17 +92,17 @@ function Dashboard() {
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
                   headerTitle="27"
-                  subHeaderTitle="Dues-Amount : 64750"
+                  subHeaderTitle="Total Students"
                   color="#81c784"
-                  colorBottom="#88ab8e"
+                  Icon={Profile2User}
                 />
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="5000"
+                  headerTitle="₹5000"
                   subHeaderTitle="Total Income This Year"
-                  color="#ffb74d"
-                  colorBottom="#BB9CC0"
+                  color="#9575cd"
+                  Icon={MoneySend}
                 />
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
@@ -99,15 +110,15 @@ function Dashboard() {
                   headerTitle="27"
                   subHeaderTitle="Dues-Amount : 64750"
                   color="#4fc3f7"
-                  colorBottom="#88ab8e"
+                  Icon={WalletMoney}
                 />
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="5000"
+                  headerTitle="₹5000"
                   subHeaderTitle="Income This Month"
                   color="#64b5f6"
-                  colorBottom="#7C93C3"
+                  Icon={Money}
                 />
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
@@ -115,21 +126,21 @@ function Dashboard() {
                   headerTitle="0"
                   subHeaderTitle="Income Today"
                   color="#E48F45"
-                  colorBottom="#994D1C"
+                  Icon={Money}
                 />
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
                   headerTitle="27"
                   subHeaderTitle="Profit This Month"
-                  color="#9575cd"
-                  colorBottom="#88ab8e"
+                  color="#ffb74d"
+                  Icon={Money}
                 />
               </Grid>
             </Grid>
 
             <Stack justifyContent="space-between">
-              <Box
+              <Stack
                 sx={{
                   width: "260px",
                   p: "1rem",
@@ -138,9 +149,9 @@ function Dashboard() {
                   bgcolor: "#1D2630",
                   position: "relative",
                   overflow: "hidden",
-
+                  justifyContent: "space-between",
                   flex: 1,
-                  mb: "1rem",
+                  mb: "0.5rem",
                   "&:after": {
                     content: '""',
                     backgroundImage: `url(${cardBack})`,
@@ -167,7 +178,7 @@ function Dashboard() {
                     SMS Credits
                   </Typography>
                   <Typography level="h4" sx={{ color: "#fff" }}>
-                    30000
+                    30000 SMS
                   </Typography>
                 </Stack>
                 <Avatar
@@ -188,11 +199,14 @@ function Dashboard() {
                     variant="solid"
                   />
                 </Box>
-              </Box>
+              </Stack>
               <Box
                 sx={{
                   bgcolor: "#3f51b5",
-                  p: "1rem",
+                  pl: "1rem",
+                  pr: "1rem",
+                  pt: "0.5rem",
+                  pb: "0.5rem",
                   borderRadius: "0.5rem",
                   ml: "1rem",
                   display: "flex",
@@ -201,14 +215,14 @@ function Dashboard() {
                 }}
               >
                 <Stack>
-                  <Typography level="title-md" sx={{ color: "#fff" }}>
+                  <Typography level="title-sm" sx={{ color: "#fff" }}>
                     Available Balance
                   </Typography>
                   <Typography level="h4" sx={{ color: "#fff" }}>
                     ₹0
                   </Typography>
                 </Stack>
-                <Card color="#fff" size={32} opacity="0.7" />
+                <Card color="#fff" size={30} opacity="0.7" />
               </Box>
             </Stack>
           </Stack>
@@ -240,17 +254,34 @@ function Dashboard() {
           {/* </Grid> */}
         </LSPage>
         <Divider />
-        <div className={style.dashboard_graph_container}>
-          <div className={style.left_panel}>
-            <h5>Month Wise Paid/Unpaid Fee Report For Current Year</h5>
-            <BarGraphChart />
-          </div>
-          <div className={style.right_panel}>{/* <Card2/> */}</div>
-        </div>
-        <div>
-          <h5>Day Wise Attendance Report of School</h5>
-          <AttendanceBarGraph />
-        </div>
+        <Grid container gap="1rem" m="1rem">
+          <Grid md={5.8} sm={12} xs={12}>
+            <Sheet
+              variant="outlined"
+              sx={{ p: "1rem", borderRadius: "0.5rem" }}
+            >
+              <Box>
+                <Typography level="title-md" textAlign="center" mb="0.5rem">
+                  Month Wise Paid/Unpaid Fee Report For Current Year
+                </Typography>
+                <BarGraphChart />
+              </Box>
+            </Sheet>
+          </Grid>
+          <Grid md={5.8} sm={12} xs={12}>
+            <Sheet
+              variant="outlined"
+              sx={{ p: "1rem", borderRadius: "0.5rem" }}
+            >
+              <Box>
+                <Typography level="title-md" textAlign="center">
+                  Day Wise Attendance Report of School
+                </Typography>
+                <AttendanceBarGraph />
+              </Box>
+            </Sheet>
+          </Grid>
+        </Grid>
 
         <Footer />
       </PageContainer>

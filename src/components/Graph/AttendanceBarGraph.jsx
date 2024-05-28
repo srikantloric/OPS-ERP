@@ -8,7 +8,7 @@ function AttendanceBarGraph() {
         { name: 'Absent', value: 30 }
       ];
 
-    const COLORS = ['#0088FE', '#FF8042'];
+    const COLORS = ['var(--bs-green)', '#FF8042'];
     const RADIAN = Math.PI / 180;
 
     const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
@@ -17,7 +17,7 @@ function AttendanceBarGraph() {
         const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
         return (
-            <text x={x} y={y} fill="red" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+            <text x={x} y={y} fill="#fff" textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
                 {`${(percent * 100).toFixed(0)}%`}
             </text>
         );
@@ -43,7 +43,6 @@ function AttendanceBarGraph() {
                     }
                 </Pie>
                 <Legend />
-            
             </PieChart>
         </ResponsiveContainer>
     )
