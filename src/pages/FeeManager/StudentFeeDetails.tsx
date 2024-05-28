@@ -230,15 +230,15 @@ function StudentFeeDetails() {
     }
   }, [selectedChallan, challanList]);
 
-  // const calculateLateFine = (lateFee: number, dueDate: Date): number => {
-  //   const dueDateFormated = dueDate;
-  //   const currentDate = new Date();
-  //   let lateFine = 0;
-  //   if (currentDate >= dueDateFormated) {
-  //     lateFine = lateFee;
-  //   }
-  //   return lateFine;
-  // };
+  const dueDateCheck = (dueDate: firebase.firestore.Timestamp) => {
+    const dueDateModified = dueDate.toDate().getDate();
+    const currentDate = new Date().getDate();
+    let isPassed: boolean = false;
+    if (currentDate >= dueDateModified) {
+      isPassed = true;
+    }
+    return isPassed;
+  };
 
   const calculateTotalDueAmount = (challan: IChallanNL): number => {
     var totalDue: number = 0;
@@ -272,41 +272,59 @@ function StudentFeeDetails() {
       });
     }
 
-    //Fetching student Fee details
-    if (location.state[0]) {
-      const dbSubscription = db
-        .collection("STUDENTS")
-        .doc(location.state[0].id)
-        .collection("CHALLANS")
-        .orderBy("createdOn", "desc")
-        .onSnapshot((snapshot) => {
-          if (snapshot.docs) {
-            // var feeArr: IStudentFeeChallanExtended[] = [];
-
-            var challans: IChallanNL[] = [];
-            snapshot.forEach((doc) => {
-              const challan = doc.data() as IChallanNL;
-
-              challan["totalDue"] = calculateTotalDueAmount(challan);
-              challans.push(challan);
+    const fetchChallans = async () => {
+      try {
+        let isLateFineApplicable: boolean = false;
+        const lateFineQuery = await db
+          .collection("CONFIG")
+          .doc("PAYMENT_CONFIG")
+          .get();
+        if (lateFineQuery.exists) {
+          isLateFineApplicable = lateFineQuery.data()!.applyLateFine;
+        }
+        //Fetching student Fee details
+        if (location.state[0]) {
+          const dbSubscription = db
+            .collection("STUDENTS")
+            .doc(location.state[0].id)
+            .collection("CHALLANS")
+            .orderBy("createdOn", "desc")
+            .onSnapshot((snapshot) => {
+              if (snapshot.docs) {
+                var challans: IChallanNL[] = [];
+                snapshot.forEach((doc) => {
+                  const challan = doc.data() as IChallanNL;
+                  if (!isLateFineApplicable && dueDateCheck(challan.dueDate)) {
+                    let updatedFeeHeaders = challan.feeHeaders.filter(
+                      (header) => header.headerTitle !== "lateFee"
+                    );
+                    challan["feeHeaders"] = updatedFeeHeaders;
+                  }
+                  challan["totalDue"] = calculateTotalDueAmount(challan);
+                  challans.push(challan);
+                });
+                setChallanList(challans);
+                setLoading(false);
+              } else {
+                setLoading(false);
+                enqueueSnackbar("No fee generated for student !", {
+                  variant: "info",
+                });
+              }
             });
-            setChallanList(challans);
-            setLoading(false);
-          } else {
-            setLoading(false);
-            enqueueSnackbar("No fee generated for student !", {
-              variant: "info",
-            });
-          }
-        });
-      return () => dbSubscription();
-    } else {
-      setLoading(false);
-      enqueueSnackbar(
-        "User document not found, please refresh and try again...",
-        { variant: "error" }
-      );
-    }
+          return () => dbSubscription();
+        } else {
+          setLoading(false);
+          enqueueSnackbar(
+            "User document not found, please refresh and try again...",
+            { variant: "error" }
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchChallans();
   }, []);
 
   const saveDataToDb = (
