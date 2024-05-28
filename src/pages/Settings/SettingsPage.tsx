@@ -5,6 +5,7 @@ import LSPage from "components/Utils/LSPage";
 import PageContainer from "components/Utils/PageContainer";
 import { Settings } from "iconsax-react";
 import RecieptConfigurations from "./Tabs/RecieptConfigurations";
+import PaymentConfigurations from "./Tabs/PaymentConfigurations";
 
 function SettingsPage() {
   return (
@@ -18,17 +19,17 @@ function SettingsPage() {
             <TabList>
               <Tab>Reciept Cofigurations</Tab>
               <Tab>Payment Configurations</Tab>
-              <Tab>Others</Tab>
+              {/* <Tab>Others</Tab> */}
             </TabList>
             <TabPanel value={0} sx={{ minHeight: "90vh", p: "2rem" }}>
               <RecieptConfigurations />
             </TabPanel>
             <TabPanel value={1}>
-              In progress
+              <PaymentConfigurations/>
             </TabPanel>
-            <TabPanel value={2}>
+            {/* <TabPanel value={2}>
               In progress
-            </TabPanel>
+            </TabPanel> */}
           </Tabs>
         </Box>
       </LSPage>

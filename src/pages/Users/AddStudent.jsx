@@ -137,12 +137,12 @@ function AddStudent() {
   };
 
   useEffect(() => {
-    db.collection("DEFAULT_FEE")
-      .doc("default_tution_fee")
+    db.collection("CONFIG")
+      .doc("PAYMENT_CONFIG")
       .get()
       .then((snap) => {
         if (snap.exists) {
-          setDefaultFee(snap.data());
+          setDefaultFee(snap.data().defaultMonthlyFee);
         }
       });
   }, []);
@@ -151,46 +151,46 @@ function AddStudent() {
     if (formData.class && defaultFee) {
       switch (formData.class) {
         case 1:
-          setMonthlyFee(defaultFee.default_fee_class_1);
+          setMonthlyFee(defaultFee.class_1);
           break;
         case 2:
-          setMonthlyFee(defaultFee.default_fee_class_2);
+          setMonthlyFee(defaultFee.class_2);
           break;
         case 3:
-          setMonthlyFee(defaultFee.default_fee_class_3);
+          setMonthlyFee(defaultFee.class_3);
           break;
         case 4:
-          setMonthlyFee(defaultFee.default_fee_class_4);
+          setMonthlyFee(defaultFee.class_4);
           break;
         case 5:
-          setMonthlyFee(defaultFee.default_fee_class_5);
+          setMonthlyFee(defaultFee.class_5);
           break;
         case 6:
-          setMonthlyFee(defaultFee.default_fee_class_6);
+          setMonthlyFee(defaultFee.class_6);
           break;
         case 7:
-          setMonthlyFee(defaultFee.default_fee_class_7);
+          setMonthlyFee(defaultFee.class_7);
           break;
         case 8:
-          setMonthlyFee(defaultFee.default_fee_class_8);
+          setMonthlyFee(defaultFee.class_8);
           break;
         case 9:
-          setMonthlyFee(defaultFee.default_fee_class_9);
+          setMonthlyFee(defaultFee.class_9);
           break;
         case 10:
-          setMonthlyFee(defaultFee.default_fee_class_10);
+          setMonthlyFee(defaultFee.class_10);
           break;
         case 11:
-          setMonthlyFee(defaultFee.default_fee_class_11);
+          setMonthlyFee(defaultFee.class_11);
           break;
         case 12:
-          setMonthlyFee(defaultFee.default_fee_class_12);
+          setMonthlyFee(defaultFee.class_12);
           break;
         case 13:
-          setMonthlyFee(defaultFee.default_fee_class_13);
+          setMonthlyFee(defaultFee.class_13);
           break;
         case 14:
-          setMonthlyFee(defaultFee.default_fee_class_14);
+          setMonthlyFee(defaultFee.class_14);
           break;
         default:
           setMonthlyFee(0);

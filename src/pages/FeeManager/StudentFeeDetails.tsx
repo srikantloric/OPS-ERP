@@ -123,7 +123,7 @@ function StudentFeeDetails() {
   const [feeChallans, setFeeChallans] = useState<IChallanNL[]>([]);
 
   const [selectedChallan, setSelectedChallan] = useState<string | null>(null);
-  const [recievedAmount, setRecievedAmount] = useState<number | null>(null);
+  const [recievedAmount, setRecievedAmount] = useState<number>(0);
 
   const [selectedChallanDetails, setSelectedChallanDetails] =
     useState<IChallanNL | null>(null);
@@ -230,15 +230,15 @@ function StudentFeeDetails() {
     }
   }, [selectedChallan, challanList]);
 
-  // const calculateLateFine = (lateFee: number, dueDate: Date): number => {
-  //   const dueDateFormated = dueDate;
-  //   const currentDate = new Date();
-  //   let lateFine = 0;
-  //   if (currentDate >= dueDateFormated) {
-  //     lateFine = lateFee;
-  //   }
-  //   return lateFine;
-  // };
+  const dueDateCheck = (dueDate: firebase.firestore.Timestamp) => {
+    const dueDateModified = dueDate.toDate().getDate();
+    const currentDate = new Date().getDate();
+    let isPassed: boolean = false;
+    if (currentDate >= dueDateModified) {
+      isPassed = true;
+    }
+    return isPassed;
+  };
 
   const calculateTotalDueAmount = (challan: IChallanNL): number => {
     var totalDue: number = 0;
@@ -250,13 +250,6 @@ function StudentFeeDetails() {
       0
     );
     totalDue += totalFeeHeaderAmount;
-    // if (challan.lateFine) {
-    //   const lateFine: number = calculateLateFine(
-    //     challan.lateFine,
-    //     challan.dueDate.toDate()
-    //   );
-    //   totalDue += lateFine;
-    // }
 
     if (challan.feeConsession) {
       totalDue -= challan.feeConsession;
@@ -279,41 +272,59 @@ function StudentFeeDetails() {
       });
     }
 
-    //Fetching student Fee details
-    if (location.state[0]) {
-      const dbSubscription = db
-        .collection("STUDENTS")
-        .doc(location.state[0].id)
-        .collection("CHALLANS")
-        .orderBy("createdOn", "desc")
-        .onSnapshot((snapshot) => {
-          if (snapshot.docs) {
-            // var feeArr: IStudentFeeChallanExtended[] = [];
-
-            var challans: IChallanNL[] = [];
-            snapshot.forEach((doc) => {
-              const challan = doc.data() as IChallanNL;
-
-              challan["totalDue"] = calculateTotalDueAmount(challan);
-              challans.push(challan);
+    const fetchChallans = async () => {
+      try {
+        let isLateFineApplicable: boolean = false;
+        const lateFineQuery = await db
+          .collection("CONFIG")
+          .doc("PAYMENT_CONFIG")
+          .get();
+        if (lateFineQuery.exists) {
+          isLateFineApplicable = lateFineQuery.data()!.applyLateFine;
+        }
+        //Fetching student Fee details
+        if (location.state[0]) {
+          const dbSubscription = db
+            .collection("STUDENTS")
+            .doc(location.state[0].id)
+            .collection("CHALLANS")
+            .orderBy("createdOn", "desc")
+            .onSnapshot((snapshot) => {
+              if (snapshot.docs) {
+                var challans: IChallanNL[] = [];
+                snapshot.forEach((doc) => {
+                  const challan = doc.data() as IChallanNL;
+                  if (!isLateFineApplicable && dueDateCheck(challan.dueDate)) {
+                    let updatedFeeHeaders = challan.feeHeaders.filter(
+                      (header) => header.headerTitle !== "lateFee"
+                    );
+                    challan["feeHeaders"] = updatedFeeHeaders;
+                  }
+                  challan["totalDue"] = calculateTotalDueAmount(challan);
+                  challans.push(challan);
+                });
+                setChallanList(challans);
+                setLoading(false);
+              } else {
+                setLoading(false);
+                enqueueSnackbar("No fee generated for student !", {
+                  variant: "info",
+                });
+              }
             });
-            setChallanList(challans);
-            setLoading(false);
-          } else {
-            setLoading(false);
-            enqueueSnackbar("No fee generated for student !", {
-              variant: "info",
-            });
-          }
-        });
-      return () => dbSubscription();
-    } else {
-      setLoading(false);
-      enqueueSnackbar(
-        "User document not found, please refresh and try again...",
-        { variant: "error" }
-      );
-    }
+          return () => dbSubscription();
+        } else {
+          setLoading(false);
+          enqueueSnackbar(
+            "User document not found, please refresh and try again...",
+            { variant: "error" }
+          );
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchChallans();
   }, []);
 
   const saveDataToDb = (
@@ -347,6 +358,8 @@ function StudentFeeDetails() {
       amountPaid: paymentObjForChallan.amountPaid,
       status: pStatus,
     });
+    console.log(paymentObjForChallan);
+    console.log(paymentObjForPayment);
 
     batch.set(paymentCollRef, paymentObjForPayment);
     batch.set(paymentCollRefOL, paymentObjForPayment);
@@ -489,7 +502,7 @@ function StudentFeeDetails() {
     }
   };
 
-  const generateCurrentFeeReciept = async () => {
+  const generateCurrentFeeReciept = async (isMonthlyRecipet: boolean) => {
     setIsGeneratingFeeReciept(true);
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set time to midnight
@@ -516,7 +529,8 @@ function StudentFeeDetails() {
         let recieptGeneratorServer: string = "";
         if (recieptSnap.exists) {
           accountantName = recieptSnap.data()?.accountantName;
-          recieptGeneratorServer = recieptSnap.data()?.recieptGeneratorServerUrl;
+          recieptGeneratorServer =
+            recieptSnap.data()?.recieptGeneratorServerUrl;
         }
 
         const {
@@ -560,7 +574,7 @@ function StudentFeeDetails() {
 
           document.body.appendChild(iframe);
         } else {
-          alert("erro");
+          alert("error");
         }
       } else {
         setIsGeneratingFeeReciept(false);
@@ -617,7 +631,7 @@ function StudentFeeDetails() {
             <Button
               variant="soft"
               startDecorator={<Print />}
-              onClick={generateCurrentFeeReciept}
+              onClick={() => generateCurrentFeeReciept(false)}
             ></Button>
             <Button variant="soft" startDecorator={<SettingsIcon />}></Button>
           </Box>
@@ -779,12 +793,14 @@ function StudentFeeDetails() {
                     <Input
                       variant="outlined"
                       color="primary"
-                      type="number"
+                      type="text"
                       required
                       placeholder="enter amount"
                       value={recievedAmountPartPayment}
                       onChange={(e) =>
-                        setRecievedAmountPartPayment(parseInt(e.target.value))
+                        setRecievedAmountPartPayment(
+                          parseInt(e.target.value) || 0
+                        )
                       }
                     ></Input>
                   </FormControl>
@@ -1194,7 +1210,7 @@ function StudentFeeDetails() {
           transformOrigin={{ horizontal: "right", vertical: "top" }}
           anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         >
-          <MenuItem>
+          <MenuItem onClick={() => generateCurrentFeeReciept(true)}>
             <ListItemIcon>
               <PrintIcon fontSize="small" />
             </ListItemIcon>
