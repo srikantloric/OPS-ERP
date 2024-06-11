@@ -22,7 +22,7 @@ export function distributePaidAmountForTransaction(
     })
   );
 
-  console.log(updatedFeeHeaders)
+  console.log(updatedFeeHeaders);
   if (isPartialPayment) {
     let remainingAmount = receivedAmount;
 
@@ -302,8 +302,36 @@ interface ChallanIdsAndHeaders {
   totalAmount: number;
   discountAmount: number;
   totalPaidAmount: number;
-  totalDueAmount:number
+  totalDueAmount: number;
+  currentDueAmount: number;
 }
+
+const getLatestDueAmounts = (challans: IPaymentNL[]) => {
+  const latestChallans = challans.reduce(
+    (acc: Record<string, IPaymentNL>, curr) => {
+      const existing = acc[curr.challanId];
+      if (
+        !existing ||
+        curr.timestamp.seconds > existing.timestamp.seconds ||
+        (curr.timestamp.seconds === existing.timestamp.seconds &&
+          curr.timestamp.nanoseconds > existing.timestamp.nanoseconds)
+      ) {
+        acc[curr.challanId] = curr;
+      }
+      return acc;
+    },
+    {}
+  );
+
+  return Object.values(latestChallans).map((challan) => ({
+    challandId: challan.challanId,
+    dueAmount: challan.breakdown.reduce(
+      (sum, payment) => sum + payment.amountDue,
+      0
+    ),
+  }));
+};
+
 export const extractChallanIdsAndHeaders = (
   payments: IPaymentNL[]
 ): ChallanIdsAndHeaders => {
@@ -314,7 +342,7 @@ export const extractChallanIdsAndHeaders = (
   let discountAmount = 0;
   let totalPaidAmount = 0;
   let totalDueAmount = 0;
-
+  let currentDueAmount = 0;
   payments.forEach((payment) => {
     const formattedDate = formatChallanDate(payment.challanId);
     challanMonthYear.push(formatChallanDate(payment.challanId));
@@ -340,6 +368,12 @@ export const extractChallanIdsAndHeaders = (
     }
   });
 
+  currentDueAmount = getLatestDueAmounts(payments).reduce(
+    (sum, item) => sum + item.dueAmount,
+    0
+  );
+  console.log("Due Amount:",currentDueAmount);
+
   console.log("Total Paid Amount", totalPaidAmount);
   console.log("Total AMount", totalAmount);
 
@@ -350,7 +384,8 @@ export const extractChallanIdsAndHeaders = (
     totalAmount,
     totalPaidAmount,
     discountAmount,
-    totalDueAmount
+    totalDueAmount,
+    currentDueAmount,
   };
 };
 
