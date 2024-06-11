@@ -411,6 +411,7 @@ function StudentFeeDetails() {
           amountPaid: recievedAmountPartPayment!,
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
+          timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForPayment,
           status: pStatus,
           feeConsession: selectedChallanDetails.feeConsession,
@@ -425,6 +426,7 @@ function StudentFeeDetails() {
             selectedChallanDetails.amountPaid + recievedAmountPartPayment!,
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
+          timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForChallan,
           status: pStatus,
           feeConsession: selectedChallanDetails.feeConsession,
@@ -452,6 +454,7 @@ function StudentFeeDetails() {
           amountPaid: recievedAmount!,
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
+          timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForPayment,
           status: "PAID",
           feeConsession: selectedChallanDetails.feeConsession,
@@ -464,6 +467,7 @@ function StudentFeeDetails() {
           amountPaid: selectedChallanDetails.amountPaid + recievedAmount!,
           recievedBy: "Admin",
           recievedOn: firebase.firestore.Timestamp.now(),
+          timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForChallan,
           status: "PAID",
           feeConsession: selectedChallanDetails.feeConsession,
@@ -522,6 +526,8 @@ function StudentFeeDetails() {
         const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
           ...(doc.data() as IPaymentNL),
         }));
+
+        console.log("Payment Data:", paymentsData);
 
         const recieptSnap = await recieptConfigRef.get();
 

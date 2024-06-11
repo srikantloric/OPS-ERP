@@ -163,8 +163,8 @@ const InstantPaymentModal: React.FC<Props> = ({
                 headerTitle: feeType.headerTitle,
                 amount: feeType.amount,
                 amountDue: 0,
-                amountPaidTotal:isMarkedAsPaid ? feeType.amount : 0,
-                amountPaid:isMarkedAsPaid ? feeType.amount : 0,
+                amountPaidTotal: isMarkedAsPaid ? feeType.amount : 0,
+                amountPaid: isMarkedAsPaid ? feeType.amount : 0,
               });
             }
           });
@@ -174,8 +174,8 @@ const InstantPaymentModal: React.FC<Props> = ({
               amount: feeDetail.lateFine,
               headerTitle: "lateFee",
               amountDue: 0,
-              amountPaidTotal:isMarkedAsPaid ? feeDetail.lateFine : 0,
-              amountPaid:isMarkedAsPaid ? feeDetail.lateFine : 0,
+              amountPaidTotal: isMarkedAsPaid ? feeDetail.lateFine : 0,
+              amountPaid: isMarkedAsPaid ? feeDetail.lateFine : 0,
             });
           }
 
@@ -270,6 +270,7 @@ const InstantPaymentModal: React.FC<Props> = ({
               amountPaid: totalFee,
               recievedBy: "Admin",
               recievedOn: firebase.firestore.Timestamp.now(),
+              timestamp: firebase.firestore.Timestamp.now(),
               breakdown: finalFeeHeader,
               status: "PAID",
               feeConsession: feeDetail.feeConsession,

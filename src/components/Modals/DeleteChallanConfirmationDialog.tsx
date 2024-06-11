@@ -17,6 +17,7 @@ import { useState } from "react";
 import LockIcon from "@mui/icons-material/Lock";
 import { enqueueSnackbar } from "notistack";
 import { db } from "../../firebase";
+import firebase from "../../firebase";
 interface Props {
   open: boolean;
   setOpen: (props: boolean) => void;
@@ -33,25 +34,35 @@ const DeleteChallanConfirmationDialog: React.FC<Props> = ({
   const [accessKeyInput, setAccessKeyInput] = useState<string>("");
   const [accessKeyError, setAccessKeyError] = useState<string>("");
 
-  const handleConfirmButton = () => {
+  const handleConfirmButton = async () => {
     if (accessKeyInput === "123456") {
       if (studentId && challanId) {
-        db.collection("STUDENTS")
+        let batch = db.batch();
+
+        let challanRef = db
+          .collection("STUDENTS")
           .doc(studentId)
           .collection("CHALLANS")
-          .doc(challanId)
-          .delete()
-          .then(() => {
-            enqueueSnackbar("Challan deleted successfully !", {
-              variant: "success",
-            });
-            setOpen(false)
-          })
-          .catch(() => {
-            enqueueSnackbar("Unable to delete from server!", {
-              variant: "error",
-            });
+          .doc(challanId);
+
+        let studentDocRef = db.collection("STUDENTS").doc(studentId);
+
+        try {
+          batch.delete(challanRef);
+          batch.update(studentDocRef, {
+            generatedChallans:
+              firebase.firestore.FieldValue.arrayRemove(challanId),
           });
+          await batch.commit();
+          enqueueSnackbar("Challan deleted successfully !", {
+            variant: "success",
+          });
+          setOpen(false);
+        } catch (e) {
+          enqueueSnackbar("Failed to delete document!");
+          console.error("Error deleting document using batch: ", e);
+          setOpen(false);
+        }
       } else {
         enqueueSnackbar("Unable to delete please try refreshing !", {
           variant: "error",
