@@ -2,18 +2,19 @@ import { configureStore } from "@reduxjs/toolkit";
 // import counterReducer from './counterSlice'
 import studentslice from "./studentSlice";
 import facultiesSlice from "./facultiesSlice";
+import dashboardAnalytics from "./Slices/dashboardAnalytics";
 
 export const store = configureStore({
   reducer: {
     students: studentslice,
     teachers: facultiesSlice,
+    analytics: dashboardAnalytics,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),
 });
-
 
 // import { combineReducers, configureStore } from "@reduxjs/toolkit";
 // import { persistStore, persistReducer } from "redux-persist";
@@ -48,4 +49,3 @@ export const store = configureStore({
 
 // // Create a persistor for the store
 // export const persistor = persistStore(store);
-

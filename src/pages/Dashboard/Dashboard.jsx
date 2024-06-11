@@ -28,6 +28,12 @@ import {
 } from "iconsax-react";
 import { Avatar } from "@mui/material";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
+import { useEffect, useState } from "react";
+import { db } from "../../firebase";
+import { enqueueSnackbar } from "notistack";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchstudent } from "store/studentSlice";
+import { fetchTotalStudents } from "store/Slices/dashboardAnalytics";
 
 Chart.register(CategoryScale);
 
@@ -45,6 +51,13 @@ export const options = {
 };
 
 function Dashboard() {
+  const totalStudentsCount = useSelector((state) => state.analytics.count);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchTotalStudents());
+  }, []);
+
   return (
     <>
       <PageContainer>
@@ -60,7 +73,7 @@ function Dashboard() {
             >
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="27"
+                  headerTitle={totalStudentsCount}
                   subHeaderTitle="Total Students"
                   color="#81c784"
                   Icon={Profile2User}
@@ -147,7 +160,7 @@ function Dashboard() {
                     SMS Credits
                   </Typography>
                   <Typography level="h4" sx={{ color: "#fff" }}>
-                    30000 SMS
+                    120 SMS
                   </Typography>
                 </Stack>
                 <Avatar
@@ -188,7 +201,7 @@ function Dashboard() {
                     Available Balance
                   </Typography>
                   <Typography level="h4" sx={{ color: "#fff" }}>
-                    ₹0
+                    ₹0.0
                   </Typography>
                 </Stack>
                 <Card color="#fff" size={30} opacity="0.7" />
