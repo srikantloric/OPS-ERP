@@ -5,14 +5,14 @@ export interface IChallanHeaderType {
   headerTitle: string;
   amount: number;
   amountPaid: number;
-  amountPaidTotal:number
-  amountDue:number;
+  amountPaidTotal: number;
+  amountDue: number;
 }
 export interface IChallanHeaderTypeForChallan {
   headerTitle: string;
   amount: number;
-  amountPaidTotal:number
-  amountDue:number;
+  amountPaidTotal: number;
+  amountDue: number;
 }
 export interface IPaymentNL {
   challanId: string;
@@ -25,6 +25,7 @@ export interface IPaymentNL {
   recievedBy: string;
   status: IPaymentStatus;
   feeConsession: number;
+  timestamp: firebase.firestore.Timestamp;
 }
 export interface IPaymentNLForChallan {
   challanId: string;
@@ -37,9 +38,8 @@ export interface IPaymentNLForChallan {
   recievedBy: string;
   status: IPaymentStatus;
   feeConsession: number;
+  timestamp: firebase.firestore.Timestamp;
 }
-
-
 
 export interface IChallanNL {
   studentId: string;

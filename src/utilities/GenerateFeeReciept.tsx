@@ -235,7 +235,7 @@ export const GenerateFeeReciept = async ({
     doc.setFontSize(8);
     doc.text("Reciept No: " + recieptId, pBorderPadd + 3, 50.5);
     doc.text("Reciept No: " + recieptId, pBorderPaddOffsetX + 3, 50.5);
-    doc.text("Date : " + recieptDate, pWidth - pBorderPadd - 2, 50.5, {
+    doc.text("Date/Time : " + recieptDate, pWidth - pBorderPadd - 2, 50.5, {
       align: "right",
     });
     doc.text(
@@ -730,9 +730,39 @@ export const GenerateFeeReciept = async ({
     );
     //////////////
 
+     /////Due Amount
+     doc.setFont("Poppins", "semibold");
+     doc.text(
+       "Due Amount: Rs." + totalDueAmount,
+       pWidth - pBorderPadd - 3,
+       feeTypeLayoutHeight + 27,
+       { align: "right" }
+     );
+     doc.text(
+       "Due Amount: Rs." + totalDueAmount,
+       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+       feeTypeLayoutHeight + 27,
+       { align: "right" }
+     );
+     doc.line(
+       pBorderPadd,
+       feeTypeLayoutHeight + 29,
+       pWidth - pBorderPadd,
+       feeTypeLayoutHeight + 29
+     );
+ 
+     doc.line(
+       pBorderPaddOffsetX,
+       feeTypeLayoutHeight + 29,
+       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 - 1),
+       feeTypeLayoutHeight + 29
+     );
+     //////////////
+ 
+
     doc.setFont("Poppins", "normal");
 
-    const feeRemarkAndAccOffY = feeTypeLayoutHeight + 35;
+    const feeRemarkAndAccOffY = feeTypeLayoutHeight + 40;
 
     doc.setFontSize(8);
     var maxWidth = 100; // Set the maximum width in PDF units (e.g., points)
