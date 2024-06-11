@@ -15,10 +15,8 @@ export default function AuthProvider({ children }) {
   const historyref = useNavigate();
 
   function login(email, password) {
-      return auth.signInWithEmailAndPassword(email, password);
+    return auth.signInWithEmailAndPassword(email, password);
   }
-
-
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -26,7 +24,7 @@ export default function AuthProvider({ children }) {
       if (user) setCurrentUser(user);
       else {
         setCurrentUser(null);
-        historyref("/login")
+        historyref("/login");
       }
     });
     return () => {
@@ -43,7 +41,7 @@ export default function AuthProvider({ children }) {
     <AuthContext.Provider value={value}>
       {loading ? (
         <Backdrop
-          sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          sx={{ bgcolor: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
           open={loading}
         >
           <CircularProgress color="inherit" />
