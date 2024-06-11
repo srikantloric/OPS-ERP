@@ -34,7 +34,8 @@ interface Props {
   recieptDate: string;
   accountantName: string;
   totalDueAmount: number;
-  recieptGeneratorServerUrl:string
+  recieptGeneratorServerUrl: string;
+  currentDueAmount: number;
 }
 
 export const GenerateFeeReciept = async ({
@@ -49,7 +50,8 @@ export const GenerateFeeReciept = async ({
   recieptId,
   accountantName,
   totalDueAmount,
-  recieptGeneratorServerUrl
+  recieptGeneratorServerUrl,
+  currentDueAmount,
 }: Props) => {
   if (studentMasterData) {
     //Page Size
@@ -459,7 +461,7 @@ export const GenerateFeeReciept = async ({
 
     doc.text("Prev. Due", col2StartX, feeSectionStartPointY + 4);
     doc.text(
-      "Prev. Due",
+      "Dues",
       pBorderPaddOffsetX + col2StartXCopy,
       feeSectionStartPointY + 4
     );
@@ -632,7 +634,7 @@ export const GenerateFeeReciept = async ({
       }
     );
 
-    //total Amount
+    // total Amount
     doc.text("Rs." + totalAmount, col1StartX + 3, feeTypeLayoutHeight + 7, {
       align: "left",
     });
@@ -644,7 +646,7 @@ export const GenerateFeeReciept = async ({
         align: "left",
       }
     );
-    //total Due
+    // total Due
     doc.text("Rs." + totalDueAmount, col2StartX + 3, feeTypeLayoutHeight + 7, {
       align: "left",
     });
@@ -730,35 +732,34 @@ export const GenerateFeeReciept = async ({
     );
     //////////////
 
-     /////Due Amount
-     doc.setFont("Poppins", "semibold");
-     doc.text(
-       "Due Amount: Rs." + totalDueAmount,
-       pWidth - pBorderPadd - 3,
-       feeTypeLayoutHeight + 27,
-       { align: "right" }
-     );
-     doc.text(
-       "Due Amount: Rs." + totalDueAmount,
-       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
-       feeTypeLayoutHeight + 27,
-       { align: "right" }
-     );
-     doc.line(
-       pBorderPadd,
-       feeTypeLayoutHeight + 29,
-       pWidth - pBorderPadd,
-       feeTypeLayoutHeight + 29
-     );
- 
-     doc.line(
-       pBorderPaddOffsetX,
-       feeTypeLayoutHeight + 29,
-       pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 - 1),
-       feeTypeLayoutHeight + 29
-     );
-     //////////////
- 
+    /////Due Amount
+    doc.setFont("Poppins", "semibold");
+    doc.text(
+      "Due Amount: Rs." + currentDueAmount,
+      pWidth - pBorderPadd - 3,
+      feeTypeLayoutHeight + 27,
+      { align: "right" }
+    );
+    doc.text(
+      "Due Amount: Rs." + currentDueAmount,
+      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 + 1),
+      feeTypeLayoutHeight + 27,
+      { align: "right" }
+    );
+    doc.line(
+      pBorderPadd,
+      feeTypeLayoutHeight + 29,
+      pWidth - pBorderPadd,
+      feeTypeLayoutHeight + 29
+    );
+
+    doc.line(
+      pBorderPaddOffsetX,
+      feeTypeLayoutHeight + 29,
+      pBorderPaddOffsetX + pWidth - (pBorderPadd * 2 - 1),
+      feeTypeLayoutHeight + 29
+    );
+    //////////////
 
     doc.setFont("Poppins", "normal");
 

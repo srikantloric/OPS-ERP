@@ -547,6 +547,7 @@ function StudentFeeDetails() {
           discountAmount,
           paidAmount,
           totalDueAmount,
+          currentDueAmount,
         } = extractChallanIdsAndHeaders(paymentsData);
 
         const recieptId = generateRandomSixDigitNumber().toString();
@@ -565,6 +566,7 @@ function StudentFeeDetails() {
           recieptDate: recieptDate,
           accountantName: accountantName,
           recieptGeneratorServerUrl: recieptGeneratorServer,
+          currentDueAmount: currentDueAmount,
         });
 
         // Create a hidden iframe
