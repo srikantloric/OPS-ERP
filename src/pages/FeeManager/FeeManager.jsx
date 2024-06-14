@@ -85,6 +85,7 @@ function FeeManager() {
         id: item.id,
         name: item.student_name,
         admission: item.admission_no,
+        fatherName: item.father_name,
         profile: item.profil_url,
         sId: item.student_id,
         dob: item.dob,
@@ -110,7 +111,7 @@ function FeeManager() {
   }, [data, dispatch]);
 
   const filterOptions = createFilterOptions({
-    stringify: (option) => option.name + option.sId + option.admission,
+    stringify: (option) => option.name + option.sId + option.admission+option.fatherName,
   });
 
   const handleNextPageBtn = (e) => {
@@ -201,8 +202,8 @@ function FeeManager() {
                       </ListItemDecorator>
                       <ListItemContent sx={{ fontSize: "sm" }}>
                         <b>{option.name}</b>
-                        <Typography level="body-xs">
-                          {option.admission} | {option.dob}
+                        <Typography level="body-xs" fontSize={"14px"}>
+                          {option.admission} |{option.fatherName}| {option.dob}
                         </Typography>
                       </ListItemContent>
                     </AutocompleteOption>
