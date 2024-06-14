@@ -44,11 +44,29 @@ const DeleteChallanConfirmationDialog: React.FC<Props> = ({
           .doc(studentId)
           .collection("CHALLANS")
           .doc(challanId);
+        let paymentRefNl = db
+          .collection("STUDENTS")
+          .doc(studentId)
+          .collection("PAYMENTS")
+          .where("challanId", "==", challanId);
+        let paymentRefGl = db
+          .collection("PAYMENTS")
+          .where("challanId", "==", challanId);
 
         let studentDocRef = db.collection("STUDENTS").doc(studentId);
 
         try {
+          const snapshot1 = await paymentRefGl.get();
+          snapshot1.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+          const snapshot2 = await paymentRefNl.get();
+          snapshot2.forEach((doc) => {
+            batch.delete(doc.ref);
+          });
+
           batch.delete(challanRef);
+
           batch.update(studentDocRef, {
             generatedChallans:
               firebase.firestore.FieldValue.arrayRemove(challanId),
