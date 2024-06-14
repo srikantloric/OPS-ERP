@@ -83,6 +83,22 @@ export const SCHOOL_FEE_MONTHS = [
 
 export const SCHOOL_FEE_YEAR = [
   {
+    title:"2019",
+    value:"2019"
+  },
+  {
+    title:"2020",
+    value:"2020"
+  },
+  {
+    title:"2022",
+    value:"2022"
+  },
+  {
+    title:"2023",
+    value:"2023"
+  },
+  {
     title:"2024",
     value:"2024"
   },

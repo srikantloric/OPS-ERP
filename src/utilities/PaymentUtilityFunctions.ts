@@ -326,7 +326,7 @@ const getLatestDueAmounts = (challans: IPaymentNL[]) => {
   return Object.values(latestChallans).map((challan) => ({
     challandId: challan.challanId,
     dueAmount: challan.breakdown.reduce(
-      (sum, payment) => sum + payment.amountDue,
+      (sum, payment) => sum + payment.amountDue - challan.feeConsession,
       0
     ),
   }));
@@ -372,7 +372,7 @@ export const extractChallanIdsAndHeaders = (
     (sum, item) => sum + item.dueAmount,
     0
   );
-  console.log("Due Amount:",currentDueAmount);
+  console.log("Due Amount:", currentDueAmount);
 
   console.log("Total Paid Amount", totalPaidAmount);
   console.log("Total AMount", totalAmount);

@@ -459,7 +459,7 @@ export const GenerateFeeReciept = async ({
       }
     );
 
-    doc.text("Prev. Due", col2StartX, feeSectionStartPointY + 4);
+    doc.text("Dues", col2StartX, feeSectionStartPointY + 4);
     doc.text(
       "Dues",
       pBorderPaddOffsetX + col2StartXCopy,
