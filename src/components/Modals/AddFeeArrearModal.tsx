@@ -52,9 +52,9 @@ const AddFeeArrearModal: React.FC<Props> = ({
   });
   const [totalAmount, setTotalAmount] = useState<number>(0);
 
-  useEffect(() => {
-    setFeeHeaderData(challanData);
-  }, [challanData]);
+  // useEffect(() => {
+  //   setFeeHeaderData(challanData);
+  // }, [challanData]);
 
   useEffect(() => {
     const total =
@@ -99,8 +99,8 @@ const AddFeeArrearModal: React.FC<Props> = ({
           // Header exists, update the amount
           const existingHeader = feeHeadersMap.get(newHeader.headerTitle);
           if (existingHeader) {
-            existingHeader.amount = newHeader.amount;
-            existingHeader.amountPaidTotal = newHeader.amountPaid;
+            existingHeader.amount += newHeader.amount;
+            existingHeader.amountPaidTotal += newHeader.amountPaid;
           }
         } else {
           // Header does not exist, append the new header

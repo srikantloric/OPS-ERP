@@ -384,7 +384,7 @@ export const GenerateFeeReciept = async ({
       feeSectionStartPointY - 6
     );
 
-    const feeMonthsString = challanMonths.join(", ");
+    const feeMonthsString = challanMonths.filter((item, index) => challanMonths.indexOf(item) === index).join(", ");
 
     doc.text(
       "Fee Months : " + feeMonthsString,
@@ -490,13 +490,18 @@ export const GenerateFeeReciept = async ({
     // Determine the number of iterations needed to draw at least four rows
     // const rowCount = Math.max(2, feeHeaders.length);
 
+    let counter = 0;
     for (let i = 0; i < feeHeaders.length; i++) {
       const item = feeHeaders[i] || {
         headerTitle: "",
         amountPaid: 0,
         amount: 0,
       };
-      feeTypeLayoutHeight = feeSectionStartPointY + (i + 2) * 6;
+
+      if ((item.amountPaid == 0) && (item.amountDue==0)) continue;
+      
+      feeTypeLayoutHeight = feeSectionStartPointY + (counter + 2) * 6;
+      counter++;
 
       // Draw fee header title and amounts for each row
       doc.text(item.headerTitle, pBorderPadd + 3, feeTypeLayoutHeight);
