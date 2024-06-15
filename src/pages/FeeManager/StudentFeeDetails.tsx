@@ -67,6 +67,7 @@ import {
 import { GenerateFeeReciept } from "utilities/GenerateFeeReciept";
 import { StudentDetailsType } from "types/student";
 import ModalLoader from "components/Loader/ModalLoader";
+import { GenerateFeeRecieptMonthly } from "utilities/GenerateFeeRecieptMonthly";
 const SearchAnotherButton = () => {
   const historyRef = useNavigate();
   return (
@@ -507,93 +508,189 @@ function StudentFeeDetails() {
   };
 
   const generateCurrentFeeReciept = async (isMonthlyRecipet: boolean) => {
-    setIsGeneratingFeeReciept(true);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Set time to midnight
-    const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+    //Generate Monthy Fee Reciept
+    if (isMonthlyRecipet) {
+      setIsGeneratingFeeReciept(true);
+      const db = firebase.firestore();
+      const paymentsRef = db
+        .collection("STUDENTS")
+        .doc(location.state[0].id)
+        .collection("PAYMENTS");
 
-    const db = firebase.firestore();
-    const paymentsRef = db
-      .collection("STUDENTS")
-      .doc(location.state[0].id)
-      .collection("PAYMENTS");
-    const query = paymentsRef.where("recievedOn", ">=", todayTimestamp);
-    const recieptConfigRef = db.collection("CONFIG").doc("RECIEPT_CONFIG");
+      const query = paymentsRef.where(
+        "challanId",
+        "==",
+        selectedRow?.challanId
+      );
+      const recieptConfigRef = db.collection("CONFIG").doc("RECIEPT_CONFIG");
 
-    try {
-      const snapshot = await query.get();
-      if (snapshot.size > 0) {
-        const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
-          ...(doc.data() as IPaymentNL),
-        }));
+      try {
+        const snapshot = await query.get();
+        if (snapshot.size > 0) {
+          const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
+            ...(doc.data() as IPaymentNL),
+          }));
 
-        console.log("Payment Data:", paymentsData);
+          console.log("Payment Data:", paymentsData);
 
-        const recieptSnap = await recieptConfigRef.get();
+          const recieptSnap = await recieptConfigRef.get();
 
-        let accountantName: string = "";
-        let recieptGeneratorServer: string = "";
-        if (recieptSnap.exists) {
-          accountantName = recieptSnap.data()?.accountantName;
-          recieptGeneratorServer =
-            recieptSnap.data()?.recieptGeneratorServerUrl;
-        }
+          let accountantName: string = "";
+          let recieptGeneratorServer: string = "";
+          if (recieptSnap.exists) {
+            accountantName = recieptSnap.data()?.accountantName;
+            recieptGeneratorServer =
+              recieptSnap.data()?.recieptGeneratorServerUrl;
+          }
+          const {
+            challanMonthYear,
+            feeHeaders,
+            discountAmount,
+            paidAmount,
+            currentDueAmount,
+          } = extractChallanIdsAndHeaders(paymentsData);
 
-        const {
-          challanMonthYear,
-          feeHeaders,
-          totalAmount,
-          totalPaidAmount,
-          discountAmount,
-          paidAmount,
-          totalDueAmount,
-          currentDueAmount,
-        } = extractChallanIdsAndHeaders(paymentsData);
+          const recieptId = generateRandomSixDigitNumber().toString();
+          const recieptDate = formatedDate(
+            paymentsData[0].recievedOn.toDate(),
+            "dd/MM/YYYY hh:mm:ss"
+          );
 
-        const recieptId = generateRandomSixDigitNumber().toString();
-        const recieptDate = formatedDate(new Date(), "dd/MM/YYYY hh:mm:ss");
+          const url = await GenerateFeeRecieptMonthly({
+            challanMonths: challanMonthYear,
+            feeHeaders: feeHeaders,
+            studentMasterData: location.state[0] as StudentDetailsType,
+            paidAmount: paidAmount,
+            discountAmount: discountAmount,
+            recieptId: recieptId,
+            recieptDate: recieptDate,
+            accountantName: accountantName,
+            recieptGeneratorServerUrl: recieptGeneratorServer,
+            currentDueAmount: currentDueAmount,
+          });
 
-        const url = await GenerateFeeReciept({
-          challanMonths: challanMonthYear,
-          feeHeaders: feeHeaders,
-          studentMasterData: location.state[0] as StudentDetailsType,
-          totalAmount: totalAmount,
-          totalDueAmount: totalDueAmount,
-          totalPaidAmount: totalPaidAmount,
-          paidAmount: paidAmount,
-          discountAmount: discountAmount,
-          recieptId: recieptId,
-          recieptDate: recieptDate,
-          accountantName: accountantName,
-          recieptGeneratorServerUrl: recieptGeneratorServer,
-          currentDueAmount: currentDueAmount,
-        });
+          // Create a hidden iframe
+          if (url) {
+            const iframe: HTMLIFrameElement = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url!;
+            setIsGeneratingFeeReciept(false);
 
-        // Create a hidden iframe
-        if (url) {
-          const iframe: HTMLIFrameElement = document.createElement("iframe");
-          iframe.style.display = "none";
-          iframe.src = url!;
-          setIsGeneratingFeeReciept(false);
+            iframe.onload = () => {
+              iframe.contentWindow?.print();
+            };
 
-          iframe.onload = () => {
-            iframe.contentWindow?.print();
-          };
-
-          document.body.appendChild(iframe);
+            document.body.appendChild(iframe);
+          } else {
+            alert("error");
+          }
         } else {
-          alert("error");
+          setIsGeneratingFeeReciept(false);
+          enqueueSnackbar(
+            "No fee reciept found, please pay fee and try again",
+            {
+              variant: "info",
+            }
+          );
         }
-      } else {
+      } catch (err) {
         setIsGeneratingFeeReciept(false);
-        enqueueSnackbar("No fee reciept found, please pay fee and try again", {
-          variant: "info",
-        });
+        enqueueSnackbar("Something went wrong!", { variant: "error" });
+        console.log(err);
       }
-    } catch (error) {
-      setIsGeneratingFeeReciept(false);
-      enqueueSnackbar("Something went wrong", { variant: "error" });
-      console.error("Error fetching payments:", error);
+    } else {
+      ///Generate Current Fee Reciept
+      setIsGeneratingFeeReciept(true);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Set time to midnight
+      const todayTimestamp = firebase.firestore.Timestamp.fromDate(today);
+
+      const db = firebase.firestore();
+      const paymentsRef = db
+        .collection("STUDENTS")
+        .doc(location.state[0].id)
+        .collection("PAYMENTS");
+      const query = paymentsRef.where("recievedOn", ">=", todayTimestamp);
+      const recieptConfigRef = db.collection("CONFIG").doc("RECIEPT_CONFIG");
+
+      try {
+        const snapshot = await query.get();
+        if (snapshot.size > 0) {
+          const paymentsData: IPaymentNL[] = snapshot.docs.map((doc) => ({
+            ...(doc.data() as IPaymentNL),
+          }));
+
+          console.log("Payment Data:", paymentsData);
+
+          const recieptSnap = await recieptConfigRef.get();
+
+          let accountantName: string = "";
+          let recieptGeneratorServer: string = "";
+          if (recieptSnap.exists) {
+            accountantName = recieptSnap.data()?.accountantName;
+            recieptGeneratorServer =
+              recieptSnap.data()?.recieptGeneratorServerUrl;
+          }
+
+          const {
+            challanMonthYear,
+            feeHeaders,
+            totalAmount,
+            totalPaidAmount,
+            discountAmount,
+            paidAmount,
+            totalDueAmount,
+            currentDueAmount,
+          } = extractChallanIdsAndHeaders(paymentsData);
+
+          const recieptId = generateRandomSixDigitNumber().toString();
+          const recieptDate = formatedDate(new Date(), "dd/MM/YYYY hh:mm:ss");
+
+          const url = await GenerateFeeReciept({
+            challanMonths: challanMonthYear,
+            feeHeaders: feeHeaders,
+            studentMasterData: location.state[0] as StudentDetailsType,
+            totalAmount: totalAmount,
+            totalDueAmount: totalDueAmount,
+            totalPaidAmount: totalPaidAmount,
+            paidAmount: paidAmount,
+            discountAmount: discountAmount,
+            recieptId: recieptId,
+            recieptDate: recieptDate,
+            accountantName: accountantName,
+            recieptGeneratorServerUrl: recieptGeneratorServer,
+            currentDueAmount: currentDueAmount,
+          });
+
+          // Create a hidden iframe
+          if (url) {
+            const iframe: HTMLIFrameElement = document.createElement("iframe");
+            iframe.style.display = "none";
+            iframe.src = url!;
+            setIsGeneratingFeeReciept(false);
+
+            iframe.onload = () => {
+              iframe.contentWindow?.print();
+            };
+
+            document.body.appendChild(iframe);
+          } else {
+            alert("error");
+          }
+        } else {
+          setIsGeneratingFeeReciept(false);
+          enqueueSnackbar(
+            "No fee reciept found, please pay fee and try again",
+            {
+              variant: "info",
+            }
+          );
+        }
+      } catch (error) {
+        setIsGeneratingFeeReciept(false);
+        enqueueSnackbar("Something went wrong", { variant: "error" });
+        console.error("Error fetching payments:", error);
+      }
     }
   };
 
