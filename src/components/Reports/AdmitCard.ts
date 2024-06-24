@@ -37,7 +37,7 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
       const margin = 5;
 
       admitCardData.forEach((data, index) => {
-        if (index > 0 && index % 4 === 0) {
+        if (index > 0 && index % 2 === 0) {
           doc.addPage();
         }
 
