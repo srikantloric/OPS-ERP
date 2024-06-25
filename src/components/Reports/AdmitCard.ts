@@ -205,6 +205,11 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
           },
         });
 
+        //Adding Signature
+        admitY+=50;
+        doc.text("Class Teacher's Sign",admitX+10,admitY);
+        doc.text("Principal",admitX+60+cardWidth/2,admitY);
+
         ///End Of PDF DESIGN
         // Draw border around content
         doc.setDrawColor("#949494");
