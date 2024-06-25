@@ -14,16 +14,44 @@ import {
   SCHOOL_NAME,
 } from "config/schoolConfig";
 import { DueRecieptPropsType } from "types/student";
+import autoTable from "jspdf-autotable";
 
-let admitCardData = [
-  { name:"student1", class:"nursary", sec:"A", fatherName:"father1", roll:"2"},
-  { name:"student1", class:"nursary", sec:"A", fatherName:"father1", roll:"2"},
-  { name:"student1", class:"nursary", sec:"A", fatherName:"father1", roll:"2"},
-  { name:"student1", class:"nursary", sec:"A", fatherName:"father1", roll:"2"},
+const tableHeader = [
+  "DATE",
+  "1st SITTING",
+  "BREAK",
+  "2nd SITTING"
+];
+
+const tableData=[
+  {
+    date:"19/06/24 Monday",
+    first_sitting:"Hindi",
+    luntch_break:"Luntch",
+    second_sitting:"Hindi Oral"
+  },
+  {
+    date:"20/06/24 Tuesday",
+    first_sitting:"English",
+    luntch_break:"Luntch",
+    second_sitting:"English Oral"
+  },
+  {
+    date:"21/06/24 Wednesday",
+    first_sitting:"Maths",
+    luntch_break:"Luntch",
+    second_sitting:"Maths Oral"
+  },
+  {
+    date:"22/06/24 Thursday",
+    first_sitting:"Science",
+    luntch_break:"Luntch",
+    second_sitting:"Science Oral"
+  },
 ];
 
 export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
-): Promise<string> =>  {
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
       const doc = new jsPDF({
@@ -32,17 +60,17 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
         format: "a4",
       });
 
-      const cardWidth = (doc.internal.pageSize.getWidth() - 15) / 2;
-      const cardHeight = (doc.internal.pageSize.getHeight() - 15) / 2;
+      const cardWidth = (doc.internal.pageSize.getWidth() - 15);
+      const cardHeight = (doc.internal.pageSize.getHeight() - 20) / 3;
       const margin = 5;
 
-      admitCardData.forEach((data, index) => {
-        if (index > 0 && index % 2 === 0) {
+      recieptData.forEach((data, index) => {
+        if (index > 0 && index % 3 === 0) {
           doc.addPage();
         }
 
-        const columnIndex = index % 2;
-        const rowIndex = Math.floor(index / 2) % 2;
+        const columnIndex = 0;
+        const rowIndex = index % 3;
 
         const x = columnIndex * (cardWidth + margin) + margin;
         const y = rowIndex * (cardHeight + margin) + margin;
@@ -118,7 +146,7 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
         //school email
         doc.addImage(
           EMAIL_ICON,
-          schoolHeaderStartX + 28,
+          schoolHeaderStartX + 67,
           schoolContactDetailStartY + 9,
           3,
           3
@@ -126,21 +154,55 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
 
         doc.text(
           SCHOOL_EMAIL,
-          schoolHeaderStartX + 32,
+          schoolHeaderStartX + 69,
           schoolContactDetailStartY + 11
         );
 
         doc.setFillColor("#939393");
 
-        doc.rect(cardXStartPoint, y + 32, cardXEndPoint, 6, "F");
+        doc.rect(cardXStartPoint, y + 28, cardXEndPoint, 6, "F");
 
         doc.setFont("Poppins", "semibold");
         doc.setFontSize(8);
         doc.setTextColor("#fff");
-        doc.text("Due Reciept", x + 3, y + 36);
+        doc.text("Final Examination 2024-25  -  ADMIT CARD", cardWidth / 2 - 20, y + 32);
 
-        doc.text("Session : 2024_25", x + cardWidth - margin, y + 36, {
-          align: "right",
+        //Admit Card Design
+        doc.setFont("Poppins", "semibold");
+        doc.setFontSize(7);
+        doc.setTextColor("#000");
+
+        let admitX = x + 5;
+        let admitY = y + 38;
+        doc.text("Name:", admitX, admitY);
+        doc.text("Father's Name:", admitX, admitY + 3);
+        doc.text("Class:", admitX + cardWidth / 2, admitY);
+        doc.text("Roll:", admitX + cardWidth / 2, admitY + 3);
+
+        doc.text(data.student_name, admitX + 20, admitY);
+        doc.text(data.father_name, admitX + 20, admitY + 3);
+        doc.text(data.class + " " + data.section, admitX + 20 + cardWidth / 2, admitY);
+        doc.text((data.roll_number).toString(), admitX + cardWidth / 2 + 20, admitY + 3);
+
+        let tableY=admitY+7;
+        let tableX = admitX+3;
+        const rows = tableData.map(obj => Object.values(obj));
+        autoTable(doc, {
+          head: [tableHeader],
+          body: rows,
+          startY: tableY,
+          theme: "grid",
+          styles: {
+            textColor: "#000",
+            fontSize: 8,
+          },
+          margin: { left: tableX + 20 },
+          headStyles: {
+            cellWidth: 30,
+            fillColor: "#fff",
+            textColor: "#000",
+            minCellHeight: 4,
+          },
         });
 
         ///End Of PDF DESIGN
@@ -148,7 +210,7 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
         doc.setDrawColor("#949494");
         doc.rect(x, y, cardWidth, cardHeight);
 
-        if (index === admitCardData.length - 1) {
+        if (index === recieptData.length - 1) {
           // Save PDF and update state with URL
 
           // Convert PDF to Blob
