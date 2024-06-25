@@ -173,7 +173,7 @@ export const AdmitCardGenerator = async (recieptData: DueRecieptPropsType[]
         doc.setTextColor("#000");
 
         let admitX = x + 5;
-        let admitY = y + 38;
+        let admitY = y + 40;
         doc.text("Name:", admitX, admitY);
         doc.text("Father's Name:", admitX, admitY + 3);
         doc.text("Class:", admitX + cardWidth / 2, admitY);
