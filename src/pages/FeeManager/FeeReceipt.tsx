@@ -8,8 +8,8 @@ import { useEffect, useState } from "react";
 import { DueRecieptPropsType } from "types/student";
 import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
 import FeeRecieptIndex from "./utilities/FeeReportIndix";
-import { Typography } from "@mui/material";
 import { AdmitCardGenerator } from "components/Reports/AdmitCard";
+import { MarksheetReportGenerator } from "components/Reports/MarksheetReport";
 // import {AdmitCard} from "components/Reports/AdmitCard"
 
 
@@ -17,6 +17,7 @@ function FeeReceipt() {
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [pdfUrl1, setPdfUrl1] = useState<string>("");
   const [pdfUrl2, setPdfUrl2] = useState<string>("");
+  const [pdfUrl3, setPdfUrl3] = useState<string>("");
 
   const sampleObjects: DueRecieptPropsType[] = [
     {
@@ -293,6 +294,22 @@ function FeeReceipt() {
   }
 
 
+  const getPdfUrl3 = async () => {
+    const pdfRes3 = await MarksheetReportGenerator(sampleObjects);
+    setPdfUrl3(pdfRes3);
+  };
+
+  useEffect(() => {
+    getPdfUrl3();
+  }, []);
+  const handleResultView=()=>{
+    const features3 =
+    "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+
+  window.open(pdfUrl3, "_blank", features3);
+  }
+
+
   return (
     <PageContainer>
       <Navbar />
@@ -300,9 +317,10 @@ function FeeReceipt() {
         <Button onClick={handleNewWindowOpen}>Generate Due Reciept</Button>
         <br/><br/>
         <Button onClick={handleDueRecieptList}>Due Reciept List</Button>
-        <Typography component="p">
+        <br/><br/>
         <Button onClick={handleViewAdmitcard}>View Admit Card</Button>
-        </Typography>
+        <br/><br/>
+        <Button onClick={handleResultView}>View Marksheet</Button>
         <FeeRecieptIndex/>
       </LSPage>
     </PageContainer>
