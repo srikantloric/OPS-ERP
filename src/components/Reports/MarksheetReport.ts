@@ -26,29 +26,36 @@ const tableHeader = [
 
 const tableData = [{
     Subject: "salple",
-    Theory: "er",
-    Pract: "afsfa",
+    Theory: "80",
+    Pract: "20",
     Pass_Marks: "33",
     Marks_Obtaine: "41"
 }, {
     Subject: "salple",
-    Theory: "er",
-    Pract: "afsfa",
+    Theory: "80",
+    Pract: "20",
     Pass_Marks: "33",
     Marks_Obtaine: "41"
 }, {
     Subject: "salple",
-    Theory: "er",
-    Pract: "afsfa",
+    Theory: "80",
+    Pract: "20",
     Pass_Marks: "33",
     Marks_Obtaine: "41"
 }, {
     Subject: "salple",
-    Theory: "er",
-    Pract: "afsfa",
+    Theory: "80",
+    Pract: "20",
     Pass_Marks: "33",
-    Marks_Obtaine: "41"
-}]
+    Marks_Obtaine: "100"
+}, {
+    Subject: "salple5",
+    Theory: "80",
+    Pract: "20",
+    Pass_Marks: "33",
+    Marks_Obtaine: "76"
+}
+]
 
 export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[]
 ): Promise<string> => {
@@ -264,9 +271,55 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                     },
                 });
 
-                let startY = (doc.getLineHeight() * lineCount )+tableY;
-                doc.text("Remarks:#############################", margin + 5, startY);
-                console.log("linecount=" + lineCount + "  startY=" + startY);
+                let startY = (doc.getLineHeight() * Math.round(lineCount)) + tableY - 1 * (tableData.length - 1);
+                let startX = margin + 5;
+                let totalPassMarks = 0;
+                let fullMarks = 0;
+                let marksObtained = 0;
+                let calFullMarks = tableData.map(obj => fullMarks += Number(obj.Theory) + Number(obj.Pract))
+                let calpassmarks = tableData.map(obj => totalPassMarks += Number(obj.Pass_Marks))
+                let calMarksObtained = tableData.map(obj => marksObtained += Number(obj.Marks_Obtaine));
+
+                const rows2 = [
+                    [
+                        { content: 'Total' },
+                        { content: fullMarks, colSpan: 2, styles: { halign: 'center' } },
+                        { content: totalPassMarks },
+                        { content: marksObtained }
+                    ],
+                    [
+                        { content: 'Percentage(%)' },
+                        { content: (marksObtained / totalPassMarks) * 100, colSpan: 4, styles: { halign: 'center' } },
+                    ],
+                    [
+                        { content: "Rank" },
+                        { content: "-", colSpan: 4, styles: { halign: 'center' } },
+                    ],
+                    [
+                        { content: "Remarks" },
+                        { content: " ", colSpan: 4, styles: { halign: 'center'} },
+                    ]
+                ];
+                autoTable(doc, {
+                    startY: startY,
+                    theme: "grid",
+                    body: rows2,
+                    margin: startX,
+                    styles: {
+                        textColor: "#000",
+                        fontSize: 8,
+                    },
+                    bodyStyles: {
+                        cellWidth: 30,
+                        fillColor: "#fff",
+                        textColor: "#000",
+                        minCellHeight: 4,
+                    },
+
+                });
+
+
+
 
 
 
