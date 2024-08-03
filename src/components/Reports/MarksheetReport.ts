@@ -57,6 +57,7 @@ const tableData = [{
 }
 ]
 
+
 export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[]
 ): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -70,115 +71,145 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
             const cardWidth = doc.internal.pageSize.getWidth() - 15;
             const cardHeight = doc.internal.pageSize.getHeight() - 15;
             const margin = 2;
-
             const x = 5 + margin;
             const y = 5 + margin;
-            // const y=cardHeight+margin;
-
-            doc.setTextColor("#000");
-
-            // Load fonts
-            doc.addFileToVFS("Poppins-Bold", POPPINS_BOLD);
-            doc.addFont("Poppins-Bold", "Poppins", "bold");
-
-            doc.addFileToVFS("Poppins-Regular", POPPINS_REGULAR);
-            doc.addFont("Poppins-Regular", "Poppins", "normal");
-
-            doc.addFileToVFS("Poppins-Semibold", POPPINS_SEMIBOLD);
-            doc.addFont("Poppins-Semibold", "Poppins", "semibold");
-            ///Start of PDF Design
-
-            doc.addImage(LOGO_BASE_64, x + 8, y + 2, 30, 25);
-
-            const schoolHeaderStartX = x + 50;
-            const schoolHeaderStartY = y + 5;
-
-            doc.setFontSize(15);
-            doc.setFont("Poppins", "bold");
-            doc.text(SCHOOL_NAME, schoolHeaderStartX + 15, schoolHeaderStartY);
-
-            doc.setFontSize(8);
-            doc.setFont("Poppins", "semibold");
-            doc.text(
-                "An English Medium School Based on CBSE Syllabus",
-                schoolHeaderStartX + 12,
-                schoolHeaderStartY + 5
-            );
-
-            const schoolContactDetailStartY = schoolHeaderStartY + 2;
-            // const schoolContactDetailStartX = schoolHeaderStartX - 5;
-
-            const cardXStartPoint = x;
-            const cardXEndPoint = cardWidth;
-
-            doc.setFillColor("#cbc9c9");
-            doc.rect(
-                schoolHeaderStartX + 10,
-                schoolContactDetailStartY + 5,
-                cardXEndPoint - 120,
-                4,
-                "F"
-            );
-
-            doc.setFontSize(6);
-            doc.setFont("Poppins", "normal");
-            doc.text(
-                SCHOOL_ADDRESS,
-                schoolHeaderStartX + 12,
-                schoolContactDetailStartY + 7.5
-            );
-
-            //school contact
-            doc.addImage(
-                PHONE_ICON,
-                schoolHeaderStartX + 9,
-                schoolContactDetailStartY + 10,
-                3,
-                3
-            );
-
-            doc.text(
-                SCHOOL_CONTACT,
-                schoolHeaderStartX + 13,
-                schoolContactDetailStartY + 12
-            );
-
-            //school email
-            doc.addImage(
-                EMAIL_ICON,
-                schoolHeaderStartX + 70,
-                schoolContactDetailStartY + 10,
-                3,
-                3
-            );
-
-            doc.text(
-                SCHOOL_EMAIL,
-                schoolHeaderStartX + 74,
-                schoolContactDetailStartY + 12
-            );
-
-            doc.setFillColor("#939393");
-
-            doc.rect(cardXStartPoint, y + 26, cardXEndPoint, 6, "F");
-
-            doc.setFont("Poppins", "semibold");
-            doc.setFontSize(9);
-            doc.setTextColor("#fff");
-            doc.text("Marksheet 20__ - 20__", cardWidth / 2 - 8, y + 30);
-
-            //Marksheet Body
-            doc.setFont("Poppins", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor("#000");
 
             recieptData.forEach((data, index) => {
-                if (index > 0 && index % 4 === 0) {
-                    doc.addPage();
-                }
+
+                // const y=cardHeight+margin;
+                let startX = margin + 25;
+                let totalPassMarks = 0;
+                let fullMarks = 0;
+                let marksObtained = 0;
+                tableData.map(obj => fullMarks += (Number(obj.Theory) + Number(obj.Pract)));
+                tableData.map(obj => totalPassMarks += Number(obj.Pass_Marks));
+                tableData.map(obj => marksObtained += Number(obj.Marks_Obtaine));
+                let percentage = (marksObtained / totalPassMarks) * 100;
+
+                const rows2 = [
+                    [
+                        { content: 'Total' },
+                        { content: fullMarks.toString(), colSpan: 2, styles: { halign: 'center' } },
+                        { content: totalPassMarks.toString() },
+                        { content: marksObtained.toString() }
+                    ],
+                    [
+                        { content: 'Percentage(%)' },
+                        { content: percentage, colSpan: 4, styles: { halign: 'center' } },
+                    ],
+                    [
+                        { content: 'Rank' },
+                        { content: '-', colSpan: 4, styles: { halign: 'center' } },
+                    ],
+                    [
+                        { content: 'Remarks', styles: { halign: 'center' } },
+                        { content: '-', colSpan: 4, rowSpan: 2, styles: { halign: 'center' } },
+                    ],
+                    [
+                        { content: '', styles: { halign: 'center' } },
+                    ]
+                ];
+
+                doc.setTextColor("#000");
+
+                // Load fonts
+                doc.addFileToVFS("Poppins-Bold", POPPINS_BOLD);
+                doc.addFont("Poppins-Bold", "Poppins", "bold");
+
+                doc.addFileToVFS("Poppins-Regular", POPPINS_REGULAR);
+                doc.addFont("Poppins-Regular", "Poppins", "normal");
+
+                doc.addFileToVFS("Poppins-Semibold", POPPINS_SEMIBOLD);
+                doc.addFont("Poppins-Semibold", "Poppins", "semibold");
+                ///Start of PDF Design
+
+                doc.addImage(LOGO_BASE_64, x + 8, y + 2, 30, 25);
+
+                const schoolHeaderStartX = x + 50;
+                const schoolHeaderStartY = y + 5;
+
+                doc.setFontSize(15);
+                doc.setFont("Poppins", "bold");
+                doc.text(SCHOOL_NAME, schoolHeaderStartX + 15, schoolHeaderStartY);
+
+                doc.setFontSize(8);
+                doc.setFont("Poppins", "semibold");
+                doc.text(
+                    "An English Medium School Based on CBSE Syllabus",
+                    schoolHeaderStartX + 12,
+                    schoolHeaderStartY + 5
+                );
+
+                const schoolContactDetailStartY = schoolHeaderStartY + 2;
+                // const schoolContactDetailStartX = schoolHeaderStartX - 5;
+
+                const cardXStartPoint = x;
+                const cardXEndPoint = cardWidth;
+
+                doc.setFillColor("#cbc9c9");
+                doc.rect(
+                    schoolHeaderStartX + 10,
+                    schoolContactDetailStartY + 5,
+                    cardXEndPoint - 120,
+                    4,
+                    "F"
+                );
+
+                doc.setFontSize(6);
+                doc.setFont("Poppins", "normal");
+                doc.text(
+                    SCHOOL_ADDRESS,
+                    schoolHeaderStartX + 12,
+                    schoolContactDetailStartY + 7.5
+                );
+
+                //school contact
+                doc.addImage(
+                    PHONE_ICON,
+                    schoolHeaderStartX + 9,
+                    schoolContactDetailStartY + 10,
+                    3,
+                    3
+                );
+
+                doc.text(
+                    SCHOOL_CONTACT,
+                    schoolHeaderStartX + 13,
+                    schoolContactDetailStartY + 12
+                );
+
+                //school email
+                doc.addImage(
+                    EMAIL_ICON,
+                    schoolHeaderStartX + 70,
+                    schoolContactDetailStartY + 10,
+                    3,
+                    3
+                );
+
+                doc.text(
+                    SCHOOL_EMAIL,
+                    schoolHeaderStartX + 74,
+                    schoolContactDetailStartY + 12
+                );
+
+                doc.setFillColor("#939393");
+
+                doc.rect(cardXStartPoint, y + 26, cardXEndPoint, 6, "F");
+
+                doc.setFont("Poppins", "semibold");
+                doc.setFontSize(9);
+                doc.setTextColor("#fff");
+                doc.text("Marksheet 20__ - 20__", cardWidth / 2 - 8, y + 30);
+
+                //Marksheet Body
+                doc.setFont("Poppins", "normal");
+                doc.setFontSize(10);
+                doc.setTextColor("#000");
+
 
                 //students details
-                doc.setFontSize(8);
+                doc.setFontSize(9);
                 doc.setFont("Poppins", "normal");
 
                 let studentDetailsStartY = y + 49;
@@ -248,10 +279,11 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 //Marks Body
                 doc.setFontSize(8);
                 doc.setTextColor("#000");
-                let tableY = studentDetailsStartY + 30;
+                let tableY = studentDetailsStartY + 50;
+                const combinedData = [...tableData, ...rows2];
 
-                let lineCount = tableData.length;
-                const rows = tableData.map(obj => Object.values(obj));
+                let lineCount = combinedData.length;
+                const rows = combinedData.map(obj => Object.values(obj));
 
                 autoTable(doc, {
                     head: [tableHeader],
@@ -262,7 +294,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                         textColor: "#000",
                         fontSize: 8,
                     },
-                    margin: { left: 5 + margin },
+                    margin: { left: 25 + margin },
                     headStyles: {
                         cellWidth: 30,
                         fillColor: "#fff",
@@ -271,55 +303,13 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                     },
                 });
 
-                let startY = (doc.getLineHeight() * Math.round(lineCount)) + tableY - 1 * (tableData.length - 1);
-                let startX = margin + 5;
-                let totalPassMarks = 0;
-                let fullMarks = 0;
-                let marksObtained = 0;
-                let calFullMarks = tableData.map(obj => fullMarks += Number(obj.Theory) + Number(obj.Pract))
-                let calpassmarks = tableData.map(obj => totalPassMarks += Number(obj.Pass_Marks))
-                let calMarksObtained = tableData.map(obj => marksObtained += Number(obj.Marks_Obtaine));
 
-                const rows2 = [
-                    [
-                        { content: 'Total' },
-                        { content: fullMarks, colSpan: 2, styles: { halign: 'center' } },
-                        { content: totalPassMarks },
-                        { content: marksObtained }
-                    ],
-                    [
-                        { content: 'Percentage(%)' },
-                        { content: (marksObtained / totalPassMarks) * 100, colSpan: 4, styles: { halign: 'center' } },
-                    ],
-                    [
-                        { content: "Rank" },
-                        { content: "-", colSpan: 4, styles: { halign: 'center' } },
-                    ],
-                    [
-                        { content: "Remarks" },
-                        { content: " ", colSpan: 4, styles: { halign: 'center'} },
-                    ]
-                ];
-                autoTable(doc, {
-                    startY: startY,
-                    theme: "grid",
-                    body: rows2,
-                    margin: startX,
-                    styles: {
-                        textColor: "#000",
-                        fontSize: 8,
-                    },
-                    bodyStyles: {
-                        cellWidth: 30,
-                        fillColor: "#fff",
-                        textColor: "#000",
-                        minCellHeight: 4,
-                    },
-
-                });
-
-
-
+                let startY = tableY + lineCount * 8;
+                //Signatures
+                startY += (50 + 2 * (tableData.length));
+                doc.text("Class Teacher's Sign", startX , startY);
+                doc.text("Parents Sign", startX + cardWidth / 3, startY);
+                doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
 
 
 
@@ -327,6 +317,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.setDrawColor("#949494");
                 doc.rect(x, y, cardWidth, cardHeight);
 
+                doc.addPage();
                 if (index === recieptData.length - 1) {
                     // Save PDF and update state with URL
 
