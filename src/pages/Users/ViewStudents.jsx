@@ -303,6 +303,7 @@ function ViewStudents() {
                 <MenuItem value={-1}>
                   <em>Select</em>
                 </MenuItem>
+                <MenuItem value={14}>Pre-Nursery</MenuItem>
                 <MenuItem value={1}>Nursery</MenuItem>
                 <MenuItem value={2}>LKG</MenuItem>
                 <MenuItem value={3}>UKG</MenuItem>

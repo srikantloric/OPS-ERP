@@ -12,6 +12,7 @@ import {
   IconUsers,
   IconMoneybag,
   IconSettings,
+  IconReportAnalytics,
 } from "@tabler/icons-react";
 import AddStudent from "../../pages/Users/AddStudent";
 import UnderConstruction from "../../pages/Extras/UnderConstruction";
@@ -23,6 +24,7 @@ import Transaction from "pages/Transaction/Transaction";
 import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMontlyChallan";
 import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
 import SettingsPage from "pages/Settings/SettingsPage";
+import UpdateResults from "pages/ResultsManagement/UpdateResults";
 
 export const routesConfig = [
   {
@@ -67,7 +69,6 @@ export const routesConfig = [
         isHeader: false,
         Component: <AddStudent />,
       },
-     
     ],
   },
   {
@@ -162,6 +163,23 @@ export const routesConfig = [
     isCollapsable: false,
     isHeader: false,
     Component: FeeReceipt,
+  },
+  {
+    title: "School Results",
+    to: "/SchoolResults",
+    icon: IconReportAnalytics,
+    isCollapsable: true,
+    isHeader: false,
+    Component: UpdateResults,
+    childrens: [
+      {
+        title: "Update Results",
+        to: "schoolResults/update-results",
+        isCollapsable: false,
+        isHeader: false,
+        Component: <UpdateResults/>,
+      },
+    ],
   },
   {
     title: "Notification",
