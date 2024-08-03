@@ -84,7 +84,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 tableData.map(obj => fullMarks += (Number(obj.Theory) + Number(obj.Pract)));
                 tableData.map(obj => totalPassMarks += Number(obj.Pass_Marks));
                 tableData.map(obj => marksObtained += Number(obj.Marks_Obtaine));
-                let percentage = (marksObtained / totalPassMarks) * 100;
+                let percentage = (marksObtained / fullMarks) * 100;
 
                 const rows2 = [
                     [
@@ -303,11 +303,20 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                     },
                 });
 
+                //Result and Promotted Class
+                let resultY = tableY + lineCount * 8;
+                let resultPF = (percentage > 33.0) ? "PASS" : "FAIL";
+                let promotedClass = (percentage > 33.0) ? (1 + Number(data.class)) : Number(data.class);
+                doc.text("Result: " + resultPF, startX, resultY);
+                doc.text("Promoted to Class: " + promotedClass, startX + cardWidth / 2, resultY);
+                console.log("promotedClass: " + promotedClass.toString());
 
-                let startY = tableY + lineCount * 8;
+
+
                 //Signatures
+                let startY = tableY + lineCount * 8;
                 startY += (50 + 2 * (tableData.length));
-                doc.text("Class Teacher's Sign", startX , startY);
+                doc.text("Class Teacher's Sign", startX, startY);
                 doc.text("Parents Sign", startX + cardWidth / 3, startY);
                 doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
 
