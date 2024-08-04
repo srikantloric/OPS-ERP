@@ -28,6 +28,7 @@ import {
   SearchDialogProvider,
   useSearchDialog,
 } from "context/SearchDialogContext";
+import UpdateResults from "pages/ResultsManagement/UpdateResults";
 
 const StudentProfilePictureUpdater = Loadable(
   lazy(() => import("pages/ProfileUpdater/StudentProfilePictureUpdater"))
@@ -63,8 +64,6 @@ function App() {
   const setSidebarOpen = (status) => {
     setIsActive(status);
   };
-
-
 
   return (
     <SideBarContext.Provider value={{ isActive, toggle, setSidebarOpen }}>
@@ -129,6 +128,12 @@ function App() {
                   element={<ViewStudentProfile />}
                 />
                 <Route path="feeReciept" element={<FeeReceipt />} />
+
+                <Route
+                  path="/schoolResults/update-results"
+                  element={<UpdateResults />}
+                />
+              
               </Route>
               <Route
                 path="update-student-profile-picture"
