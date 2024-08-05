@@ -36,6 +36,8 @@ import { StudentDetailsType } from "types/student";
 import { db } from "../../firebase";
 import { enqueueSnackbar } from "notistack";
 import firebase from "../../firebase";
+import { MarksheetReportGenerator } from "components/Reports/MarksheetReport";
+import { paperMarksType, resultType } from "types/results";
 
 type examType = {
   examId: string;
@@ -45,20 +47,6 @@ type examType = {
 type paperType = {
   paperId: string;
   paperTitle: string;
-};
-
-type paperMarksType = {
-  paperId: string;
-  paperTitle: string;
-  paperMark: number;
-};
-
-type resultType = {
-  examId: string;
-  examTitle: string;
-  publishedOn: firebase.firestore.FieldValue;
-  result: paperMarksType[];
-  docId?: string;
 };
 
 type examConfig = {
@@ -93,6 +81,8 @@ function UpdateResults() {
 
   const [studentIdInput, setStudentIdInput] = useState<string | null>(null);
   const [resultDocId, setResultDocId] = useState<string | null>(null);
+
+
 
   useEffect(() => {
     setStudentList([]);
@@ -235,7 +225,9 @@ function UpdateResults() {
       const paperWithMarks: paperMarksType = {
         paperId: paper.paperId,
         paperTitle: paper.paperTitle,
-        paperMark: 0,
+        paperMarkObtained: 0,
+        paperMarkTheory: 80,
+        paperMarkPractical: 20,
       };
 
       const isPaperAlreadyExising = studentSelectedMarkList.filter(
@@ -255,39 +247,83 @@ function UpdateResults() {
     );
   };
 
-  const handleMarkUpdate = (val: string, paper: paperMarksType) => {
-    setStudentSelectedMarkList((prev) =>
-      prev.map((item) =>
-        item.paperId === paper.paperId
-          ? { ...item, paperMark: Number(val) }
-          : item
-      )
-    );
+  const handleMarkUpdate = (
+    val: string,
+    paper: paperMarksType,
+    type: string
+  ) => {
+    if (type === "THEORY") {
+      setStudentSelectedMarkList((prev) =>
+        prev.map((item) =>
+          item.paperId === paper.paperId
+            ? { ...item, paperMarkTheory: Number(val) }
+            : item
+        )
+      );
+    } else if (type === "PRAC") {
+      setStudentSelectedMarkList((prev) =>
+        prev.map((item) =>
+          item.paperId === paper.paperId
+            ? { ...item, paperMarkPractical: Number(val) }
+            : item
+        )
+      );
+    } else {
+      setStudentSelectedMarkList((prev) =>
+        prev.map((item) =>
+          item.paperId === paper.paperId
+            ? { ...item, paperMarkObtained: Number(val) }
+            : item
+        )
+      );
+    }
   };
 
   const handleSaveResultBtn = () => {
     if (currentSelectedStudent != null) {
-      if (studentSelectedMarkList.length > 0) {
-        //create result data
+      if (selectedExam != null) {
+        if (studentSelectedMarkList.length > 0) {
+          //create result data
 
-        const examTitle = examsList
-          .filter((exam) => exam.examId === selectedExam)
-          .at(0)?.examTitle!;
+          const examTitle = examsList
+            .filter((exam) => exam.examId === selectedExam)
+            .at(0)?.examTitle!;
 
-        const resultData: resultType = {
-          examId: selectedExam,
-          examTitle: examTitle,
-          publishedOn: firebase.firestore.FieldValue.serverTimestamp(),
-          result: studentSelectedMarkList,
-        };
-        ///update student marks
-        if (isUpdatingResult) {
-          if (resultDocId) {
+          const resultData: resultType = {
+            examId: selectedExam,
+            examTitle: examTitle,
+            publishedOn: firebase.firestore.FieldValue.serverTimestamp(),
+            result: studentSelectedMarkList,
+          };
+          ///update student marks
+          if (isUpdatingResult) {
+            if (resultDocId) {
+              db.collection("STUDENTS")
+                .doc(currentSelectedStudent.id)
+                .collection("PUBLISHED_RESULTS")
+                .doc(resultDocId)
+                .update(resultData)
+                .then(() => {
+                  setUpdateResultDialogOpen(false);
+                  enqueueSnackbar("Result published successfully!", {
+                    variant: "success",
+                  });
+                })
+                .catch((err) => {
+                  console.log(err);
+                  enqueueSnackbar("Failed to save result!", {
+                    variant: "error",
+                  });
+                });
+            } else {
+              enqueueSnackbar("Result document doesn't exit!");
+            }
+          } else {
             db.collection("STUDENTS")
               .doc(currentSelectedStudent.id)
               .collection("PUBLISHED_RESULTS")
-              .doc(resultDocId)
-              .update(resultData)
+              .doc()
+              .set(resultData)
               .then(() => {
                 setUpdateResultDialogOpen(false);
                 enqueueSnackbar("Result published successfully!", {
@@ -298,28 +334,14 @@ function UpdateResults() {
                 console.log(err);
                 enqueueSnackbar("Failed to save result!", { variant: "error" });
               });
-          } else {
-            enqueueSnackbar("Result document doesn't exit!");
           }
         } else {
-          db.collection("STUDENTS")
-            .doc(currentSelectedStudent.id)
-            .collection("PUBLISHED_RESULTS")
-            .doc()
-            .set(resultData)
-            .then(() => {
-              setUpdateResultDialogOpen(false);
-              enqueueSnackbar("Result published successfully!", {
-                variant: "success",
-              });
-            })
-            .catch((err) => {
-              console.log(err);
-              enqueueSnackbar("Failed to save result!", { variant: "error" });
-            });
+          enqueueSnackbar("No paper selected !", {
+            variant: "error",
+          });
         }
       } else {
-        enqueueSnackbar("No paper selected !", {
+        enqueueSnackbar("No exam selected !", {
           variant: "error",
         });
       }
@@ -372,6 +394,15 @@ function UpdateResults() {
       setSelectedExam(null);
     }
   }, [updateResultDialogOpen]);
+
+  const printStudentMarksheet = async (result: resultType) => {
+    const pdfUrl = await MarksheetReportGenerator([
+      { student: currentSelectedStudent!, result: result.result },
+    ]);
+    const createPDFWindow =
+      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+    window.open(pdfUrl, "_blank", createPDFWindow);
+  };
 
   return (
     <PageContainer>
@@ -529,6 +560,7 @@ function UpdateResults() {
                                   variant="plain"
                                   color="success"
                                   size="sm"
+                                  onClick={() => printStudentMarksheet(result)}
                                   startDecorator={<Print />}
                                 ></Button>
                               </Stack>
@@ -637,16 +669,34 @@ function UpdateResults() {
                       mb={"1rem"}
                       justifyContent="space-between"
                     >
-                      <Typography level="title-md">
-                        {index + 1}. {paper.paperTitle} -
+                      <Typography level="title-md" sx={{ mr: "8px" }}>
+                        {index + 1}. {paper.paperTitle}
                       </Typography>
                       <Stack direction={"row"} gap={2}>
                         <Input
-                          placeholder={`${paper.paperTitle} mark..`}
+                          type="number"
+                          sx={{ width: "90px" }}
                           onChange={(e) =>
-                            handleMarkUpdate(e.target.value, paper)
+                            handleMarkUpdate(e.target.value, paper, "THEORY")
                           }
-                          value={paper.paperMark}
+                          value={paper.paperMarkTheory}
+                        />
+                        <Input
+                          type="number"
+                          sx={{ width: "90px" }}
+                          onChange={(e) =>
+                            handleMarkUpdate(e.target.value, paper, "PRAC")
+                          }
+                          value={paper.paperMarkPractical}
+                        />
+                        <Divider orientation="vertical" />
+                        <Input
+                          type="number"
+                          sx={{ width: "90px" }}
+                          onChange={(e) =>
+                            handleMarkUpdate(e.target.value, paper, "OBTAINED")
+                          }
+                          value={paper.paperMarkObtained}
                         />
                         <Button
                           size="sm"
@@ -680,6 +730,8 @@ function UpdateResults() {
             </DialogActions>
           </ModalDialog>
         </Modal>
+
+       
       </LSPage>
     </PageContainer>
   );

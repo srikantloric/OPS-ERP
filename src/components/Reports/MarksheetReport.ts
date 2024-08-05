@@ -1,343 +1,379 @@
 import {
-    EMAIL_ICON,
-    LOGO_BASE_64,
-    PHONE_ICON,
-    POPPINS_BOLD,
-    POPPINS_REGULAR,
-    POPPINS_SEMIBOLD,
+  LOGO_BASE_64,
+  POPPINS_BOLD,
+  POPPINS_REGULAR,
+  POPPINS_SEMIBOLD,
 } from "utilities/Base64Url";
-import {
-    SCHOOL_ADDRESS,
-    SCHOOL_CONTACT,
-    SCHOOL_EMAIL,
-    SCHOOL_NAME,
-} from "config/schoolConfig";
+import { SCHOOL_NAME } from "config/schoolConfig";
 import { jsPDF } from "jspdf";
-import { DueRecieptPropsType } from "types/student";
 import autoTable from "jspdf-autotable";
+import { marksheetType } from "types/results";
+import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 
-// const tableHeader = [
-//     [{ content: "PERIODIC TEST (TERM 1)", colSpan: 4, styles: { halign: 'center' } }]
-// ];
 const header2 = [
-    [{ content: "PERIODIC TEST (TERM 1)", colSpan: 4, styles: { halign: 'center' } }],
-    [
-        "Subject",
-        "Theory",
-        "Pract.",
-        "Pass Marks",
-        "Marks Obtained"
-    ]
-]
+  [
+    {
+      content: "PERIODIC TEST (TERM 1)",
+      colSpan: 4,
 
-const tableData = [{
-    Subject: "salple",
-    Theory: "80",
-    Pract: "20",
-    Pass_Marks: "33",
-    Marks_Obtaine: "41"
-}, {
-    Subject: "salple",
-    Theory: "80",
-    Pract: "20",
-    Pass_Marks: "33",
-    Marks_Obtaine: "41"
-}, {
-    Subject: "salple",
-    Theory: "80",
-    Pract: "20",
-    Pass_Marks: "33",
-    Marks_Obtaine: "41"
-}, {
-    Subject: "salple",
-    Theory: "80",
-    Pract: "20",
-    Pass_Marks: "33",
-    Marks_Obtaine: "100"
-}, {
-    Subject: "salple5",
-    Theory: "80",
-    Pract: "20",
-    Pass_Marks: "33",
-    Marks_Obtaine: "76"
-}
-]
+      styles: { halign: "center" },
+    },
+  ],
+  ["Subject", "Theory", "Pract.", "Pass Marks", "Marks Obtained"],
+];
 
+type paperMarksTypeLocal = {
+  paperTitle: string;
+  paperMarkObtained: number;
+  paperMarkPractical: number;
+  paperMarkTheory: number;
+  paperMarkPassing: number;
+};
 
-export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[]
+export const MarksheetReportGenerator = async (
+  resultData: marksheetType[]
 ): Promise<string> => {
-    return new Promise((resolve, reject) => {
-        try {
-            const doc = new jsPDF({
-                orientation: "p",
-                unit: "mm",
-                format: "a4",
-            });
+  return new Promise((resolve, reject) => {
+    try {
+      const doc = new jsPDF({
+        orientation: "p",
+        unit: "mm",
+        format: "a4",
+      });
 
-            const cardWidth = doc.internal.pageSize.getWidth() - 15;
-            const cardHeight = doc.internal.pageSize.getHeight() - 15;
-            const margin = 2;
-            const x = 5 + margin;
-            const y = 5 + margin;
+      //data manupulation
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const cardWidth = doc.internal.pageSize.getWidth() - 15;
+      // const cardHeight = doc.internal.pageSize.getHeight() - 15;
+      const margin = 2;
+      const x = 5 + margin;
+      const y = 5 + margin;
 
-            recieptData.forEach((data, index) => {
+      resultData.forEach((data, index) => {
+        let resDataTable: paperMarksTypeLocal[] = [];
+        data.result.map((item) => {
+          const res: paperMarksTypeLocal = {
+            paperTitle: item.paperTitle,
+            paperMarkTheory: item.paperMarkTheory,
+            paperMarkPractical: item.paperMarkPractical,
+            paperMarkPassing: 33,
+            paperMarkObtained: item.paperMarkObtained,
+          };
+          resDataTable.push(res);
+        });
+        // const y=cardHeight+margin;
+        let startX = margin + 25;
+        let totalPassMarks = 0;
+        let fullMarks = 0;
+        let marksObtained = 0;
+        data.result.map(
+          (obj) =>
+            (fullMarks +=
+              Number(obj.paperMarkTheory) + Number(obj.paperMarkPractical))
+        );
+        data.result.map(
+          (obj) => (totalPassMarks += Number(obj.paperMarkTheory))
+        );
+        data.result.map(
+          (obj) => (marksObtained += Number(obj.paperMarkObtained))
+        );
+        let percentage = (marksObtained / fullMarks) * 100;
 
-                // const y=cardHeight+margin;
-                let startX = margin + 25;
-                let totalPassMarks = 0;
-                let fullMarks = 0;
-                let marksObtained = 0;
-                tableData.map(obj => fullMarks += (Number(obj.Theory) + Number(obj.Pract)));
-                tableData.map(obj => totalPassMarks += Number(obj.Pass_Marks));
-                tableData.map(obj => marksObtained += Number(obj.Marks_Obtaine));
-                let percentage = (marksObtained / fullMarks) * 100;
+        const rows2 = [
+          [
+            { content: "Total", styles: { halign: "center" } },
+            {
+              content: fullMarks.toString(),
+              colSpan: 2,
+              styles: { halign: "center" },
+            },
+            {
+              content: totalPassMarks.toString(),
+              styles: { halign: "center" },
+            },
+            { content: marksObtained.toString(), styles: { halign: "center" } },
+          ],
+          [
+            { content: "Percentage(%)" },
+            { content: percentage, colSpan: 4, styles: { halign: "center" } },
+          ],
+          [
+            { content: "Rank" },
+            { content: "", colSpan: 4, styles: { halign: "center" } },
+          ],
+          [
+            { content: "Remarks" },
+            { content: "", colSpan: 4, styles: { halign: "center" } },
+          ],
+        ];
 
-                const rows2 = [
-                    [
-                        { content: 'Total', styles: { halign: 'center' } },
-                        { content: fullMarks.toString(), colSpan: 2, styles: { halign: 'center' } },
-                        { content: totalPassMarks.toString(), styles: { halign: 'center' } },
-                        { content: marksObtained.toString(), styles: { halign: 'center' } }
-                    ],
-                    [
-                        { content: 'Percentage(%)' },
-                        { content: percentage, colSpan: 4, styles: { halign: 'center' } },
-                    ],
-                    [
-                        { content: 'Rank' },
-                        { content: '', colSpan: 4, styles: { halign: 'center' } },
-                    ],
-                    [
-                        { content: 'Remarks' },
-                        { content: '', colSpan: 4, styles: { halign: 'center' } },
-                    ]
-                ];
+        doc.setTextColor("#000");
 
-                doc.setTextColor("#000");
+        // Load fonts
+        doc.addFileToVFS("Poppins-Bold", POPPINS_BOLD);
+        doc.addFont("Poppins-Bold", "Poppins", "bold");
 
-                // Load fonts
-                doc.addFileToVFS("Poppins-Bold", POPPINS_BOLD);
-                doc.addFont("Poppins-Bold", "Poppins", "bold");
+        doc.addFileToVFS("Poppins-Regular", POPPINS_REGULAR);
+        doc.addFont("Poppins-Regular", "Poppins", "normal");
 
-                doc.addFileToVFS("Poppins-Regular", POPPINS_REGULAR);
-                doc.addFont("Poppins-Regular", "Poppins", "normal");
+        doc.addFileToVFS("Poppins-Semibold", POPPINS_SEMIBOLD);
+        doc.addFont("Poppins-Semibold", "Poppins", "semibold");
+        ///Start of PDF Design
 
-                doc.addFileToVFS("Poppins-Semibold", POPPINS_SEMIBOLD);
-                doc.addFont("Poppins-Semibold", "Poppins", "semibold");
-                ///Start of PDF Design
+        doc.addImage(LOGO_BASE_64, x + 8, y + 2, 25, 20);
+        doc.addImage(LOGO_BASE_64, cardWidth - 30, y + 2, 25, 20);
 
-                doc.addImage(LOGO_BASE_64, x + 8, y + 2, 30, 25);
-                doc.addImage(LOGO_BASE_64, cardWidth - 30, y + 2, 30, 25);
+        const schoolHeaderStartX = x + 40;
+        const schoolHeaderStartY = y + 10;
 
-                const schoolHeaderStartX = x + 40;
-                const schoolHeaderStartY = y + 10;
+        doc.setFontSize(26);
+        doc.setFont("Poppins", "bold");
+        doc.text(
+          SCHOOL_NAME.toUpperCase(),
+          (pageWidth - doc.getTextWidth(SCHOOL_NAME.toUpperCase())) / 2,
+          schoolHeaderStartY
+        );
 
-                doc.setFontSize(20);
-                doc.setFont("Poppins", "bold");
-                doc.text(SCHOOL_NAME, schoolHeaderStartX + 15, schoolHeaderStartY);
+        doc.setFontSize(9);
+        doc.setFont("Poppins", "semibold");
+        const tagline = "An English Medium School Based on CBSE Syllabus";
+        doc.text(
+          tagline,
+          (pageWidth - doc.getTextWidth(tagline)) / 2,
+          schoolHeaderStartY + 5
+        );
 
-                doc.setFontSize(8);
-                doc.setFont("Poppins", "semibold");
-                doc.text(
-                    "An English Medium School Based on CBSE Syllabus",
-                    schoolHeaderStartX + 15,
-                    schoolHeaderStartY + 5
-                );
+        const schoolContactDetailStartY = schoolHeaderStartY + 5;
+        doc.setFontSize(9);
+        doc.setFont("Poppins", "normal");
+        const address = "Address: Patardih, Nawdiha, Jamua,";
+        doc.text(
+          address,
+          (pageWidth - doc.getTextWidth(address)) / 2,
+          schoolContactDetailStartY + 5
+        );
+        const address2 = "Giridih, Jharkhand – 815312";
+        doc.text(
+          address2,
+          (pageWidth - doc.getTextWidth(address2)) / 2,
+          schoolContactDetailStartY + 9
+        );
+        const contact = "Phone: 91-9973669863,91-9608108499 ";
+        doc.text(
+          contact,
+          (pageWidth - doc.getTextWidth(contact)) / 2,
+          schoolContactDetailStartY + 13
+        );
+        const contact2 = "91-6299820529,91-864007990";
+        doc.text(
+          contact2,
+          (pageWidth - doc.getTextWidth(contact2)) / 2,
+          schoolContactDetailStartY + 17
+        );
+        const websiteName = "www.orientpublicschool.org";
+        doc.text(
+          websiteName,
+          (pageWidth - doc.getTextWidth(websiteName)) / 2,
+          schoolContactDetailStartY + 21
+        );
 
-                const schoolContactDetailStartY = schoolHeaderStartY + 2;
-                // const schoolContactDetailStartX = schoolHeaderStartX - 5;
+        doc.setDrawColor("#4a6ccc");
+        doc.rect(schoolHeaderStartX + 20, y + 45, schoolHeaderStartX + 28, 10);
 
-                const cardXEndPoint = cardWidth;
+        doc.setFont("Poppins", "bold");
+        doc.setFontSize(16);
+        doc.setTextColor("#4a6ccc");
 
-                doc.setFillColor("#cbc9c9");
-                doc.rect(
-                    schoolHeaderStartX + 13,
-                    schoolContactDetailStartY + 5,
-                    cardXEndPoint - 120,
-                    4,
-                    "F"
-                );
+        const progressReportText = "Progress Report Card";
 
-                doc.setFontSize(6);
-                doc.setFont("Poppins", "normal");
-                doc.text(
-                    SCHOOL_ADDRESS,
-                    schoolHeaderStartX + 22,
-                    schoolContactDetailStartY + 7.5
-                );
+        doc.text(
+          progressReportText,
+          (pageWidth - doc.getTextWidth(progressReportText)) / 2,
+          y + 52
+        );
+        doc.setFont("Poppins", "semibold");
+        doc.setFontSize(12);
+        doc.setTextColor("#000");
 
-                //school contact
-                doc.addImage(
-                    PHONE_ICON,
-                    schoolHeaderStartX + 5,
-                    schoolContactDetailStartY + 10,
-                    3,
-                    3
-                );
+        const classText = `Class - ${getClassNameByValue(
+          data.student.class!
+        )} ${data.student.section}`;
+        doc.text(
+          classText,
+          (pageWidth - doc.getTextWidth(classText)) / 2,
+          y + 62
+        );
+        const sessionText = "Academic Session - 2024-25";
+        doc.text(
+          sessionText,
+          (pageWidth - doc.getTextWidth(sessionText)) / 2,
+          y + 68
+        );
 
-                doc.text(
-                    SCHOOL_CONTACT,
-                    schoolHeaderStartX + 9,
-                    schoolContactDetailStartY + 12
-                );
+        //Marksheet Body
 
-                //school email
-                doc.addImage(
-                    EMAIL_ICON,
-                    schoolHeaderStartX + 66,
-                    schoolContactDetailStartY + 10,
-                    3,
-                    3
-                );
+        //students details
+        doc.setFontSize(13);
+        doc.setFont("Poppins", "normal");
+        doc.setTextColor("#000");
 
-                doc.text(
-                    SCHOOL_EMAIL,
-                    schoolHeaderStartX + 70,
-                    schoolContactDetailStartY + 12
-                );
+        let studentDetailsStartY = y + 60 + 20;
 
-                doc.setFillColor("#ADD8E6");
+        const leftXStart = x + 12;
+        const leftXStartContent = x + 55;
 
-                doc.rect(schoolHeaderStartX + 20, y + 37, schoolHeaderStartX + 28, 8);
+        doc.text("Name", leftXStart, studentDetailsStartY);
 
-                doc.setFont("Poppins", "semibold");
-                doc.setFontSize(12);
-                doc.setTextColor("#000");
-                doc.text("Progress Report Card", cardWidth / 2 - 17, y + 42);
+        doc.text(
+          ": " + data.student.student_name,
+          leftXStartContent,
+          studentDetailsStartY
+        );
 
-                //Marksheet Body
+        doc.text("Student ID", leftXStart, studentDetailsStartY + 8);
+        doc.text(
+          ": " + data.student.admission_no,
+          leftXStartContent,
+          studentDetailsStartY + 8
+        );
 
+        doc.text("Father's Name", leftXStart, studentDetailsStartY + 15);
+        doc.text(
+          ": " + data.student.father_name,
+          leftXStartContent,
+          studentDetailsStartY + 15
+        );
 
+        doc.text("Mother's Name", leftXStart, studentDetailsStartY + 22);
 
-                //students details
-                doc.setFontSize(11);
-                doc.setFont("Poppins", "normal");
-                doc.setTextColor("#000");
+        doc.text(
+          ": " + data.student.mother_name,
+          leftXStartContent,
+          studentDetailsStartY + 22
+        );
+        doc.text("Date Of Birth", leftXStart, studentDetailsStartY + 29);
+        doc.text(
+          ": " + data.student.dob,
+          leftXStartContent,
+          studentDetailsStartY + 29
+        );
+        doc.text("Address", leftXStart, studentDetailsStartY + 36);
+        doc.text(
+          ": #" + data.student.address,
+          leftXStartContent,
+          studentDetailsStartY + 36
+        );
 
-                let studentDetailsStartY = y + 60;
+        //right side
 
-                doc.text("Name: " + data.student_name, x + 3, studentDetailsStartY);
+        const rightXStart = cardWidth - 60;
+        const rightXStartContent = cardWidth - 24;
 
-                doc.text(
-                    "Class : " + data.class,
-                    cardWidth - 35,
-                    studentDetailsStartY
-                );
+        doc.text("Class", rightXStart, studentDetailsStartY);
+        doc.text(
+          ": " + data.student.class,
+          rightXStartContent,
+          studentDetailsStartY
+        );
 
-                doc.text(
-                    "Father Name: " + data.father_name,
-                    x + 3,
-                    studentDetailsStartY + 7
-                );
+        doc.text("Roll No", rightXStart, studentDetailsStartY + 15);
 
-                doc.text(
-                    "DOB : " + data.dob,
-                    cardWidth - 35,
-                    studentDetailsStartY + 7
-                );
+        doc.text(
+          ": " + data.student.class_roll,
+          rightXStartContent,
+          studentDetailsStartY + 15
+        );
 
-                doc.text(
-                    "Phone No: " + data.phone_number,
-                    x + 3,
-                    studentDetailsStartY + 14
-                );
+        doc.text("Admission No", rightXStart, studentDetailsStartY + 8);
+        doc.text(
+          ": " + data.student.admission_no.slice(-5),
+          rightXStartContent,
+          studentDetailsStartY + 8
+        );
 
-                doc.text(
-                    "Roll No: " + data.roll_number,
-                    cardWidth - 35,
-                    studentDetailsStartY + 14
-                );
+        doc.text("Contact No", rightXStart, studentDetailsStartY + 22);
 
-                doc.text(
-                    "Section: " + data.section,
-                    cardWidth - 35,
-                    studentDetailsStartY + 21
-                );
+        doc.text(
+          ": " + data.student.contact_number,
+          rightXStartContent,
+          studentDetailsStartY + 22
+        );
 
-                doc.text(
-                    "Reg. No : " + data.admission_no,
-                    x + 3,
-                    studentDetailsStartY + 21
-                );
+        //Marks Body
+        let tableY = studentDetailsStartY + 45;
+        const combinedData = [...header2, ...resDataTable, ...rows2];
 
-                doc.text(
-                    "Address : " + data.address,
-                    x + 3,
-                    studentDetailsStartY + 27
-                );
+        doc.setFontSize(11);
+        doc.setTextColor("#000");
 
+        let lineCount = combinedData.length;
+        const rows = combinedData.map((obj) => Object.values(obj));
 
-                //Marks Body
-                let tableY = studentDetailsStartY + 65;
-                const combinedData = [...header2, ...tableData, ...rows2];
+        autoTable(doc, {
+          body: rows,
+          startY: tableY,
+          theme: "grid",
+          styles: {
+            textColor: "#000",
+            fontSize: 12,
+            halign: "center",
+          },
+          margin: { left: leftXStart },
+          bodyStyles: {
+            cellWidth: 40,
+            fillColor: "#fff",
+            textColor: "#000",
+            minCellHeight: 6,
+          },
+        });
 
-                doc.setFontSize(11);
-                doc.setTextColor("#000");
-                doc.text("Academic Session : 2024 - 25", cardWidth / 2 - 15, tableY - 13);
+        //Result and Promotted Class
+        let resultY = tableY + 10 + lineCount * 8;
+        let resultPF = percentage > 33.0 ? "PASS" : "FAIL";
+        let promotedClass =
+          percentage > 33.0
+            ? 1 + Number(data.student.class)
+            : Number(data.student.class);
+        doc.text("Result: " + resultPF, startX + 10, resultY + 5);
+        doc.text(
+          "Promoted to Class: " + promotedClass,
+          startX + 10 + cardWidth / 2,
+          resultY + 5
+        );
+        console.log("promotedClass: " + promotedClass.toString());
 
-                let lineCount = combinedData.length;
-                const rows = combinedData.map(obj => Object.values(obj));
+        //Signatures
+        let startY = tableY + lineCount * 8;
+        startY += 50 + 2 * data.result.length;
+        doc.setLineWidth(0.3);
+        doc.setDrawColor(0, 0, 0);
 
-                autoTable(doc, {
-                    body: rows,
-                    startY: tableY,
-                    theme: "grid",
-                    styles: {
-                        textColor: "#000",
-                        fontSize: 10,
-                        halign: 'center',
-                    },
-                    margin: { left: 25 + margin },
-                    bodyStyles: {
-                        cellWidth: 40,
-                        fillColor: "#fff",
-                        textColor: "#000",
-                        minCellHeight: 5,
-                    },
-                });
+        doc.line(startX - 3, startY - 5, startX + 35, startY - 5);
+        doc.text("Class Teacher's Sign", startX, startY);
+        doc.line(
+          startX - 3 + cardWidth / 3,
+          startY - 5,
+          startX + 35 + cardWidth / 3,
+          startY - 5
+        );
+        doc.text("Parents Sign", startX + cardWidth / 3, startY);
+        doc.line(
+          startX - 3 + 2 * (cardWidth / 3),
+          startY - 5,
+          startX + 35 + 2 * (cardWidth / 3),
+          startY - 5
+        );
+        doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
 
-                //Result and Promotted Class
-                let resultY = tableY + lineCount * 8;
-                let resultPF = (percentage > 33.0) ? "PASS" : "FAIL";
-                let promotedClass = (percentage > 33.0) ? (1 + Number(data.class)) : Number(data.class);
-                doc.text("Result: " + resultPF, startX + 10, resultY + 5);
-                doc.text("Promoted to Class: " + promotedClass, startX + 10 + cardWidth / 2, resultY + 5);
-                console.log("promotedClass: " + promotedClass.toString());
-
-
-
-                //Signatures
-                let startY = tableY + lineCount * 8;
-                startY += (50 + 2 * (tableData.length));
-                doc.setLineWidth(0.3);
-                doc.setDrawColor(0, 0, 0);
-
-                doc.line(startX - 3, startY - 5, startX + 35, startY - 5)
-                doc.text("Class Teacher's Sign", startX, startY);
-                doc.line(startX - 3 + cardWidth / 3, startY - 5, startX + 35 + cardWidth / 3, startY - 5);
-                doc.text("Parents Sign", startX + cardWidth / 3, startY);
-                doc.line(startX - 3 + 2 * (cardWidth / 3), startY - 5, startX + 35 + 2 * (cardWidth / 3), startY - 5);
-                doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
-
-
-
-                doc.addPage();
-                if (index === recieptData.length - 1) {
-                    // Save PDF and update state with URL
-
-                    // Convert PDF to Blob
-                    const blob = doc.output("blob");
-                    const url = URL.createObjectURL(blob);
-
-                    resolve(url);
-                }
-
-            });
-
-        } catch (error) {
-            reject(error);
+        doc.addPage();
+        if (index === resultData.length - 1) {
+          const blob = doc.output("blob");
+          const url = URL.createObjectURL(blob);
+          resolve(url);
         }
-    });
-}
-
-
+      });
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
