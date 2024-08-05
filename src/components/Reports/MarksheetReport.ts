@@ -108,7 +108,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                         { content: '-', colSpan: 4, styles: { halign: 'center' } },
                     ],
                     [
-                        { content: 'Remarks', styles: { halign: 'center' } },
+                        { content: 'Remarks', rowSpan: 2, styles: { halign: 'center' } },
                         { content: '-', colSpan: 4, rowSpan: 2, styles: { halign: 'center' } },
                     ],
                     [
