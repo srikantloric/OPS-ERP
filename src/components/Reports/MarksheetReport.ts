@@ -201,12 +201,12 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
 
                 doc.setFillColor("#ADD8E6");
 
-                doc.rect(schoolHeaderStartX + 28, y + 32, schoolHeaderStartX + 32, 8);
+                doc.rect(schoolHeaderStartX + 20, y + 32, schoolHeaderStartX + 28, 8);
 
                 doc.setFont("Poppins", "semibold");
                 doc.setFontSize(12);
                 doc.setTextColor("#000");
-                doc.text("Progress Report Card", cardWidth / 2 - 11, y + 37);
+                doc.text("Progress Report Card", cardWidth / 2 - 17, y + 37);
 
                 //Marksheet Body
 
@@ -314,11 +314,14 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 //Signatures
                 let startY = tableY + lineCount * 8;
                 startY += (50 + 2 * (tableData.length));
-                doc.text("______________________", startX - 3, startY - 5);
+                doc.setLineWidth(0.3);
+                doc.setDrawColor(0, 0, 0);
+
+                doc.line(startX - 3, startY - 5, startX + 35, startY - 5)
                 doc.text("Class Teacher's Sign", startX, startY);
-                doc.text("______________________", startX - 3 + cardWidth / 3, startY - 5);
+                doc.line(startX - 3 + cardWidth / 3, startY - 5, startX + 35 + cardWidth / 3, startY - 5);
                 doc.text("Parents Sign", startX + cardWidth / 3, startY);
-                doc.text("______________________", startX - 3 + 2 * (cardWidth / 3), startY - 5);
+                doc.line(startX - 3 + 2 * (cardWidth / 3), startY - 5, startX + 35 + 2 * (cardWidth / 3), startY - 5);
                 doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
 
 
