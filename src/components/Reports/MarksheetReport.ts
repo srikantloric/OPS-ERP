@@ -16,13 +16,19 @@ import { jsPDF } from "jspdf";
 import { DueRecieptPropsType } from "types/student";
 import autoTable from "jspdf-autotable";
 
-const tableHeader = [
-    "Subject",
-    "Theory",
-    "Pract.",
-    "Pass Marks",
-    "Marks Obtained"
-];
+// const tableHeader = [
+//     [{ content: "PERIODIC TEST (TERM 1)", colSpan: 4, styles: { halign: 'center' } }]
+// ];
+const header2 = [
+    [{ content: "PERIODIC TEST (TERM 1)", colSpan: 4, styles: { halign: 'center' } }],
+    [
+        "Subject",
+        "Theory",
+        "Pract.",
+        "Pass Marks",
+        "Marks Obtained"
+    ]
+]
 
 const tableData = [{
     Subject: "salple",
@@ -88,10 +94,10 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
 
                 const rows2 = [
                     [
-                        { content: 'Total' },
+                        { content: 'Total' ,styles: { halign: 'center' }},
                         { content: fullMarks.toString(), colSpan: 2, styles: { halign: 'center' } },
-                        { content: totalPassMarks.toString() },
-                        { content: marksObtained.toString() }
+                        { content: totalPassMarks.toString(),styles: { halign: 'center' } },
+                        { content: marksObtained.toString(),styles: { halign: 'center' } }
                     ],
                     [
                         { content: 'Percentage(%)' },
@@ -128,7 +134,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 const schoolHeaderStartX = x + 50;
                 const schoolHeaderStartY = y + 5;
 
-                doc.setFontSize(15);
+                doc.setFontSize(20);
                 doc.setFont("Poppins", "bold");
                 doc.text(SCHOOL_NAME, schoolHeaderStartX + 15, schoolHeaderStartY);
 
@@ -149,7 +155,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.setFillColor("#cbc9c9");
                 doc.rect(
                     schoolHeaderStartX + 10,
-                    schoolContactDetailStartY + 5,
+                    schoolContactDetailStartY + 15,
                     cardXEndPoint - 120,
                     4,
                     "F"
@@ -203,14 +209,12 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.text("Marksheet 20__ - 20__", cardWidth / 2 - 8, y + 30);
 
                 //Marksheet Body
-                doc.setFont("Poppins", "normal");
-                doc.setFontSize(10);
-                doc.setTextColor("#000");
-
-
+                
+                
                 //students details
-                doc.setFontSize(9);
+                doc.setFontSize(10);
                 doc.setFont("Poppins", "normal");
+                doc.setTextColor("#000");
 
                 let studentDetailsStartY = y + 49;
 
@@ -218,88 +222,76 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
 
                 doc.text(
                     "Class : " + data.class,
-                    x + cardWidth - margin,
-                    studentDetailsStartY,
-                    {
-                        align: "right",
-                    }
+                    cardWidth - 35,
+                    studentDetailsStartY
                 );
 
                 doc.text(
                     "Father Name: " + data.father_name,
                     x + 3,
-                    studentDetailsStartY + 4.5
+                    studentDetailsStartY + 5
                 );
 
                 doc.text(
                     "DOB : " + data.dob,
-                    x + cardWidth - margin,
-                    studentDetailsStartY + 4.5,
-                    {
-                        align: "right",
-                    }
+                    cardWidth - 35,
+                    studentDetailsStartY + 5
                 );
 
                 doc.text(
                     "Phone No: " + data.phone_number,
                     x + 3,
-                    studentDetailsStartY + 8.5
+                    studentDetailsStartY + 10
                 );
 
                 doc.text(
                     "Roll No: " + data.roll_number,
-                    x + cardWidth - margin,
-                    studentDetailsStartY + 8.5,
-                    {
-                        align: "right",
-                    }
+                    cardWidth - 35,
+                    studentDetailsStartY + 10
                 );
 
                 doc.text(
                     "Section: " + data.section,
-                    x + cardWidth - margin,
-                    studentDetailsStartY + 12.5,
-                    {
-                        align: "right",
-                    }
+                    cardWidth - 35,
+                    studentDetailsStartY + 15
                 );
 
                 doc.text(
                     "Reg. No : " + data.admission_no,
                     x + 3,
-                    studentDetailsStartY + 12.5
+                    studentDetailsStartY + 15
                 );
 
                 doc.text(
                     "Address : " + data.address,
                     x + 3,
-                    studentDetailsStartY + 16.5
+                    studentDetailsStartY + 20
                 );
 
                 //Marks Body
                 doc.setFontSize(8);
                 doc.setTextColor("#000");
                 let tableY = studentDetailsStartY + 50;
-                const combinedData = [...tableData, ...rows2];
+                const combinedData = [...header2, ...tableData, ...rows2];
 
                 let lineCount = combinedData.length;
                 const rows = combinedData.map(obj => Object.values(obj));
 
                 autoTable(doc, {
-                    head: [tableHeader],
                     body: rows,
                     startY: tableY,
                     theme: "grid",
                     styles: {
                         textColor: "#000",
-                        fontSize: 8,
+                        fontSize: 9,
+                        halign: 'center',
                     },
                     margin: { left: 25 + margin },
-                    headStyles: {
-                        cellWidth: 30,
+                    bodyStyles: {
+                        cellWidth: 40,
                         fillColor: "#fff",
                         textColor: "#000",
-                        minCellHeight: 4,
+                        minCellHeight: 5,
                     },
                 });
 
