@@ -105,14 +105,11 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                     ],
                     [
                         { content: 'Rank' },
-                        { content: '-', colSpan: 4, styles: { halign: 'center' } },
+                        { content: '', colSpan: 4, styles: { halign: 'center' } },
                     ],
                     [
-                        { content: 'Remarks', rowSpan: 2, styles: { halign: 'center' } },
-                        { content: '-', colSpan: 4, rowSpan: 2, styles: { halign: 'center' } },
-                    ],
-                    [
-                        { content: '', styles: { halign: 'center' } },
+                        { content: 'Remarks' },
+                        { content: '', colSpan: 4, styles: { halign: 'center' } },
                     ]
                 ];
 
@@ -143,7 +140,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.setFont("Poppins", "semibold");
                 doc.text(
                     "An English Medium School Based on CBSE Syllabus",
-                    schoolHeaderStartX + 12,
+                    schoolHeaderStartX + 15,
                     schoolHeaderStartY + 5
                 );
 
@@ -154,7 +151,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
 
                 doc.setFillColor("#cbc9c9");
                 doc.rect(
-                    schoolHeaderStartX + 10,
+                    schoolHeaderStartX + 13,
                     schoolContactDetailStartY + 5,
                     cardXEndPoint - 120,
                     4,
@@ -165,7 +162,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.setFont("Poppins", "normal");
                 doc.text(
                     SCHOOL_ADDRESS,
-                    schoolHeaderStartX + 12,
+                    schoolHeaderStartX + 22,
                     schoolContactDetailStartY + 7.5
                 );
 
@@ -201,23 +198,23 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
 
                 doc.setFillColor("#ADD8E6");
 
-                doc.rect(schoolHeaderStartX + 20, y + 32, schoolHeaderStartX + 28, 8);
+                doc.rect(schoolHeaderStartX + 20, y + 37, schoolHeaderStartX + 28, 8);
 
                 doc.setFont("Poppins", "semibold");
                 doc.setFontSize(12);
                 doc.setTextColor("#000");
-                doc.text("Progress Report Card", cardWidth / 2 - 17, y + 37);
+                doc.text("Progress Report Card", cardWidth / 2 - 17, y + 42);
 
                 //Marksheet Body
 
 
 
                 //students details
-                doc.setFontSize(10);
+                doc.setFontSize(11);
                 doc.setFont("Poppins", "normal");
                 doc.setTextColor("#000");
 
-                let studentDetailsStartY = y + 49;
+                let studentDetailsStartY = y + 60;
 
                 doc.text("Name: " + data.student_name, x + 3, studentDetailsStartY);
 
@@ -230,55 +227,53 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.text(
                     "Father Name: " + data.father_name,
                     x + 3,
-                    studentDetailsStartY + 5
+                    studentDetailsStartY + 7
                 );
 
                 doc.text(
                     "DOB : " + data.dob,
                     cardWidth - 35,
-                    studentDetailsStartY + 5
+                    studentDetailsStartY + 7
                 );
 
                 doc.text(
                     "Phone No: " + data.phone_number,
                     x + 3,
-                    studentDetailsStartY + 10
+                    studentDetailsStartY + 14
                 );
 
                 doc.text(
                     "Roll No: " + data.roll_number,
                     cardWidth - 35,
-                    studentDetailsStartY + 10
+                    studentDetailsStartY + 14
                 );
 
                 doc.text(
                     "Section: " + data.section,
                     cardWidth - 35,
-                    studentDetailsStartY + 15
+                    studentDetailsStartY + 21
                 );
 
                 doc.text(
                     "Reg. No : " + data.admission_no,
                     x + 3,
-                    studentDetailsStartY + 15
+                    studentDetailsStartY + 21
                 );
 
                 doc.text(
                     "Address : " + data.address,
                     x + 3,
-                    studentDetailsStartY + 20
+                    studentDetailsStartY + 27
                 );
 
 
                 //Marks Body
-                doc.setFontSize(8);
-                doc.setTextColor("#000");
-                let tableY = studentDetailsStartY + 50;
+                let tableY = studentDetailsStartY + 65;
                 const combinedData = [...header2, ...tableData, ...rows2];
 
-                doc.setFontSize(9);
+                doc.setFontSize(11);
                 doc.setTextColor("#000");
-                doc.text("Academic Session : 2024 - 25", cardWidth / 2 - 11, tableY - 13);
+                doc.text("Academic Session : 2024 - 25", cardWidth / 2 - 15, tableY - 13);
 
                 let lineCount = combinedData.length;
                 const rows = combinedData.map(obj => Object.values(obj));
@@ -289,7 +284,7 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                     theme: "grid",
                     styles: {
                         textColor: "#000",
-                        fontSize: 9,
+                        fontSize: 10,
                         halign: 'center',
                     },
                     margin: { left: 25 + margin },
@@ -305,8 +300,8 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 let resultY = tableY + lineCount * 8;
                 let resultPF = (percentage > 33.0) ? "PASS" : "FAIL";
                 let promotedClass = (percentage > 33.0) ? (1 + Number(data.class)) : Number(data.class);
-                doc.text("Result: " + resultPF, startX, resultY);
-                doc.text("Promoted to Class: " + promotedClass, startX + cardWidth / 2, resultY);
+                doc.text("Result: " + resultPF, startX + 10, resultY + 5);
+                doc.text("Promoted to Class: " + promotedClass, startX + 10 + cardWidth / 2, resultY + 5);
                 console.log("promotedClass: " + promotedClass.toString());
 
 
@@ -325,10 +320,6 @@ export const MarksheetReportGenerator = async (recieptData: DueRecieptPropsType[
                 doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
 
 
-
-                // Draw border around content
-                doc.setDrawColor("#949494");
-                doc.rect(x, y, cardWidth, cardHeight);
 
                 doc.addPage();
                 if (index === recieptData.length - 1) {
