@@ -532,6 +532,9 @@ function UpdateResults() {
                               >
                                 {result.examTitle}
                               </Typography>
+                              <Typography>
+                                Updated:10/02/2024
+                              </Typography>
 
                               <Divider
                                 orientation="vertical"
