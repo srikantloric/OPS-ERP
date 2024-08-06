@@ -227,6 +227,7 @@ function UpdateResults() {
         paperTitle: paper.paperTitle,
         paperMarkObtained: 0,
         paperMarkTheory: 80,
+        paperMarkPassing: 33,
         paperMarkPractical: 20,
       };
 

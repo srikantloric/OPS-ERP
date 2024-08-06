@@ -71,12 +71,14 @@ export const MarksheetReportGenerator = async (
                     (fullMarks +=
                         Number(obj.paperMarkTheory) + Number(obj.paperMarkPractical))
                 );
+
                 data.result.map(
-                    (obj) => (totalPassMarks += Number(obj.paperMarkTheory))
-                );
+                    (obj) => (totalPassMarks += 33));
+
                 data.result.map(
                     (obj) => (marksObtained += Number(obj.paperMarkObtained))
                 );
+
                 let percentage = (marksObtained / fullMarks) * 100;
 
                 const rows2 = [
@@ -106,6 +108,8 @@ export const MarksheetReportGenerator = async (
                         { content: "", colSpan: 4, styles: { halign: "center" } },
                     ],
                 ];
+
+                console.log("totalPassMarks: " + totalPassMarks);
 
 
                 const getTextWidth = (text: string, doc: jsPDF): number => {
