@@ -5,6 +5,7 @@ export type paperMarksType = {
   paperTitle: string;
   paperMarkObtained: number;
   paperMarkPractical: number;
+  paperMarkPassing: number;
   paperMarkTheory: number;
 };
 
