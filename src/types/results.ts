@@ -12,7 +12,7 @@ export type paperMarksType = {
 export type resultType = {
   examId: string;
   examTitle: string;
-  publishedOn: firebase.firestore.FieldValue;
+  publishedOn: firebase.firestore.Timestamp;
   result: paperMarksType[];
   docId?: string;
 };

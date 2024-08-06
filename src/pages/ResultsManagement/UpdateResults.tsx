@@ -3,6 +3,7 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import UpdateIcon from "@mui/icons-material/Update";
+import WarningRoundedIcon from "@mui/icons-material/WarningRounded";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import {
   Box,
@@ -81,8 +82,12 @@ function UpdateResults() {
 
   const [studentIdInput, setStudentIdInput] = useState<string | null>(null);
   const [resultDocId, setResultDocId] = useState<string | null>(null);
+  const [isDeleteConfimDialogOpen, setIsDeleteConfirmDialogOpen] =
+    useState<boolean>(false);
 
-
+  const [selectedExamDocId, setSelectedExamDocId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     setStudentList([]);
@@ -293,7 +298,7 @@ function UpdateResults() {
           const resultData: resultType = {
             examId: selectedExam,
             examTitle: examTitle,
-            publishedOn: firebase.firestore.FieldValue.serverTimestamp(),
+            publishedOn: firebase.firestore.Timestamp.now(),
             result: studentSelectedMarkList,
           };
           ///update student marks
@@ -354,13 +359,19 @@ function UpdateResults() {
   };
 
   const handleResultDeleteBtn = (id: string) => {
-    if (currentSelectedStudent && id) {
+    setSelectedExamDocId(id);
+    setIsDeleteConfirmDialogOpen(true);
+  };
+
+  const handleDeletePaperAfterConfirmation = () => {
+    if (currentSelectedStudent && selectedExamDocId) {
       db.collection("STUDENTS")
         .doc(currentSelectedStudent?.id)
         .collection("PUBLISHED_RESULTS")
-        .doc(id)
+        .doc(selectedExamDocId)
         .delete()
         .then(() => {
+          setIsDeleteConfirmDialogOpen(false);
           enqueueSnackbar("Plublished result deleted successfully!", {
             variant: "success",
           });
@@ -527,15 +538,31 @@ function UpdateResults() {
                               sx={{ m: "10px" }}
                               justifyContent="space-between"
                             >
-                              <Typography
-                                level="title-md"
-                                sx={{ ml: "1.2rem", mr: "1.2rem" }}
+                              <Stack
+                                direction={"column"}
+                                flex={1}
+                                height="100%"
                               >
-                                {result.examTitle}
-                              </Typography>
-                              <Typography>
-                                Updated:10/02/2024
-                              </Typography>
+                                <Box
+                                  flex={1}
+                                  display="flex"
+                                  alignItems="center"
+                                >
+                                  <Typography
+                                    level="title-lg"
+                                    sx={{ ml: "1.2rem", mr: "1.2rem" }}
+                                  >
+                                    {result.examTitle}
+                                  </Typography>
+                                </Box>
+                                <Divider />
+                                <Typography level="body-sm" textAlign="center">
+                                  Published:
+                                  {result.publishedOn
+                                    .toDate()
+                                    .toLocaleDateString()}
+                                </Typography>
+                              </Stack>
 
                               <Divider
                                 orientation="vertical"
@@ -734,8 +761,37 @@ function UpdateResults() {
             </DialogActions>
           </ModalDialog>
         </Modal>
-
-       
+        <Modal
+          open={isDeleteConfimDialogOpen}
+          onClose={() => setIsDeleteConfirmDialogOpen(false)}
+        >
+          <ModalDialog variant="outlined" role="alertdialog">
+            <DialogTitle>
+              <WarningRoundedIcon />
+              Confirmation
+            </DialogTitle>
+            <Divider />
+            <DialogContent>
+              Are you sure you want to delete exam result?
+            </DialogContent>
+            <DialogActions>
+              <Button
+                variant="solid"
+                color="danger"
+                onClick={handleDeletePaperAfterConfirmation}
+              >
+                Delete Result
+              </Button>
+              <Button
+                variant="plain"
+                color="neutral"
+                onClick={() => setIsDeleteConfirmDialogOpen(false)}
+              >
+                Cancel
+              </Button>
+            </DialogActions>
+          </ModalDialog>
+        </Modal>
       </LSPage>
     </PageContainer>
   );
