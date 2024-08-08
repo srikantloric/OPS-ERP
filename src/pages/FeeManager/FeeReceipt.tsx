@@ -1,4 +1,3 @@
-// import { generateDueReciept } from "components/DueRecieptGenerator/DueRecieptGenerator";
 import { Button } from "@mui/joy";
 import { generateDueReciept2 } from "components/DueRecieptGenerator/DueRecieptGenerator2";
 import Navbar from "components/Navbar/Navbar";
@@ -9,16 +8,11 @@ import { DueRecieptPropsType } from "types/student";
 import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
 import FeeRecieptIndex from "./utilities/FeeReportIndix";
 import { AdmitCardGenerator } from "components/Reports/AdmitCard";
-import { MarksheetReportGenerator } from "components/Reports/MarksheetReport";
-// import {AdmitCard} from "components/Reports/AdmitCard"
-
 
 function FeeReceipt() {
   const [pdfUrl, setPdfUrl] = useState<string>("");
   const [pdfUrl1, setPdfUrl1] = useState<string>("");
   const [pdfUrl2, setPdfUrl2] = useState<string>("");
-  const [pdfUrl3, setPdfUrl3] = useState<string>("");
-
   const sampleObjects: DueRecieptPropsType[] = [
     {
       reciept_id: "RCPT12345",
@@ -232,8 +226,6 @@ function FeeReceipt() {
     },
   ];
 
-  
-
   const getPdfUrl = async () => {
     // const pdfRes = await generateDueReciept(sampleObjects);
     const pdfRes = await generateDueReciept2(sampleObjects);
@@ -245,20 +237,11 @@ function FeeReceipt() {
   }, []);
 
   const handleNewWindowOpen = () => {
-    // const stringfy = JSON.stringify({data:sampleObjects})
-
-    // / URL of the new page to open
-    // const url = `http://localhost:3000/smart-pdf-viewer?pdfUrl=${encodeURIComponent(
-    //   pdfUrl
-    // )}`;
-
     // Specify window features
     const features =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
-
     window.open(pdfUrl, "_blank", features);
   };
-
 
   const getPdfUrl1 = async () => {
     const pdfRes1 = await DueRecieptList(sampleObjects);
@@ -269,14 +252,13 @@ function FeeReceipt() {
     getPdfUrl1();
   }, []);
 
-  const handleDueRecieptList=()=>{
+  const handleDueRecieptList = () => {
     const features1 =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
 
     window.open(pdfUrl1, "_blank", features1);
   };
 
-  
   const getPdfUrl2 = async () => {
     const pdfRes2 = await AdmitCardGenerator(sampleObjects);
     setPdfUrl2(pdfRes2);
@@ -286,42 +268,28 @@ function FeeReceipt() {
     getPdfUrl2();
   }, []);
 
-  const handleViewAdmitcard=()=>{
+  const handleViewAdmitcard = () => {
     const features2 =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
 
     window.open(pdfUrl2, "_blank", features2);
-  }
-
-
-  const getPdfUrl3 = async () => {
-    const pdfRes3 = await MarksheetReportGenerator(sampleObjects);
-    setPdfUrl3(pdfRes3);
   };
-
-  useEffect(() => {
-    getPdfUrl3();
-  }, []);
-  const handleResultView=()=>{
-    const features3 =
-    "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
-
-  window.open(pdfUrl3, "_blank", features3);
-  }
-
 
   return (
     <PageContainer>
       <Navbar />
       <LSPage>
         <Button onClick={handleNewWindowOpen}>Generate Due Reciept</Button>
-        <br/><br/>
+        <br />
+        <br />
         <Button onClick={handleDueRecieptList}>Due Reciept List</Button>
-        <br/><br/>
+        <br />
+        <br />
         <Button onClick={handleViewAdmitcard}>View Admit Card</Button>
-        <br/><br/>
-        <Button onClick={handleResultView}>View Marksheet</Button>
-        <FeeRecieptIndex/>
+        <br />
+        <br />
+
+        <FeeRecieptIndex />
       </LSPage>
     </PageContainer>
   );
