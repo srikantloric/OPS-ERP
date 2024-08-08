@@ -683,6 +683,7 @@ function UpdateResults() {
                 Please fill marks for respective papers.
               </Typography>
 
+              <Typography textAlign="center">Total Theory | Total Practical | Marks Obtained</Typography>
               <Sheet
                 sx={{ mt: "6px", flex: 1, p: "10px" }}
                 variant="soft"
