@@ -310,8 +310,11 @@ export const MarksheetReportGenerator = async (
                 const rightXStartContent = cardWidth - 24;
 
                 doc.text("Class", rightXStart, studentDetailsStartY);
+                const classText2 = `Class - ${getClassNameByValue(
+                    data.student.class!
+                )} ${data.student.section}`;
                 doc.text(
-                    ": " + data.student.class,
+                    ": " + classText2,
                     rightXStartContent,
                     studentDetailsStartY
                 );
@@ -370,17 +373,17 @@ export const MarksheetReportGenerator = async (
                 //Result and Promotted Class
                 let resultY = tableY + 10 + lineCount * 8;
                 let resultPF = percentage > 33.0 ? "PASS" : "FAIL";
-                let promotedClass =
-                    percentage > 33.0
-                        ? 1 + Number(data.student.class)
-                        : Number(data.student.class);
+                // let promotedClass =
+                //     percentage > 33.0
+                //         ? 1 + Number(data.student.class)
+                //         : Number(data.student.class);
                 doc.text("Result: " + resultPF, startX + 10, resultY + 5);
-                doc.text(
-                    "Promoted to Class: " + promotedClass,
-                    startX + 10 + cardWidth / 2,
-                    resultY + 5
-                );
-                console.log("promotedClass: " + promotedClass.toString());
+                // doc.text(
+                //     "Promoted to Class: " + promotedClass,
+                //     startX + 10 + cardWidth / 2,
+                //     resultY + 5
+                // );
+                // console.log("promotedClass: " + promotedClass.toString());
 
                 //Signatures
                 let startY = tableY + lineCount * 8;
