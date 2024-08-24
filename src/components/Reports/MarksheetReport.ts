@@ -310,9 +310,9 @@ export const MarksheetReportGenerator = async (
                 const rightXStartContent = cardWidth - 24;
 
                 doc.text("Class", rightXStart, studentDetailsStartY);
-                const classText2 = `Class - ${getClassNameByValue(
+                const classText2 = `${getClassNameByValue(
                     data.student.class!
-                )} ${data.student.section}`;
+                )}`;
                 doc.text(
                     ": " + classText2,
                     rightXStartContent,
