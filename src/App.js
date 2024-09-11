@@ -29,6 +29,7 @@ import {
   useSearchDialog,
 } from "context/SearchDialogContext";
 import UpdateResults from "pages/ResultsManagement/UpdateResults";
+import PrintResult from "pages/ResultsManagement/PrintResult";
 
 const StudentProfilePictureUpdater = Loadable(
   lazy(() => import("pages/ProfileUpdater/StudentProfilePictureUpdater"))
@@ -132,6 +133,10 @@ function App() {
                 <Route
                   path="/schoolResults/update-results"
                   element={<UpdateResults />}
+                />
+                <Route
+                  path="/schoolResults/print-results"
+                  element={<PrintResult />}
                 />
               
               </Route>
