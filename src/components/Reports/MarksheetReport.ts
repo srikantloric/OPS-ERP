@@ -382,7 +382,8 @@ export const MarksheetReportGenerator = async (
         // console.log("promotedClass: " + promotedClass.toString());
 
         //Signatures
-        let startY = tableY + lineCount * 8;
+        
+        let startY = tableY + lineCount * 6;
         startY += 50 + 2 * data.result.length;
         doc.setLineWidth(0.3);
         doc.setDrawColor(0, 0, 0);
