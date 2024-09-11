@@ -25,6 +25,7 @@ import GenerateMonthlyChallan from "pages/FeeManager/GenerateChallan/GenerateMon
 import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
 import SettingsPage from "pages/Settings/SettingsPage";
 import UpdateResults from "pages/ResultsManagement/UpdateResults";
+import PrintResult from "pages/ResultsManagement/PrintResult";
 
 export const routesConfig = [
   {
@@ -178,6 +179,13 @@ export const routesConfig = [
         isCollapsable: false,
         isHeader: false,
         Component: <UpdateResults/>,
+      },
+      {
+        title: "Print Results",
+        to: "schoolResults/print-results",
+        isCollapsable: false,
+        isHeader: false,
+        Component: <PrintResult/>,
       },
     ],
   },
