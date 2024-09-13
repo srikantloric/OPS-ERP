@@ -52,12 +52,12 @@ export const MarksheetReportGenerator = async (
 
       //get student rank
 
-      let studentRanks:rankDoctype|null = null;
+      let studentRanks: rankDoctype | null = null;
       type rankDoctype = {
-        class:number,
-        lastUpdated:Date,
-        studentRanks:rankType[],
-      }
+        class: number;
+        lastUpdated: Date;
+        studentRanks: rankType[];
+      };
 
       const rank = await db
         .collection("RESULTS")
@@ -66,8 +66,6 @@ export const MarksheetReportGenerator = async (
       if (rank.exists) {
         studentRanks = rank.data() as rankDoctype;
       }
-   
-    
 
       resultData.forEach((data, index) => {
         let resDataTable: paperMarksTypeLocal[] = [];
@@ -102,14 +100,12 @@ export const MarksheetReportGenerator = async (
 
         let calculatedRank = "N/A";
 
-        if (studentRanks&& studentRanks.studentRanks.length > 0) {
+        if (studentRanks && studentRanks.studentRanks.length > 0) {
           const rank = studentRanks.studentRanks
-          .filter((student:any) => student.studentId === data.student.id)
-          .at(0);
-          
-          
+            .filter((student: any) => student.studentId === data.student.id)
+            .at(0);
 
-          if (rank && rank.rankObtained!==-1) {
+          if (rank && rank.rankObtained !== -1) {
             calculatedRank = getOrdinal(Number(rank.rankObtained));
           }
         }
@@ -405,7 +401,7 @@ export const MarksheetReportGenerator = async (
             fillColor: "#fff",
             textColor: "#000",
             minCellHeight: 6,
-            lineColor:"#000"
+            lineColor: "#000",
           },
         });
 
