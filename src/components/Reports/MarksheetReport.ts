@@ -106,7 +106,7 @@ export const MarksheetReportGenerator = async (
             .filter((student:any) => student.studentId === data.student.id)
             .at(0);
             
-          if (rank && rank.rankObtained !== "N/A") {
+          if (rank && rank.rankObtained===-1) {
             calculatedRank = getOrdinal(Number(rank.rankObtained));
           }
         }

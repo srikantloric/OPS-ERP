@@ -178,7 +178,7 @@ function PrintResult() {
 
                   const rankTemp: rankType = {
                     studentId: allStudentList[i].id,
-                    rankObtained: "N/A",
+                    rankObtained: -1,
                     marksObtained: totalMark,
                   };
 
@@ -203,13 +203,8 @@ function PrintResult() {
         markSheetTempList.sort((a, b) => b.marksObtained - a.marksObtained);
 
         // Update ranks for top 10 students
-        for (let i = 0; i < Math.min(10, markSheetTempList.length); i++) {
+        for (let i = 0; i < markSheetTempList.length;i++) {
           markSheetTempList[i].rankObtained = i + 1;
-        }
-
-        // For other students, the rank remains "N/A" or can be updated as needed
-        for (let i = 10; i < markSheetTempList.length; i++) {
-          markSheetTempList[i].rankObtained = "N/A";
         }
         
         //Upload Rank to DB
@@ -218,7 +213,7 @@ function PrintResult() {
           lastUpdated:new Date(),
           studentRanks:markSheetTempList,
         }
-        
+
         db.collection("RESULTS").doc(""+selectedClass).set(rankData).then(()=>{
           setIsGeneratingRank(false);
           enqueueSnackbar("Rank updated Succefully",{variant:"success"});
