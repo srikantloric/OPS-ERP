@@ -24,6 +24,6 @@ export type marksheetType = {
 
 export type rankType = {
   studentId: string;
-  rankObtained: number | string;
+  rankObtained: number;
   marksObtained: number;
 };
