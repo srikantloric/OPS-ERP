@@ -256,7 +256,7 @@ export const MarksheetReportGenerator = async (
 
         doc.setFont("Poppins", "bold");
         doc.setFontSize(16);
-        doc.setTextColor("#4a6ccc");
+        doc.setTextColor("#000");
 
         const progressReportText = "Progress Report Card";
 
