@@ -107,7 +107,7 @@ export const MarksheetReportGenerator = async (
           .filter((student:any) => student.studentId === data.student.id)
           .at(0);
           
-          console.log("calculating rank",rank)
+          
 
           if (rank && rank.rankObtained!==-1) {
             calculatedRank = getOrdinal(Number(rank.rankObtained));
@@ -405,6 +405,7 @@ export const MarksheetReportGenerator = async (
             fillColor: "#fff",
             textColor: "#000",
             minCellHeight: 6,
+            lineColor:"#000"
           },
         });
 
