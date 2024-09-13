@@ -7,7 +7,9 @@ import {
   Input,
   Option,
   Select,
+  Sheet,
   Stack,
+  Table,
   Typography,
 } from "@mui/joy";
 import { Paper } from "@mui/material";
@@ -20,9 +22,18 @@ import { SCHOOL_CLASSES } from "config/schoolConfig";
 import { db } from "../../firebase";
 import { useEffect, useState } from "react";
 import { enqueueSnackbar } from "notistack";
-import { marksheetType, paperMarksType, rankType, resultType } from "types/results";
+import {
+  marksheetType,
+  paperMarksType,
+  rankType,
+  resultType,
+} from "types/results";
 import { StudentDetailsType } from "types/student";
 import { MarksheetReportGenerator } from "components/Reports/MarksheetReport";
+import rank1Img from "../../assets/rank_images/1st_rank.png";
+import rank2Img from "../../assets/rank_images/2nd_rank.png";
+import rank3Img from "../../assets/rank_images/3rd_rank.png";
+import { getOrdinal } from "utilities/UtilitiesFunctions";
 
 type examType = {
   examId: string;
@@ -38,6 +49,14 @@ type examConfig = {
   exams: examType[];
 };
 
+type rankTypeExtended = {
+  studentId: string;
+  studentName: string;
+  studentFather: string;
+  rankObtained: number;
+  marksObtained: number;
+};
+
 function PrintResult() {
   const [studentIdInput, setStudentIdInput] = useState<string | null>(null);
   const [selectedClass, setSelectedClass] = useState<any | null>(null);
@@ -48,6 +67,10 @@ function PrintResult() {
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [loading, setLoading] = useState(false);
   const [isGeneratingRank, setIsGeneratingRank] = useState<boolean>(false);
+
+  const [studentRankDetails, setStudentRankDetails] = useState<
+    rankTypeExtended[]
+  >([]);
 
   useEffect(() => {
     db.collection("CONFIG")
@@ -155,8 +178,9 @@ function PrintResult() {
         }
 
         //Fetch results of all students
-      
+
         let markSheetTempList: rankType[] = [];
+        let markSheetTempListExtended: rankTypeExtended[] = [];
 
         for (let i = 0; i < allStudentList.length; i++) {
           try {
@@ -182,7 +206,16 @@ function PrintResult() {
                     marksObtained: totalMark,
                   };
 
+                  const rankTempExtended: rankTypeExtended = {
+                    studentId: allStudentList[i].admission_no,
+                    studentName: allStudentList[i].student_name,
+                    studentFather: allStudentList[i].father_name,
+                    rankObtained: -1,
+                    marksObtained: totalMark,
+                  };
+
                   markSheetTempList.push(rankTemp);
+                  markSheetTempListExtended.push(rankTempExtended);
                 } else {
                   console.log(
                     `Result not published for ${allStudentList[i].id}`
@@ -201,27 +234,36 @@ function PrintResult() {
         //set Rank for student
         // Sort the markSheetTempList by marksObtained in descending order
         markSheetTempList.sort((a, b) => b.marksObtained - a.marksObtained);
+        markSheetTempListExtended.sort(
+          (a, b) => b.marksObtained - a.marksObtained
+        );
 
         // Update ranks for top 10 students
-        for (let i = 0; i < markSheetTempList.length;i++) {
+        for (let i = 0; i < markSheetTempList.length; i++) {
           markSheetTempList[i].rankObtained = i + 1;
+          markSheetTempListExtended[i].rankObtained = i + 1;
         }
-        
+
         //Upload Rank to DB
         const rankData = {
-          class:selectedClass,
-          lastUpdated:new Date(),
-          studentRanks:markSheetTempList,
-        }
+          class: selectedClass,
+          lastUpdated: new Date(),
+          studentRanks: markSheetTempList,
+        };
 
-        db.collection("RESULTS").doc(""+selectedClass).set(rankData).then(()=>{
-          setIsGeneratingRank(false);
-          enqueueSnackbar("Rank updated Succefully",{variant:"success"});
-        }).catch((err)=>{
-          setIsGeneratingRank(false);
-          enqueueSnackbar("Failed to update rank!",{variant:"error"});
-        })
+        setStudentRankDetails(markSheetTempListExtended);
 
+        db.collection("RESULTS")
+          .doc("" + selectedClass)
+          .set(rankData)
+          .then(() => {
+            setIsGeneratingRank(false);
+            enqueueSnackbar("Rank updated Succefully", { variant: "success" });
+          })
+          .catch((err) => {
+            setIsGeneratingRank(false);
+            enqueueSnackbar("Failed to update rank!", { variant: "error" });
+          });
 
         console.log("Student Rank Array", markSheetTempList);
       } else {
@@ -310,6 +352,111 @@ function PrintResult() {
             </Paper>
           </>
         )}
+
+        <br />
+        <Sheet variant="outlined" sx={{ borderRadius: "10px" }}>
+          <Stack
+            direction="row"
+            minHeight="200px"
+            justifyContent="space-evenly"
+            alignItems="center"
+          >
+            <Stack alignItems="center">
+              <img src={rank1Img} alt="1st_rank" style={{ height: "120px" }} />
+              <Typography
+                level="title-md"
+                sx={{
+                  bgcolor: "var(--bs-primary)",
+                  borderRadius: "16px",
+                  pl: "8px",
+                  pr: "8px",
+                  pt: "3px",
+                  pb: "3px",
+                  color: "#fff",
+                }}
+              >
+                {studentRankDetails.at(0)?.studentName}
+              </Typography>
+              <Typography level="body-sm">
+                {" "}
+                {studentRankDetails.at(0)?.studentId}
+              </Typography>
+            </Stack>
+            <Stack alignItems="center">
+              <img src={rank2Img} alt="1st_rank" style={{ height: "120px" }} />
+              <Typography
+                level="title-md"
+                sx={{
+                  bgcolor: "var(--bs-primary)",
+                  borderRadius: "16px",
+                  pl: "8px",
+                  pr: "8px",
+                  pt: "3px",
+                  pb: "3px",
+                  color: "#fff",
+                }}
+              >
+                {studentRankDetails.at(1)?.studentName}
+              </Typography>
+              <Typography level="body-sm">
+                {" "}
+                {studentRankDetails.at(1)?.studentId}
+              </Typography>
+            </Stack>
+            <Stack alignItems="center">
+              <img src={rank3Img} alt="1st_rank" style={{ height: "120px" }} />
+              <Typography
+                level="title-md"
+                sx={{
+                  bgcolor: "var(--bs-primary)",
+                  borderRadius: "16px",
+                  pl: "8px",
+                  pr: "8px",
+                  pt: "3px",
+                  pb: "3px",
+                  color: "#fff",
+                }}
+              >
+                {studentRankDetails.at(2)?.studentName}
+              </Typography>
+              <Typography level="body-sm">
+                {studentRankDetails.at(2)?.studentId}
+              </Typography>
+            </Stack>
+          </Stack>
+        
+          <br />
+
+          <Sheet variant="outlined" sx={{ m: "10px", p: "10px" }}>
+            <Table hoverRow stripe="even" sx={{ '& tr > *': { textAlign: 'center' } }}>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Marks Obtained</th>
+                  <th>Student ID</th>
+                  <th>Student Name</th>
+                  <th>Fathers Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                {studentRankDetails &&
+                  studentRankDetails.map((studentRank) => (
+                    <tr>
+                      <td>
+                        <Typography level="title-md" sx={{color:"#000"}}> 
+                          {getOrdinal(studentRank.rankObtained)}
+                        </Typography>
+                      </td>
+                      <td>{studentRank.marksObtained}</td>
+                      <td>{studentRank.studentId}</td>
+                      <td>{studentRank.studentName}</td>
+                      <td>{studentRank.studentFather}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </Table>
+          </Sheet>
+        </Sheet>
       </LSPage>
     </PageContainer>
   );
