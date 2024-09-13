@@ -354,109 +354,127 @@ function PrintResult() {
         )}
 
         <br />
-        <Sheet variant="outlined" sx={{ borderRadius: "10px" }}>
-          <Stack
-            direction="row"
-            minHeight="200px"
-            justifyContent="space-evenly"
-            alignItems="center"
-          >
-            <Stack alignItems="center">
-              <img src={rank1Img} alt="1st_rank" style={{ height: "120px" }} />
-              <Typography
-                level="title-md"
-                sx={{
-                  bgcolor: "var(--bs-primary)",
-                  borderRadius: "16px",
-                  pl: "8px",
-                  pr: "8px",
-                  pt: "3px",
-                  pb: "3px",
-                  color: "#fff",
-                }}
-              >
-                {studentRankDetails.at(0)?.studentName}
-              </Typography>
-              <Typography level="body-sm">
-                {" "}
-                {studentRankDetails.at(0)?.studentId}
-              </Typography>
+        {studentRankDetails.length>0 && (
+          <Sheet variant="outlined" sx={{ borderRadius: "10px" }}>
+            <Stack
+              direction="row"
+              minHeight="200px"
+              justifyContent="space-evenly"
+              alignItems="center"
+            >
+              <Stack alignItems="center">
+                <img
+                  src={rank1Img}
+                  alt="1st_rank"
+                  style={{ height: "120px" }}
+                />
+                <Typography
+                  level="title-md"
+                  sx={{
+                    bgcolor: "var(--bs-primary)",
+                    borderRadius: "16px",
+                    pl: "8px",
+                    pr: "8px",
+                    pt: "3px",
+                    pb: "3px",
+                    color: "#fff",
+                  }}
+                >
+                  {studentRankDetails.at(0)?.studentName}
+                </Typography>
+                <Typography level="body-sm">
+                  {" "}
+                  {studentRankDetails.at(0)?.studentId}
+                </Typography>
+              </Stack>
+              <Stack alignItems="center">
+                <img
+                  src={rank2Img}
+                  alt="1st_rank"
+                  style={{ height: "120px" }}
+                />
+                <Typography
+                  level="title-md"
+                  sx={{
+                    bgcolor: "var(--bs-primary)",
+                    borderRadius: "16px",
+                    pl: "8px",
+                    pr: "8px",
+                    pt: "3px",
+                    pb: "3px",
+                    color: "#fff",
+                  }}
+                >
+                  {studentRankDetails.at(1)?.studentName}
+                </Typography>
+                <Typography level="body-sm">
+                  {" "}
+                  {studentRankDetails.at(1)?.studentId}
+                </Typography>
+              </Stack>
+              <Stack alignItems="center">
+                <img
+                  src={rank3Img}
+                  alt="1st_rank"
+                  style={{ height: "120px" }}
+                />
+                <Typography
+                  level="title-md"
+                  sx={{
+                    bgcolor: "var(--bs-primary)",
+                    borderRadius: "16px",
+                    pl: "8px",
+                    pr: "8px",
+                    pt: "3px",
+                    pb: "3px",
+                    color: "#fff",
+                  }}
+                >
+                  {studentRankDetails.at(2)?.studentName}
+                </Typography>
+                <Typography level="body-sm">
+                  {studentRankDetails.at(2)?.studentId}
+                </Typography>
+              </Stack>
             </Stack>
-            <Stack alignItems="center">
-              <img src={rank2Img} alt="1st_rank" style={{ height: "120px" }} />
-              <Typography
-                level="title-md"
-                sx={{
-                  bgcolor: "var(--bs-primary)",
-                  borderRadius: "16px",
-                  pl: "8px",
-                  pr: "8px",
-                  pt: "3px",
-                  pb: "3px",
-                  color: "#fff",
-                }}
-              >
-                {studentRankDetails.at(1)?.studentName}
-              </Typography>
-              <Typography level="body-sm">
-                {" "}
-                {studentRankDetails.at(1)?.studentId}
-              </Typography>
-            </Stack>
-            <Stack alignItems="center">
-              <img src={rank3Img} alt="1st_rank" style={{ height: "120px" }} />
-              <Typography
-                level="title-md"
-                sx={{
-                  bgcolor: "var(--bs-primary)",
-                  borderRadius: "16px",
-                  pl: "8px",
-                  pr: "8px",
-                  pt: "3px",
-                  pb: "3px",
-                  color: "#fff",
-                }}
-              >
-                {studentRankDetails.at(2)?.studentName}
-              </Typography>
-              <Typography level="body-sm">
-                {studentRankDetails.at(2)?.studentId}
-              </Typography>
-            </Stack>
-          </Stack>
-        
-          <br />
 
-          <Sheet variant="outlined" sx={{ m: "10px", p: "10px" }}>
-            <Table hoverRow stripe="even" sx={{ '& tr > *': { textAlign: 'center' } }}>
-              <thead>
-                <tr>
-                  <th>Rank</th>
-                  <th>Marks Obtained</th>
-                  <th>Student ID</th>
-                  <th>Student Name</th>
-                  <th>Fathers Name</th>
-                </tr>
-              </thead>
-              <tbody>
-                {studentRankDetails &&
-                  studentRankDetails.map((studentRank) => (
-                    <tr>
-                      <td>
-                        <Typography level="title-md" sx={{color:"#000"}}> 
-                          {getOrdinal(studentRank.rankObtained)}
-                        </Typography>
-                      </td>
-                      <td>{studentRank.marksObtained}</td>
-                      <td>{studentRank.studentId}</td>
-                      <td>{studentRank.studentName}</td>
-                      <td>{studentRank.studentFather}</td>
-                    </tr>
-                  ))}
-              </tbody>
-            </Table>
+            <br />
+
+            <Sheet variant="outlined" sx={{ m: "10px", p: "10px" }}>
+              <Table
+                hoverRow
+                stripe="even"
+                sx={{ "& tr > *": { textAlign: "center" } }}
+              >
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Marks Obtained</th>
+                    <th>Student ID</th>
+                    <th>Student Name</th>
+                    <th>Fathers Name</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studentRankDetails &&
+                    studentRankDetails.map((studentRank) => (
+                      <tr>
+                        <td>
+                          <Typography level="title-md" sx={{ color: "#000" }}>
+                            {getOrdinal(studentRank.rankObtained)}
+                          </Typography>
+                        </td>
+                        <td>{studentRank.marksObtained}</td>
+                        <td>{studentRank.studentId}</td>
+                        <td>{studentRank.studentName}</td>
+                        <td>{studentRank.studentFather}</td>
+                      </tr>
+                    ))}
+                </tbody>
+              </Table>
+            </Sheet>
           </Sheet>
-        </Sheet>
+        )}
       </LSPage>
     </PageContainer>
   );
