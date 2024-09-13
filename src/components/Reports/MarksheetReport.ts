@@ -7,8 +7,9 @@ import {
 import { SCHOOL_NAME } from "config/schoolConfig";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import { marksheetType } from "types/results";
-import { getClassNameByValue } from "utilities/UtilitiesFunctions";
+import { marksheetType, rankType } from "types/results";
+import { getClassNameByValue, getOrdinal } from "utilities/UtilitiesFunctions";
+import { db } from "../../firebase";
 
 const header2 = [
   [
@@ -33,7 +34,7 @@ type paperMarksTypeLocal = {
 export const MarksheetReportGenerator = async (
   resultData: marksheetType[]
 ): Promise<string> => {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
     try {
       const doc = new jsPDF({
         orientation: "p",
@@ -48,6 +49,24 @@ export const MarksheetReportGenerator = async (
       const margin = 2;
       const x = 5 + margin;
       const y = 5 + margin;
+
+      //get student rank
+
+      let studentRanks:rankDoctype|null = null;
+      type rankDoctype = {
+        class:number,
+        lastUpdated:Date,
+        studentRanks:rankType[],
+      }
+
+      const rank = await db
+        .collection("RESULTS")
+        .doc(resultData.at(0)?.student.class?.toString())
+        .get();
+      if (rank.exists) {
+        studentRanks = rank.data() as rankDoctype;
+      }
+   
 
       resultData.forEach((data, index) => {
         let resDataTable: paperMarksTypeLocal[] = [];
@@ -80,6 +99,18 @@ export const MarksheetReportGenerator = async (
 
         let percentage = (marksObtained / fullMarks) * 100;
 
+        let calculatedRank = "N/A";
+
+        if (studentRanks&& studentRanks.studentRanks.length > 0) {
+          const rank = studentRanks.studentRanks
+            .filter((student:any) => student.studentId === data.student.id)
+            .at(0);
+            
+          if (rank && rank.rankObtained !== "N/A") {
+            calculatedRank = getOrdinal(Number(rank.rankObtained));
+          }
+        }
+
         const rows2 = [
           [
             { content: "Total", styles: { halign: "center" } },
@@ -96,11 +127,19 @@ export const MarksheetReportGenerator = async (
           ],
           [
             { content: "Percentage(%)" },
-            { content: percentage, colSpan: 4, styles: { halign: "center" } },
+            {
+              content: percentage.toFixed(1),
+              colSpan: 4,
+              styles: { halign: "center" },
+            },
           ],
           [
             { content: "Rank" },
-            { content: "", colSpan: 4, styles: { halign: "center" } },
+            {
+              content: calculatedRank,
+              colSpan: 4,
+              styles: { halign: "center" },
+            },
           ],
           [
             { content: "Remarks" },
@@ -382,7 +421,7 @@ export const MarksheetReportGenerator = async (
         // console.log("promotedClass: " + promotedClass.toString());
 
         //Signatures
-        
+
         let startY = tableY + lineCount * 6;
         startY += 50 + 2 * data.result.length;
         doc.setLineWidth(0.3);
@@ -404,7 +443,7 @@ export const MarksheetReportGenerator = async (
           startY - 5
         );
         doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
-        
+
         doc.addPage();
         if (index === resultData.length - 1) {
           const blob = doc.output("blob");

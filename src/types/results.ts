@@ -21,3 +21,9 @@ export type marksheetType = {
   student: StudentDetailsType;
   result: paperMarksType[];
 };
+
+export type rankType = {
+  studentId: string;
+  rankObtained: number | string;
+  marksObtained: number;
+};
