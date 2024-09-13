@@ -67,6 +67,7 @@ export const MarksheetReportGenerator = async (
         studentRanks = rank.data() as rankDoctype;
       }
    
+    
 
       resultData.forEach((data, index) => {
         let resDataTable: paperMarksTypeLocal[] = [];
@@ -103,10 +104,12 @@ export const MarksheetReportGenerator = async (
 
         if (studentRanks&& studentRanks.studentRanks.length > 0) {
           const rank = studentRanks.studentRanks
-            .filter((student:any) => student.studentId === data.student.id)
-            .at(0);
-            
-          if (rank && rank.rankObtained===-1) {
+          .filter((student:any) => student.studentId === data.student.id)
+          .at(0);
+          
+          console.log("calculating rank",rank)
+
+          if (rank && rank.rankObtained!==-1) {
             calculatedRank = getOrdinal(Number(rank.rankObtained));
           }
         }
