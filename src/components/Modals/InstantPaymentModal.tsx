@@ -104,15 +104,15 @@ const InstantPaymentModal: React.FC<Props> = ({
 
   useEffect(() => {
     var totalFee =
-      feeDetail.monthlyFee +
-      feeDetail.computerFee +
-      feeDetail.transportationFee +
-      feeDetail.admissionFee +
-      feeDetail.examFee +
-      feeDetail.annualFee +
-      feeDetail.otherFee +
-      feeDetail.lateFine -
-      feeDetail.feeConsession;
+      Number(feeDetail.monthlyFee) +
+      Number(feeDetail.computerFee) +
+      Number(feeDetail.transportationFee) +
+      Number(feeDetail.admissionFee) +
+      Number(feeDetail.examFee) +
+      Number(feeDetail.annualFee) +
+      Number(feeDetail.otherFee) +
+      Number(feeDetail.lateFine) -
+      Number(feeDetail.feeConsession);
 
     setTotalFee(totalFee);
   }, [feeDetail]);
