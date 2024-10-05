@@ -100,7 +100,7 @@ const schema = z.object({
   student_name: z.string().min(1, "Student is required!"),
   monthly_fee: z.number().min(1, "Monthly Fee is required!"),
   computer_fee: z.number(),
-  admission_fee: z.number().optional(),
+  // admission_fee: z.number().optional(),
   transportation_fee: z.number(),
   fee_discount: z.number(),
   updated_at: z.instanceof(firebase.firestore.Timestamp).optional(),
@@ -165,13 +165,11 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
       section: studentData.section,
       state: studentData.state,
       student_name: studentData.student_name,
-      monthly_fee: studentData.monthly_fee ? studentData.monthly_fee : 0,
-      computer_fee: studentData.computer_fee ? studentData.computer_fee : 0,
-      admission_fee: studentData.admission_fee ? studentData.admission_fee : 0,
-      transportation_fee: studentData.transportation_fee
-        ? studentData.transportation_fee
-        : 0,
-      fee_discount: studentData.fee_discount ? studentData.fee_discount : 0,
+      monthly_fee: studentData.monthly_fee || 0,
+      computer_fee: studentData.computer_fee || 0,
+      // admission_fee: studentData.admission_fee || 0,
+      transportation_fee: studentData.transportation_fee || 0,
+      fee_discount: studentData.fee_discount || 0,
     },
   });
 
@@ -187,6 +185,7 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
             variant: "success",
           });
           setIsUpdating(false);
+          setPaymentDetailsChangeBlocked(true);
         })
         .catch(() => {
           enqueueSnackbar("Something went wrong while updating data!", {
@@ -198,9 +197,12 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
       enqueueSnackbar("Unable to update!", { variant: "error" });
     }
   };
+
   const onError = async (data: any) => {
     console.log(data);
-    enqueueSnackbar("Please check the fields!" + data, { variant: "info" });
+    enqueueSnackbar("Please check the fields!" + JSON.stringify(data), {
+      variant: "info",
+    });
   };
 
   return (
@@ -545,7 +547,7 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
                   <FormControl>
                     <FormLabel required>Monthly Fee</FormLabel>
                     <Input
-                      type="text"
+                      type="number"
                       startDecorator={"Rs."}
                       {...register("monthly_fee", { valueAsNumber: true })}
                       error={errors.monthly_fee ? true : false}
@@ -560,9 +562,8 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
                   <FormControl>
                     <FormLabel>Transport Fee</FormLabel>
                     <Input
-                      type="text"
+                      type="number"
                       startDecorator={"Rs."}
-                     
                       {...register("transportation_fee", {
                         valueAsNumber: true,
                       })}
@@ -586,7 +587,7 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
                   <FormControl>
                     <FormLabel>Computer Fee</FormLabel>
                     <Input
-                      type="text"
+                      type="number"
                       startDecorator={"Rs."}
                       {...register("computer_fee", { valueAsNumber: true })}
                       error={errors.computer_fee ? true : false}
@@ -601,7 +602,7 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
                   <FormControl>
                     <FormLabel>Student Discount</FormLabel>
                     <Input
-                      type="text"
+                      type="number"
                       startDecorator={"Rs."}
                       {...register("fee_discount", { valueAsNumber: true })}
                       error={errors.fee_discount ? true : false}
