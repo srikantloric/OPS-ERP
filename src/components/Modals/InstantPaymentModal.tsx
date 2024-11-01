@@ -66,7 +66,7 @@ const InstantPaymentModal: React.FC<Props> = ({
   const [selectedMonth, setSelectedMonth] = useState<number>(currentMonth);
   const [selectedYear, setSelectedYear] = useState<string>(currentYear);
 
-  const [isMarkedAsPaid, setIsMarkedAsPaid] = useState<boolean>(true);
+  const [isMarkedAsPaid, setIsMarkedAsPaid] = useState<boolean>(false);
 
   const [totalFee, setTotalFee] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);

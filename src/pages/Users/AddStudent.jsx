@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import PageContainer from "../../components/Utils/PageContainer";
 import Navbar from "../../components/Navbar/Navbar";
 import LSPage from "../../components/Utils/LSPage";
@@ -23,7 +23,6 @@ import {
 import Styles from "./AddStudent.module.scss";
 import { IconEdit } from "@tabler/icons-react";
 import { useDispatch } from "react-redux";
-import { addstudent } from "../../store/studentSlice";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GrainIcon from "@mui/icons-material/Grain";
 import { useSnackbar } from "notistack";
@@ -31,7 +30,8 @@ import { db } from "../../firebase";
 import { FormHelperText, FormLabel } from "@mui/joy";
 import { Link } from "react-router-dom";
 import { SCHOOL_CLASSES, SCHOOL_SECTIONS } from "../../config/schoolConfig";
-import { StudentDetailsType } from "types/student";
+import { addstudent } from "store/reducers/studentSlice";
+
 
 function AddStudent() {
   const dispatch = useDispatch();
@@ -48,7 +48,6 @@ function AddStudent() {
   const [isAdmissionFeeEditable, setIsAdmissionFeeEditable] = useState(true);
   const [isTransportationFeeEditable, setIsTransportationFeeEditable] =
     useState(true);
-  const formRef = useRef();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -96,8 +95,6 @@ function AddStudent() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // console.log(selectedImage);
-
     if (formData.contact_number.length !== 10) {
       enqueueSnackbar("Please enter correct contact detail!", {
         variant: "error",
@@ -830,7 +827,7 @@ function AddStudent() {
             <br />
             <FormGroup>
               <FormControlLabel
-                required
+          
                 control={<Checkbox />}
                 label="I here by confirm that above details provided are correct and only used for official purpose."
               />

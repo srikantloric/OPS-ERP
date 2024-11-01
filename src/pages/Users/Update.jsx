@@ -19,11 +19,10 @@ import {
 } from "@mui/material";
 import Styles from "./AddStudent.module.scss";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  updatedatastudent,
-} from "../../store/studentSlice";
+
 import { useParams } from "react-router-dom";
 import { db } from "../../firebase";
+import { updatedatastudent } from "store/reducers/studentSlice";
 
 
 function UpdateStudent() {
@@ -34,7 +33,7 @@ function UpdateStudent() {
   const [loading, setLoading] = useState(false);
   const users = useSelector((state) => state.students.studentarray);
   const [editable, setEditable] = useState(false);
-  const [isUpdating,setIsUpdating] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const [formData, setFormData] = useState({
     student_name: "",
@@ -49,7 +48,7 @@ function UpdateStudent() {
     section: "",
     email: "",
     cast: "",
-    aadhar_number:"",
+    aadhar_number: "",
     religion: "",
     father_name: "",
     profil_url: "",
@@ -64,8 +63,8 @@ function UpdateStudent() {
     address: "",
     contact_number: "",
     alternate_number: "",
-    created_at:'',
-    updated_at:'',
+    created_at: '',
+    updated_at: '',
   });
 
   useEffect(() => {
@@ -91,7 +90,7 @@ function UpdateStudent() {
           console.log(data.data())
         });
     }
-  }, [id,users]);
+  }, [id, users]);
 
   const handleImageChange = (e) => {
     setSelectedImage(e.target.files[0]);
@@ -104,7 +103,7 @@ function UpdateStudent() {
         studentdata: formData,
         imageupdate: selectedImage,
       })
-      )
+    )
       .unwrap()
       .then((msg) => {
         if (msg) {
@@ -128,7 +127,7 @@ function UpdateStudent() {
       <Navbar />
       <LSPage>
         {loading ? (
-          <LinearProgress/>
+          <LinearProgress />
         ) : (
           <Paper
             sx={{ padding: "10px 30px", margin: "0px 10px " }}
@@ -181,19 +180,19 @@ function UpdateStudent() {
                         }))
                       }
                     >
-                          <MenuItem value={1}>Nursery</MenuItem>
-                <MenuItem value={2}>LKG</MenuItem>
-                <MenuItem value={3}>UKG</MenuItem>
-                <MenuItem value={4}>STD-1</MenuItem>
-                <MenuItem value={5}>STD-2</MenuItem>
-                <MenuItem value={6}>STD-3</MenuItem>
-                <MenuItem value={7}>STD-4</MenuItem>
-                <MenuItem value={8}>STD-5</MenuItem>
-                <MenuItem value={9}>STD-6</MenuItem>
-                <MenuItem value={10}>STD-7</MenuItem>
-                <MenuItem value={11}>STD-8</MenuItem>
-                <MenuItem value={12}>STD-9</MenuItem>
-                <MenuItem value={13}>STD-10</MenuItem>
+                      <MenuItem value={1}>Nursery</MenuItem>
+                      <MenuItem value={2}>LKG</MenuItem>
+                      <MenuItem value={3}>UKG</MenuItem>
+                      <MenuItem value={4}>STD-1</MenuItem>
+                      <MenuItem value={5}>STD-2</MenuItem>
+                      <MenuItem value={6}>STD-3</MenuItem>
+                      <MenuItem value={7}>STD-4</MenuItem>
+                      <MenuItem value={8}>STD-5</MenuItem>
+                      <MenuItem value={9}>STD-6</MenuItem>
+                      <MenuItem value={10}>STD-7</MenuItem>
+                      <MenuItem value={11}>STD-8</MenuItem>
+                      <MenuItem value={12}>STD-9</MenuItem>
+                      <MenuItem value={13}>STD-10</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -349,21 +348,21 @@ function UpdateStudent() {
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
-                <TextField
-                  sx={{ width: "100%" }}
-                  label="Aaadhar Number"
-                  disabled={!editable}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      aadhar_number: e.target.value,
-                    }))
-                  }
-                  variant="outlined"
-                  
-                  type="number"
-                />
-              </Grid>
+                  <TextField
+                    sx={{ width: "100%" }}
+                    label="Aaadhar Number"
+                    disabled={!editable}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        aadhar_number: e.target.value,
+                      }))
+                    }
+                    variant="outlined"
+
+                    type="number"
+                  />
+                </Grid>
               </Grid>
               {/* Family Details */}
               <br />
@@ -398,10 +397,10 @@ function UpdateStudent() {
                         ...prev,
                         father_occupation: e.target.value,
                       }))
-                      
+
                     }
                     required
-                    
+
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -417,7 +416,7 @@ function UpdateStudent() {
                         father_qualification: e.target.value,
                       }))
                     }
-                  
+
                   />
                 </Grid>
                 <Grid item xs={12} md={4}>
@@ -519,7 +518,7 @@ function UpdateStudent() {
                         email: e.target.value,
                       }))
                     }
-                    
+
                   />
                 </Grid>
                 <Grid item xs={12} md={12}>
@@ -671,7 +670,7 @@ function UpdateStudent() {
                     type="submit"
                     disableElevation={true}
                     disabled={isUpdating}
-                    
+
                   >
                     Update Profile
                   </Button>

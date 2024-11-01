@@ -6,8 +6,12 @@ import { BalanceSheetType } from "types/student";
 import { BalanceSheet } from "components/TransactionsReport/BalanceSheet";
 import DailyAttendance from "components/AttendanceReport/DailyAttendanceReport";
 import AttendanceRegisterReport from "components/AttendanceReport/AttendanceRegister";
+import { useNavigate } from "react-router-dom";
 
 function Transaction() {
+
+  const history = useNavigate()
+
   const sampleObjects: BalanceSheetType[] = [
     {
       tran_id: "HISJDO689JJ",
@@ -66,6 +70,9 @@ function Transaction() {
         <br />
         <Button onClick={handleAttendanceRegister}>
           Generate Attendance Register
+        </Button>
+        <Button onClick={()=>history("/print-id-cards")}>
+          Print Id Cards Back QR
         </Button>
       </LSPage>
     </PageContainer>

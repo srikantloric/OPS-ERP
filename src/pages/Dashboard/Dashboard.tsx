@@ -28,12 +28,10 @@ import {
 } from "iconsax-react";
 import { Avatar } from "@mui/material";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
-import { useEffect, useState } from "react";
-import { db } from "../../firebase";
-import { enqueueSnackbar } from "notistack";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchstudent } from "store/studentSlice";
-import { fetchTotalStudents } from "store/Slices/dashboardAnalytics";
+import { useEffect } from "react";
+
+import { fetchTotalStudents } from "store/reducers/dashboardSlice";
+import { RootState, useDispatch, useSelector } from "store";
 
 Chart.register(CategoryScale);
 
@@ -51,7 +49,7 @@ export const options = {
 };
 
 function Dashboard() {
-  const totalStudentsCount = useSelector((state) => state.analytics.count);
+  const { totalStudent, totalFeeCollection } = useSelector((state: RootState) => state.dashboard.dashboardAnalytics);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -73,7 +71,7 @@ function Dashboard() {
             >
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle={totalStudentsCount}
+                  headerTitle={totalStudent}
                   subHeaderTitle="Total Students"
                   color="#81c784"
                   Icon={Profile2User}
@@ -81,7 +79,7 @@ function Dashboard() {
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="₹5000"
+                  headerTitle={`₹${totalFeeCollection && totalFeeCollection.thisYear || "-"}`}
                   subHeaderTitle="Total Income This Year"
                   color="#9575cd"
                   Icon={MoneySend}
@@ -89,15 +87,15 @@ function Dashboard() {
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="27"
-                  subHeaderTitle="Dues-Amount : 64750"
+                  headerTitle="-"
+                  subHeaderTitle="Dues-Amount : -"
                   color="#4fc3f7"
                   Icon={WalletMoney}
                 />
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="₹5000"
+                  headerTitle={`₹${totalFeeCollection && totalFeeCollection.thisMonth || "-"}`}
                   subHeaderTitle="Income This Month"
                   color="#64b5f6"
                   Icon={Money}
@@ -105,7 +103,7 @@ function Dashboard() {
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="0"
+                  headerTitle={`₹${totalFeeCollection && totalFeeCollection.today || "-"}`}
                   subHeaderTitle="Income Today"
                   color="#E48F45"
                   Icon={Money}
@@ -113,7 +111,7 @@ function Dashboard() {
               </Grid>
               <Grid xs={12} md={3.9} lg={3.9}>
                 <CardDashboard
-                  headerTitle="27"
+                  headerTitle="-"
                   subHeaderTitle="Profit This Month"
                   color="#ffb74d"
                   Icon={Money}

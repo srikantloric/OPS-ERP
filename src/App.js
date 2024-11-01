@@ -30,6 +30,7 @@ import {
 } from "context/SearchDialogContext";
 import UpdateResults from "pages/ResultsManagement/UpdateResults";
 import PrintResult from "pages/ResultsManagement/PrintResult";
+import IdCardGeneration from "pages/Extras/IdCardGeneration";
 
 const StudentProfilePictureUpdater = Loadable(
   lazy(() => import("pages/ProfileUpdater/StudentProfilePictureUpdater"))
@@ -137,6 +138,10 @@ function App() {
                 <Route
                   path="/schoolResults/print-results"
                   element={<PrintResult />}
+                />
+                <Route
+                  path="/print-id-cards"
+                  element={<IdCardGeneration />}
                 />
               
               </Route>

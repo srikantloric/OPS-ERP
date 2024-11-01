@@ -67,7 +67,7 @@ const schema = z.object({
       },
       {
         message:
-          "If provided, the number must be a non-negative 10-character string",
+          "If provided, the number must be a 10-character string",
       }
     ),
   blood_group: z.string().min(1, "Blood Group is required!"),
@@ -140,6 +140,7 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
     formState: { errors },
   } = useForm<UpdateFormFields>({
     resolver: zodResolver(schema),
+    mode:"all",
     defaultValues: {
       aadhar_number: studentData.aadhar_number,
       address: studentData.address,
@@ -199,9 +200,9 @@ const PersonalTab: React.FC<StudentProfileProps> = ({ studentData }) => {
   };
 
   const onError = async (data: any) => {
-    console.log(data);
-    enqueueSnackbar("Please check the fields!" + JSON.stringify(data), {
-      variant: "info",
+    console.log(data)
+    enqueueSnackbar("Please check the fields!", {
+      variant: "error",
     });
   };
 

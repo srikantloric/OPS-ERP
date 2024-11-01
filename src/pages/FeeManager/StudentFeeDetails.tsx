@@ -411,7 +411,7 @@ function StudentFeeDetails() {
           challanId: selectedChallanDetails.challanId,
           amountPaid: recievedAmountPartPayment!,
           recievedBy: "Admin",
-          recievedOn: firebase.firestore.Timestamp.now(),
+          recievedOn: firebase.firestore.Timestamp.fromDate(new Date(feeCollectionDate!)),
           timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForPayment,
           status: pStatus,
@@ -426,12 +426,14 @@ function StudentFeeDetails() {
           amountPaid:
             selectedChallanDetails.amountPaid + recievedAmountPartPayment!,
           recievedBy: "Admin",
-          recievedOn: firebase.firestore.Timestamp.now(),
+          recievedOn: firebase.firestore.Timestamp.fromDate(new Date(feeCollectionDate!)),
           timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForChallan,
           status: pStatus,
           feeConsession: selectedChallanDetails.feeConsession,
         };
+        console.log(paymentDataForChallan)
+        console.log(paymentDataForPayment)
 
         saveDataToDb(paymentDataForPayment, paymentDataForChallan, pStatus);
       } else {

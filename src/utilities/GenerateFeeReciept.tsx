@@ -498,7 +498,7 @@ export const GenerateFeeReciept = async ({
         amount: 0,
       };
 
-      if ((item.amountPaid == 0) && (item.amountDue==0)) continue;
+      if ((item.amountPaid === 0) && (item.amountDue===0)) continue;
       
       feeTypeLayoutHeight = feeSectionStartPointY + (counter + 2) * 6;
       counter++;
