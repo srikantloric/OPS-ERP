@@ -24,7 +24,6 @@ import Styles from "../Users/AddStudent.module.scss";
 import { IconEdit, IconPrinter } from "@tabler/icons-react";
 import ReactToPrint from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
-import { addstudent } from "../../store/studentSlice";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GrainIcon from "@mui/icons-material/Grain";
 import { useSnackbar } from "notistack";
@@ -34,12 +33,13 @@ import { color } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import _ from "lodash";
+import { addstudent } from "store/reducers/studentSlice";
 
 function AddEnquire() {
   const printRef = useRef();
   const dispatch = useDispatch();
   const { id } = useParams();
-  console.log(id);
+
 
   const [selectedImage, setSelectedImage] = useState(null);
   const [loading, setLoading] = useState(false);

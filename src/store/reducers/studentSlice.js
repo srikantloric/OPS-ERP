@@ -1,9 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { db, auth, storageRef } from "../firebase";
-import firebase from '../firebase'
+import { db, auth, storageRef } from "../../firebase";
+import firebase from '../../firebase'
 
-import { Alert } from "../components/Utils/Alert";
-import { FEMALE_DUMMY, MALE_DUMMY } from "../assets/dummyProfil";
+import { Alert } from "../../components/Utils/Alert";
+import { FEMALE_DUMMY, MALE_DUMMY } from "../../assets/dummyProfil";
 import FileResizer from "react-image-file-resizer";
 
 const resizeFile = (file) =>

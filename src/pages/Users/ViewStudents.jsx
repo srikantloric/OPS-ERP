@@ -15,7 +15,6 @@ import {
 
 import Styles from "./ViewStudents.module.scss";
 import { Link, useNavigate } from "react-router-dom";
-import BadgeIcon from "@mui/icons-material/Badge";
 import GrainIcon from "@mui/icons-material/Grain";
 import SearchIcon from "@mui/icons-material/Search";
 import PersonIcon from "@mui/icons-material/Person";
@@ -31,7 +30,7 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
-import { deleltedata, fetchstudent } from "../../store/studentSlice";
+
 import { useState } from "react";
 import MaterialTable from "@material-table/core";
 import EditIcon from "@mui/icons-material/Edit";
@@ -46,6 +45,7 @@ import { getClassNameByValue } from "utilities/UtilitiesFunctions";
 import { StudReportPDF } from "components/StudentDetailsReport/StudentReportGeneratorPDF";
 import ExportToExcel from "components/Reports/ExportToExcel";
 import { Avatar } from "@mui/joy";
+import { deleltedata, fetchstudent } from "store/reducers/studentSlice";
 
 function ViewStudents() {
   const data = useSelector((state) => state.students.studentarray);

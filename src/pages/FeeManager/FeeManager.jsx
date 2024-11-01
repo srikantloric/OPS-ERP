@@ -21,10 +21,10 @@ import {
   ListItemDecorator,
 } from "@mui/joy";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchstudent } from "../../store/studentSlice";
 import { enqueueSnackbar } from "notistack";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
 import { StudentDetailsType } from "types/student";
+import { fetchstudent } from "store/reducers/studentSlice";
 
 function CustomTabPanel(props) {
   const { children, value, index, ...other } = props;
