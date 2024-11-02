@@ -28,7 +28,7 @@ import {
 } from "iconsax-react";
 import { Avatar } from "@mui/material";
 import BreadCrumbsV2 from "components/Breadcrumbs/BreadCrumbsV2";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { fetchTotalStudents } from "store/reducers/dashboardSlice";
 import { RootState, useDispatch, useSelector } from "store";
@@ -50,10 +50,19 @@ export const options = {
 
 function Dashboard() {
   const { totalStudent, totalFeeCollection } = useSelector((state: RootState) => state.dashboard.dashboardAnalytics);
+  const [smsBalance, setSmsBalance] = useState<number>(0);
   const dispatch = useDispatch();
+
+  const fetchSMSBalance = async () => {
+    const apiKey = process.env.REACT_APP_SMS_GATEWAY_API_KEY;
+    const result = await fetch(`https://www.fast2sms.com/dev/wallet?authorization=${apiKey}`)
+    const data = await result.json();
+    setSmsBalance(data.wallet);
+  }
 
   useEffect(() => {
     dispatch(fetchTotalStudents());
+    fetchSMSBalance();
   }, []);
 
   return (
@@ -155,10 +164,10 @@ function Dashboard() {
                   spacing={1}
                 >
                   <Typography level="title-lg" sx={{ color: "#fff" }}>
-                    SMS Credits
+                    SMS Balance
                   </Typography>
                   <Typography level="h4" sx={{ color: "#fff" }}>
-                    120 SMS
+                    ₹{smsBalance}
                   </Typography>
                 </Stack>
                 <Avatar
@@ -169,7 +178,7 @@ function Dashboard() {
                   <Simcard1 color="#fff" opacity="0.6" />
                 </Avatar>
                 <Typography level="body-sm" mt="0.5rem" sx={{ color: "#fff" }}>
-                  120SMS/1200SMS Remaining
+                  {smsBalance && Math.floor(smsBalance * 100 / 25)} SMS Remaining
                 </Typography>
                 <Box mt="0.5rem">
                   <LinearProgress
@@ -199,7 +208,7 @@ function Dashboard() {
                     Available Balance
                   </Typography>
                   <Typography level="h4" sx={{ color: "#fff" }}>
-                    ₹0.0
+                    ₹{smsBalance}
                   </Typography>
                 </Stack>
                 <Card color="#fff" size={30} opacity="0.7" />
