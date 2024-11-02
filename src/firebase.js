@@ -1,16 +1,20 @@
 import firebase from "firebase";
 import "firebase/firestore";
 import "firebase/remote-config";
+console.log(process.env)
 
-const app = firebase.initializeApp({
-  apiKey: "AIzaSyAaPYVd2N7YepVt3RPj1d6CtXKaHuw0pt4",
-  authDomain: "orient-public-school-prod.firebaseapp.com",
-  projectId: "orient-public-school-prod",
-  storageBucket: "orient-public-school-prod.appspot.com",
-  messagingSenderId: "995813385072",
-  appId: "1:995813385072:web:280e2f800cd216d589e5b5",
-  measurementId: "G-DP1MLS115J"
-});
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  projectId: process.env.REACT_APP_PROJECT_ID,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+  messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID,
+  appId: process.env.REACT_APP_APP_ID,
+  measurementId: process.env.REACT_APP_MEASUREMENT_ID,
+};
+console.log(firebaseConfig)
+const app =  firebase.initializeApp(firebaseConfig)
 
 export const auth = app.auth();
 export const storageRef = firebase.storage().ref();

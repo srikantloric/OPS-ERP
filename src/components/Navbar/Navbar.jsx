@@ -22,10 +22,12 @@ import {
 import { Logout, Settings } from "@mui/icons-material";
 import { auth } from "../../firebase";
 import { useSearchDialog } from "context/SearchDialogContext";
+import { Chip } from "@mui/joy";
 
 function Navbar() {
   const [screenSize, setScreenSize] = useState(getCurrentDimension());
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const environment = process.env.REACT_APP_MODE || process.env.NODE_ENV;
 
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
@@ -81,6 +83,7 @@ function Navbar() {
     };
   }, [screenSize]);
 
+
   return (
     <div className="navbar-container">
       <div className="navbar-wrapper">
@@ -98,6 +101,7 @@ function Navbar() {
           </div>
         </div>
         <div className="navbar-rightsection">
+          <Chip color="primary" sx={{ mr: 2 }}>{environment}</Chip>
           <div className="rounded-bg">
             <Tooltip title="Night Mode">
               <IconButton>
