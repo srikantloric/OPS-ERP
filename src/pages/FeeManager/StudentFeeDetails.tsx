@@ -404,6 +404,7 @@ function StudentFeeDetails() {
         var pStatus: IPaymentStatus =
           totalPaidAmount >= totalAmountDue ? "PAID" : "PARTIAL";
 
+
         const paymentDataForPayment: IPaymentNL = {
           challanTitle: selectedChallanDetails.challanTitle,
           paymentId: generateAlphanumericUUID(8),
@@ -432,8 +433,6 @@ function StudentFeeDetails() {
           status: pStatus,
           feeConsession: selectedChallanDetails.feeConsession,
         };
-        console.log(paymentDataForChallan)
-        console.log(paymentDataForPayment)
 
         saveDataToDb(paymentDataForPayment, paymentDataForChallan, pStatus);
       } else {
@@ -456,7 +455,7 @@ function StudentFeeDetails() {
           studentId: selectedChallanDetails.studentId,
           amountPaid: recievedAmount!,
           recievedBy: "Admin",
-          recievedOn: firebase.firestore.Timestamp.now(),
+          recievedOn: firebase.firestore.Timestamp.fromDate(new Date(feeCollectionDate!)),
           timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForPayment,
           status: "PAID",
@@ -469,7 +468,7 @@ function StudentFeeDetails() {
           studentId: selectedChallanDetails.studentId,
           amountPaid: selectedChallanDetails.amountPaid + recievedAmount!,
           recievedBy: "Admin",
-          recievedOn: firebase.firestore.Timestamp.now(),
+          recievedOn: firebase.firestore.Timestamp.fromDate(new Date(feeCollectionDate!)),
           timestamp: firebase.firestore.Timestamp.now(),
           breakdown: updatedFeeHeaderForChallan,
           status: "PAID",

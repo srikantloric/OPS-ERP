@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "orient-public-school-prod"
+    "default": "orient-public-school-prod",
+    "test": "orient-public-school"
   }
 }
