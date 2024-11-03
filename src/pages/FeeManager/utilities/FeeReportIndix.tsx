@@ -1,7 +1,7 @@
 import { Grid } from "@mui/joy";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import { generateDueReciept2 } from "components/DueRecieptGenerator/DueRecieptGenerator2";
-import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
+// import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
 import { useEffect, useState } from "react";
 import { DueRecieptPropsType } from "types/student";
 
@@ -228,7 +228,7 @@ const sampleObjects1: DueRecieptPropsType[] = [
 function FeeRecieptIndex() {
 
     const [pdfUrl, setPdfUrl] = useState<string>("");
-  const [pdfUrl1, setPdfUrl1] = useState<string>("");
+  // const [pdfUrl1, setPdfUrl1] = useState<string>("");
 
     const getPdfUrl = async () => {
         // const pdfRes = await generateDueReciept(sampleObjects);
@@ -249,8 +249,8 @@ function FeeRecieptIndex() {
     
     
       const getPdfUrl1 = async () => {
-        const pdfRes1 = await DueRecieptList(sampleObjects1);
-        setPdfUrl1(pdfRes1);
+        // const pdfRes1 = await DueRecieptList(sampleObjects1);
+        // setPdfUrl1(pdfRes1);
       };
     
       useEffect(() => {
@@ -258,10 +258,10 @@ function FeeRecieptIndex() {
       }, []);
     
       const handleDueRecieptList=()=>{
-        const features1 =
-          "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+        // const features1 =
+        //   "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
     
-        window.open(pdfUrl1, "_blank", features1);
+        // window.open(pdfUrl1, "_blank", features1);
       };
 
       const rowData: Indexdata[] = [

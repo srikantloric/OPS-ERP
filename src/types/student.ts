@@ -106,7 +106,6 @@ export type BalanceSheetType = {
 };
 
 
-
 export interface IStudentFeeChallan {
   docIdExt: string,
   studentId: string,

@@ -5,13 +5,13 @@ import LSPage from "components/Utils/LSPage";
 import PageContainer from "components/Utils/PageContainer";
 import { useEffect, useState } from "react";
 import { DueRecieptPropsType } from "types/student";
-import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
+// import { DueRecieptList } from "components/DueRecieptGenerator/DueRecieptList";
 import FeeRecieptIndex from "./utilities/FeeReportIndix";
 import { AdmitCardGenerator } from "components/Reports/AdmitCard";
 
 function FeeReceipt() {
   const [pdfUrl, setPdfUrl] = useState<string>("");
-  const [pdfUrl1, setPdfUrl1] = useState<string>("");
+  // const [pdfUrl1, setPdfUrl1] = useState<string>("");
   const [pdfUrl2, setPdfUrl2] = useState<string>("");
   const sampleObjects: DueRecieptPropsType[] = [
     {
@@ -244,8 +244,8 @@ function FeeReceipt() {
   };
 
   const getPdfUrl1 = async () => {
-    const pdfRes1 = await DueRecieptList(sampleObjects);
-    setPdfUrl1(pdfRes1);
+    // const pdfRes1 = await DueRecieptList(sampleObjects);
+    // setPdfUrl1(pdfRes1);
   };
 
   useEffect(() => {
@@ -253,10 +253,10 @@ function FeeReceipt() {
   }, []);
 
   const handleDueRecieptList = () => {
-    const features1 =
-      "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
+    // const features1 =
+    //   "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
 
-    window.open(pdfUrl1, "_blank", features1);
+    // window.open(pdfUrl1, "_blank", features1);
   };
 
   const getPdfUrl2 = async () => {
