@@ -1,7 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import {
-    EMAIL_ICON,
     LOGO_BASE_64,
     PHONE_ICON,
     POPPINS_BOLD,
@@ -11,63 +10,15 @@ import {
 import {
     SCHOOL_ADDRESS,
     SCHOOL_CONTACT,
-    SCHOOL_EMAIL,
     SCHOOL_NAME,
 } from "config/schoolConfig";
-import { DueRecieptPropsType } from "types/student";
 
+import { DueReportType } from "types/reports";
 
-let DueRecieptListHeader = [
-    "#",
-    "D_Month",
-    "D_Date",
-    "Name",
-    "Ad no",
-    "Class",
-    "Roll",
-    "Father's Name",
-    "Contact",
-    "D_Amount",
-    "Remark",
-];
-
-// type ListArr={
-//     sl:String,
-//     session:String,
-//     due_month:String,
-//     due_date:String,
-//     stud_name:String,
-//     stud_adno:String,
-//     stud_class:String,
-//     stud_sec:String,
-//     stud_rol:String,
-//     stud_contact:String,
-//     due_amount:String,
-//     remark:String,
-// };
 
 export const DueRecieptList = async (
-    recieptData: DueRecieptPropsType[]
+    recieptData: DueReportType[]
 ): Promise<string> => {
-
-    let tempArr:any[] = [];
-    // let DueRecieptListArr = recieptData.map((item, index) => {
-    //         const stringArr = [];
-    //         stringArr.push((index + 1).toString());
-    //         stringArr.push(item.due_month);
-    //         stringArr.push(item.due_date);
-    //         stringArr.push(item.student_name);
-    //         stringArr.push(item.admission_no);
-    //         stringArr.push(item.class+" "+item.section);
-    //         stringArr.push(item.roll_number.toString());
-    //         stringArr.push(item.father_name);
-    //         stringArr.push(item.phone_number.toString());
-    //         stringArr.push(item.fee_heads[0].value+item.fee_heads[1].value+item.fee_heads[2].value);
-    //         stringArr.push("");
-    //         tempArr.push(stringArr);
-    //         return tempArr;
-    //     });
-
 
     return new Promise((resolve, reject) => {
         try {
@@ -82,7 +33,7 @@ export const DueRecieptList = async (
             const margin = 2;
 
             const x = 5 + margin;
-            const y = 5 + margin;
+            const y = 8 + margin;
             // const y=cardHeight+margin;
 
             doc.setTextColor("#000");
@@ -98,10 +49,10 @@ export const DueRecieptList = async (
             doc.addFont("Poppins-Semibold", "Poppins", "semibold");
             ///Start of PDF Design
 
-            doc.addImage(LOGO_BASE_64, x + 8, y + 2, 30, 25);
+            doc.addImage(LOGO_BASE_64, x + 45, y + 4, 20, 18);
 
-            const schoolHeaderStartX = x + 50;
-            const schoolHeaderStartY = y + 5;
+            const schoolHeaderStartX = x + 65;
+            const schoolHeaderStartY = y + 8;
 
             doc.setFontSize(15);
             doc.setFont("Poppins", "bold");
@@ -153,20 +104,7 @@ export const DueRecieptList = async (
                 schoolContactDetailStartY + 12
             );
 
-            //school email
-            doc.addImage(
-                EMAIL_ICON,
-                schoolHeaderStartX + 34,
-                schoolContactDetailStartY + 10,
-                3,
-                3
-            );
 
-            doc.text(
-                SCHOOL_EMAIL,
-                schoolHeaderStartX + 38,
-                schoolContactDetailStartY + 12
-            );
 
             doc.setFillColor("#939393");
 
@@ -182,19 +120,36 @@ export const DueRecieptList = async (
             doc.setTextColor("#000");
             let tableX = x - 7;
             let tableY = y + 38.5;
-            doc.text("Session - "+recieptData[0].current_session,x+3,tableY);
+            doc.text("Session : 2024-25", x + 3, tableY);
 
             tableX = x - 7;
             tableY = y + 42.5;
 
+            const tableColumn = [
+                "SL", "Due Month", "Student Name", "Student ID", "Class",
+                "Father's Name", "Contact", "Due Amount", "Remark"
+            ];
+            const tableRows = recieptData.map((item, index) => [
+                index + 1,
+                item.dueMonth,
+                item.studentName,
+                item.studentId,
+                item.class,
+                item.fatherName,
+                item.contact,
+                item.dueAmount,
+                item.remark,
+            ]);
+
             autoTable(doc, {
-                head: [DueRecieptListHeader],
-                body: tempArr,
+                head: [tableColumn],
+                body: tableRows,
                 startY: tableY,
                 theme: "grid",
                 styles: {
                     textColor: "#000",
                     fontSize: 6.5,
+
                 },
                 margin: { left: tableX + 10 },
                 headStyles: {
@@ -202,19 +157,7 @@ export const DueRecieptList = async (
                     textColor: "#000",
                     minCellHeight: 4,
                 },
-                columnStyles:{
-                    0:{cellWidth:6}, //Sl no
-                    1:{cellWidth:17}, //Due Month
-                    2:{cellWidth:13}, //Due Date
-                    3:{cellWidth:20}, //Name
-                    4:{cellWidth:16}, //Admission no
-                    5:{cellWidth:18}, //Class
-                    6:{cellWidth:8}, //Roll
-                    7:{cellWidth:23}, //Father's Name
-                    8:{cellWidth:18}, //Contact
-                    9:{cellWidth:15}, //Due Amount
-                    10:{cellWidth:35}, //Remark
-                },
+
             });
 
 

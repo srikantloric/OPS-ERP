@@ -13,6 +13,7 @@ import {
   IconMoneybag,
   IconSettings,
   IconReportAnalytics,
+  IconReport,
 } from "@tabler/icons-react";
 import AddStudent from "../../pages/Users/AddStudent";
 import UnderConstruction from "../../pages/Extras/UnderConstruction";
@@ -26,6 +27,7 @@ import ViewStudentProfile from "pages/Users/StudentProfile/ViewStudentProfile";
 import SettingsPage from "pages/Settings/SettingsPage";
 import UpdateResults from "pages/ResultsManagement/UpdateResults";
 import PrintResult from "pages/ResultsManagement/PrintResult";
+import FeeReports from "pages/Reports/FeeReports";
 
 export const routesConfig = [
   {
@@ -190,8 +192,16 @@ export const routesConfig = [
     ],
   },
   {
-    title: "Notification",
+    title: "Reports",
     isHeader: true,
+  },
+  {
+    title: "Fee Report",
+    to: "/FeeReport",
+    icon: IconReport,
+    isCollapsable: false,
+    isHeader: false,
+    Component: FeeReports,
   },
   {
     title: "Transaction",
@@ -200,7 +210,6 @@ export const routesConfig = [
     isCollapsable: false,
     isHeader: false,
     Component: Transaction,
-    // Component: UnderConstruction,
   },
   {
     title: "Message",

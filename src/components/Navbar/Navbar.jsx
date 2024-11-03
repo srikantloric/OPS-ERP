@@ -19,7 +19,7 @@ import {
   IconMoon,
   IconSearch,
 } from "@tabler/icons-react";
-import { Logout, Settings } from "@mui/icons-material";
+import { Circle, Logout, Settings } from "@mui/icons-material";
 import { auth } from "../../firebase";
 import { useSearchDialog } from "context/SearchDialogContext";
 import { Chip } from "@mui/joy";
@@ -101,7 +101,7 @@ function Navbar() {
           </div>
         </div>
         <div className="navbar-rightsection">
-          <Chip color="primary" sx={{ mr: 2 }}>{environment}</Chip>
+          <Chip color="primary"  sx={{ mr: 2,pl:"10px",pr:"10px"}}  startDecorator={<Circle sx={{fontSize:"12px"}} color="success" />}>{environment}</Chip>
           <div className="rounded-bg">
             <Tooltip title="Night Mode">
               <IconButton>

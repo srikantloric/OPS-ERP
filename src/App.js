@@ -31,6 +31,8 @@ import {
 import UpdateResults from "pages/ResultsManagement/UpdateResults";
 import PrintResult from "pages/ResultsManagement/PrintResult";
 import IdCardGeneration from "pages/Extras/IdCardGeneration";
+import BalanceSheet from "pages/Reports/BalanceSheet";
+import DueReport from "pages/Reports/DueReport";
 
 const StudentProfilePictureUpdater = Loadable(
   lazy(() => import("pages/ProfileUpdater/StudentProfilePictureUpdater"))
@@ -66,6 +68,9 @@ function App() {
   const setSidebarOpen = (status) => {
     setIsActive(status);
   };
+
+
+
 
   return (
     <SideBarContext.Provider value={{ isActive, toggle, setSidebarOpen }}>
@@ -143,13 +148,23 @@ function App() {
                   path="/print-id-cards"
                   element={<IdCardGeneration />}
                 />
+
+                {/* Reports Routes */}
+                <Route
+                  path="/FeeReport/balance-sheet"
+                  element={<BalanceSheet />}
+                />
+              
+                <Route
+                  path="/FeeReport/due-report"
+                  element={<DueReport />}
+                />
               
               </Route>
               <Route
                 path="update-student-profile-picture"
                 element={<StudentProfilePictureUpdater />}
               />
-
               <Route path="/login" element={<AuthenticationLayout />}>
                 <Route index element={<Login />} />
               </Route>
