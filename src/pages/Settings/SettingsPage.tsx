@@ -6,6 +6,7 @@ import PageContainer from "components/Utils/PageContainer";
 import { Settings } from "iconsax-react";
 import RecieptConfigurations from "./Tabs/RecieptConfigurations";
 import PaymentConfigurations from "./Tabs/PaymentConfigurations";
+import SMSNotification from "./Tabs/SMSNotification";
 
 function SettingsPage() {
   return (
@@ -19,7 +20,7 @@ function SettingsPage() {
             <TabList>
               <Tab>Reciept Cofigurations</Tab>
               <Tab>Payment Configurations</Tab>
-              {/* <Tab>Others</Tab> */}
+              <Tab>SMS Notification</Tab>
             </TabList>
             <TabPanel value={0} sx={{ minHeight: "90vh", p: "2rem" }}>
               <RecieptConfigurations />
@@ -27,9 +28,9 @@ function SettingsPage() {
             <TabPanel value={1}>
               <PaymentConfigurations/>
             </TabPanel>
-            {/* <TabPanel value={2}>
-              In progress
-            </TabPanel> */}
+            <TabPanel value={2}>
+              <SMSNotification/>
+            </TabPanel>
           </Tabs>
         </Box>
       </LSPage>
