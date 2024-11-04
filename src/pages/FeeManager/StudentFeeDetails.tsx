@@ -342,7 +342,7 @@ function StudentFeeDetails() {
       .doc(paymentObjForPayment.studentId)
       .collection("PAYMENTS")
       .doc();
-    const paymentCollRefOL = db.collection("PAYMENTS").doc();
+    const paymentCollRefOL = db.collection("MY_PAYMENTS").doc();
 
     //update challan
     const challanDocRef = db
