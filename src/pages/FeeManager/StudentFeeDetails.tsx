@@ -333,6 +333,8 @@ function StudentFeeDetails() {
     paymentObjForChallan: IPaymentNLForChallan,
     pStatus: IPaymentStatus
   ) => {
+
+    
     setIsPaymentLoading(true);
     const batch = db.batch();
     const paymentCollRef = db
@@ -359,8 +361,7 @@ function StudentFeeDetails() {
       amountPaid: paymentObjForChallan.amountPaid,
       status: pStatus,
     });
-    console.log(paymentObjForChallan);
-    console.log(paymentObjForPayment);
+
 
     batch.set(paymentCollRef, paymentObjForPayment);
     batch.set(paymentCollRefOL, paymentObjForPayment);

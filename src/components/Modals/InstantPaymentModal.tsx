@@ -51,7 +51,7 @@ interface IInstantPaymentDetailsType {
   fee_discount: number;
 }
 
-interface IInstantPaymentDetailsType extends Record<string, number> {}
+interface IInstantPaymentDetailsType extends Record<string, number> { }
 
 const InstantPaymentModal: React.FC<Props> = ({
   open,
@@ -262,6 +262,8 @@ const InstantPaymentModal: React.FC<Props> = ({
               .collection("PAYMENTS")
               .doc();
 
+            const paymentCollRefGlobal = db.collection("PAYMENTS").doc();
+
             const paymentDataForNL: IPaymentNL = {
               challanTitle: challanTitle,
               paymentId: generateAlphanumericUUID(8),
@@ -275,8 +277,8 @@ const InstantPaymentModal: React.FC<Props> = ({
               status: "PAID",
               feeConsession: feeDetail.feeConsession,
             };
-
             batch.set(paymentCollRef, paymentDataForNL);
+            batch.set(paymentCollRefGlobal, paymentDataForNL)
           }
 
           batch
@@ -427,28 +429,28 @@ const InstantPaymentModal: React.FC<Props> = ({
             </Grid>
             {showMoreHeader
               ? FEE_HEADERS.map((item) => {
-                  return (
-                    <>
-                      <Grid xs={5}>
-                        <Typography>{item.title}</Typography>
-                      </Grid>
-                      <Grid xs={5}>
-                        <Input
-                          name={item.field}
-                          value={feeDetail[item.field]}
-                          onChange={(e) =>
-                            setFeeDetails((prev) => ({
-                              ...prev,
-                              [item.field]: parseInt(e.target.value) || 0,
-                            }))
-                          }
-                          defaultValue={0}
-                          startDecorator={"₹"}
-                        />
-                      </Grid>
-                    </>
-                  );
-                })
+                return (
+                  <>
+                    <Grid xs={5}>
+                      <Typography>{item.title}</Typography>
+                    </Grid>
+                    <Grid xs={5}>
+                      <Input
+                        name={item.field}
+                        value={feeDetail[item.field]}
+                        onChange={(e) =>
+                          setFeeDetails((prev) => ({
+                            ...prev,
+                            [item.field]: parseInt(e.target.value) || 0,
+                          }))
+                        }
+                        defaultValue={0}
+                        startDecorator={"₹"}
+                      />
+                    </Grid>
+                  </>
+                );
+              })
               : null}
           </Grid>
           <Grid container justifyContent={"space-between"}>
