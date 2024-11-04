@@ -262,7 +262,7 @@ const InstantPaymentModal: React.FC<Props> = ({
               .collection("PAYMENTS")
               .doc();
 
-            const paymentCollRefGlobal = db.collection("PAYMENTS").doc();
+            const paymentCollRefGlobal = db.collection("MY_PAYMENTS").doc();
 
             const paymentDataForNL: IPaymentNL = {
               challanTitle: challanTitle,

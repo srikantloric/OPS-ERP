@@ -108,7 +108,7 @@ function QuickPaymentModal({
           .doc(selectedRowData.doc_id);
 
         const mainPaymentRef = db
-          .collection("PAYMENTS")
+          .collection("MY_PAYMENTS")
           .doc(selectedRowData.doc_id);
 
         batch.update(studentPaymentRef, paymentData);

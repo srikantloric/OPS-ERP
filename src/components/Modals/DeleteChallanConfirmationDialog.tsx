@@ -50,7 +50,7 @@ const DeleteChallanConfirmationDialog: React.FC<Props> = ({
           .collection("PAYMENTS")
           .where("challanId", "==", challanId);
         let paymentRefGl = db
-          .collection("PAYMENTS")
+          .collection("MY_PAYMENTS")
           .where("challanId", "==", challanId);
 
         let studentDocRef = db.collection("STUDENTS").doc(studentId);
