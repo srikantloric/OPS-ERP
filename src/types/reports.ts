@@ -5,7 +5,7 @@ export interface DueReportType {
     class: string;
     fatherName: string,
     contact: string,
-    dueAmount: number|string,
+    dueAmount: number,
     remark: string,
     sl:string,
 }

@@ -1,37 +1,24 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { db } from "../../firebase";
+import { FacultyType } from "types/facuities";
 
-interface Faculty {
-  faculty_aadhar: string;
-  faculty_address: string;
-  faculty_email: string;
-  faculty_gender: 'male' | 'female' | 'other';
-  faculty_image: string;
-  faculty_image_thumb: string;
-  faculty_name: string;
-  faculty_pass: string; // Consider handling passwords securely
-  faculty_phone: string;
-  faculty_qualification: string;
-  faculty_specification: string;
-  id: string;
-}
+
 
 interface FacultyState {
-  teacherArray: Faculty[];
+  teacherArray: FacultyType[];
   loading: boolean;
   error: string | null;
 }
 
 //FETCH
-export const fetchTeacher = createAsyncThunk<Faculty[], void>(
+export const fetchTeacher = createAsyncThunk<FacultyType[], void>(
   "teachers/fetchTeacher",
   async () => {
     const snap = await db.collection("FACULTIES").get();
-    const teachers: Faculty[] = [];
+    const teachers: FacultyType[] = [];
     snap.forEach((doc) => {
-      teachers.push({ ...doc.data(), id: doc.id } as Faculty);
+      teachers.push({ ...doc.data(), id: doc.id } as FacultyType);
     });
-    console.log(teachers);
     sessionStorage.setItem("faculties_list", JSON.stringify(teachers));
     return teachers;
   }
@@ -52,7 +39,7 @@ const facultiesSlice = createSlice({
       .addCase(fetchTeacher.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchTeacher.fulfilled, (state, action: PayloadAction<Faculty[]>) => {
+      .addCase(fetchTeacher.fulfilled, (state, action: PayloadAction<FacultyType[]>) => {
         state.loading = false;
         state.teacherArray = action.payload;
       })

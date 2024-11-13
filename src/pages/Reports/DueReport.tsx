@@ -65,7 +65,7 @@ function DueReport() {
                         studentName: studentData.student_name,
                         fatherName: studentData.father_name,
                         contact: studentData.contact_number,
-                        dueAmount: "-",
+                        dueAmount: 0,
                         dueMonth: getMonthTitleByValue(selectedMonth!)!,
                         remark: "Challan not generated",
                         class: getClassNameByValue(selectedClass!)!,

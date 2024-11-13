@@ -1,5 +1,23 @@
 import firebase from "firebase";
 
+export interface FacultyType {
+  id: string;
+  faculty_name: string;
+  faculty_email: string;
+  faculty_phone: string;
+  faculty_address: string;
+  faculty_gender: string;
+  faculty_image: string;
+  faculty_image_thumb: string;
+  faculty_aadhar: string;
+  faculty_pass: string;
+  faculty_qualification: string;
+  faculty_specification: string;
+  faculty_dob:string;
+  faculty_doj:string
+}
+
+
 export type FacultyAttendanceShema = {
   isSmartAttendance?: boolean;
 
