@@ -462,6 +462,7 @@ function StudentFeeDetails() {
           status: "PAID",
           feeConsession: selectedChallanDetails.feeConsession,
         };
+        
         const paymentDataForChallan: IPaymentNLForChallan = {
           challanTitle: selectedChallanDetails.challanTitle,
           paymentId: generateAlphanumericUUID(8),
@@ -612,7 +613,7 @@ function StudentFeeDetails() {
         .collection("STUDENTS")
         .doc(location.state[0].id)
         .collection("PAYMENTS");
-      const query = paymentsRef.where("recievedOn", ">=", todayTimestamp);
+      const query = paymentsRef.where("timestamp", ">=", todayTimestamp);
       const recieptConfigRef = db.collection("CONFIG").doc("RECIEPT_CONFIG");
 
       try {

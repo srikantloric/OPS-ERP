@@ -12,7 +12,6 @@ function Card({ facultyData }) {
     navigate(`/Faculties/${data}`);
   };
 
-  // console.log(facultyData);
   const handleImageOnLoad = () => {
     setImageLoaded(true);
   };

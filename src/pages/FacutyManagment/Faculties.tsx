@@ -8,8 +8,8 @@ import { Link } from "react-router-dom";
 import PersonIcon from "@mui/icons-material/Person";
 import GrainIcon from "@mui/icons-material/Grain";
 import { Breadcrumbs, Paper, Typography } from "@mui/material";
-import { Button, LinearProgress } from "@mui/joy";
-import { Download } from "@mui/icons-material";
+import { Button, Input, LinearProgress } from "@mui/joy";
+import { Add, Search } from "@mui/icons-material";
 import { RootState, useDispatch, useSelector } from "store";
 import { fetchTeacher } from "store/reducers/facultiesSlice";
 
@@ -17,9 +17,7 @@ function Faculties() {
   const facultiesList = useSelector((state: RootState) => state.faculties.teacherArray);
   const [facultiesListNew, setFacultiesListNew] = useState(facultiesList);
   const dipatch = useDispatch()
-  useEffect(() => {
-    setFacultiesListNew(facultiesList);
-  }, [facultiesList]);
+
   useEffect(() => {
     if (sessionStorage.getItem("faculties_list")) {
       const facDataFromCache = JSON.parse(
@@ -70,12 +68,13 @@ function Faculties() {
             </Breadcrumbs>
             <Button
               variant="soft"
-              startDecorator={<Download />}
+              startDecorator={<Add />}
             >
-              Export
+              Add
             </Button>
           </Paper>
-
+          <br/>
+          <Input placeholder="search faculty..." startDecorator={<Search/>} sx={{m:1}}/>
           <br />
           {facultiesListNew ? null : (
             <LinearProgress thickness={2} sx={{ ml: 2, mr: 2 }} />
