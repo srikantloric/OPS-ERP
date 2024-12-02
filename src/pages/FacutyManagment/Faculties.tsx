@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Navbar from "../../components/Navbar/Navbar";
 import LSPage from "../../components/Utils/LSPage";
 import PageContainer from "../../components/Utils/PageContainer";
@@ -15,19 +15,10 @@ import { fetchTeacher } from "store/reducers/facultiesSlice";
 
 function Faculties() {
   const facultiesList = useSelector((state: RootState) => state.faculties.teacherArray);
-  const [facultiesListNew, setFacultiesListNew] = useState(facultiesList);
   const dipatch = useDispatch()
 
   useEffect(() => {
-    if (sessionStorage.getItem("faculties_list")) {
-      const facDataFromCache = JSON.parse(
-        sessionStorage.getItem("faculties_list")!
-      );
-      setFacultiesListNew(facDataFromCache);
-      console.log("fetched faculties from cache");
-    } else {
-      dipatch(fetchTeacher());
-    }
+    dipatch(fetchTeacher());
   }, []);
 
 
@@ -73,10 +64,10 @@ function Faculties() {
               Add
             </Button>
           </Paper>
-          <br/>
-          <Input placeholder="search faculty..." startDecorator={<Search/>} sx={{m:1}}/>
           <br />
-          {facultiesListNew ? null : (
+          <Input placeholder="search faculty..." startDecorator={<Search />} sx={{ m: 1 }} />
+          <br />
+          {facultiesList ? null : (
             <LinearProgress thickness={2} sx={{ ml: 2, mr: 2 }} />
           )}
           <div
@@ -86,8 +77,8 @@ function Faculties() {
               flexWrap: "wrap",
             }}
           >
-            {facultiesListNew &&
-              facultiesListNew.map((dta) => {
+            {facultiesList &&
+              facultiesList.map((dta) => {
                 return <Card facultyData={dta} key={dta.id} />;
               })}
           </div>

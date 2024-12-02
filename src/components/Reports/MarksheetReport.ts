@@ -11,17 +11,6 @@ import { marksheetType, rankType } from "types/results";
 import { getClassNameByValue, getOrdinal } from "utilities/UtilitiesFunctions";
 import { db } from "../../firebase";
 
-const header2 = [
-  [
-    {
-      content: "PERIODIC TEST (TERM 1)",
-      colSpan: 5,
-
-      styles: { halign: "center" },
-    },
-  ],
-  ["Subject", "Theory", "Pract.", "Pass Marks", "Marks Obtained"],
-];
 
 type paperMarksTypeLocal = {
   paperTitle: string;
@@ -32,7 +21,7 @@ type paperMarksTypeLocal = {
 };
 
 export const MarksheetReportGenerator = async (
-  resultData: marksheetType[]
+  resultData: marksheetType[],
 ): Promise<string> => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -41,6 +30,8 @@ export const MarksheetReportGenerator = async (
         unit: "mm",
         format: "a4",
       });
+
+
 
       //data manupulation
       const pageWidth = doc.internal.pageSize.getWidth();
@@ -68,6 +59,19 @@ export const MarksheetReportGenerator = async (
       }
 
       resultData.forEach((data, index) => {
+        const header2 = [
+          [
+            {
+              content: data.examTitle,
+              colSpan: 5,
+
+              styles: { halign: "center" },
+            },
+          ],
+          ["Subject", "Theory", "Pract.", "Pass Marks", "Marks Obtained"],
+        ];
+
+
         let resDataTable: paperMarksTypeLocal[] = [];
         data.result.map((item) => {
           const res: paperMarksTypeLocal = {
@@ -86,8 +90,8 @@ export const MarksheetReportGenerator = async (
         let marksObtained = 0;
         data.result.map(
           (obj) =>
-            (fullMarks +=
-              Number(obj.paperMarkTheory) + Number(obj.paperMarkPractical))
+          (fullMarks +=
+            Number(obj.paperMarkTheory) + Number(obj.paperMarkPractical))
         );
 
         data.result.map((obj) => (totalPassMarks += 33));

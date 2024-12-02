@@ -19,6 +19,7 @@ export type resultType = {
 
 export type marksheetType = {
   student: StudentDetailsType;
+  examTitle:string;
   result: paperMarksType[];
 };
 

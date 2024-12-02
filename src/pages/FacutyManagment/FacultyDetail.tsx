@@ -5,22 +5,35 @@ import PageContainer from "../../components/Utils/PageContainer";
 
 import {
   Box,
-  Button,
   Paper,
 } from "@mui/material";
-import {  useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
-import { IconEdit } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 import { FacultyType } from "types/facuities";
-import { Delete } from "@mui/icons-material";
+import { db } from "../../firebase";
+import { enqueueSnackbar } from "notistack";
 
 
 function FacultyDetail() {
   const { id } = useParams();
-  const [teacherData, setteacherData] = useState<FacultyType>();
+  const [teacherData, setTeacherData] = useState<FacultyType>();
+
+
+  useEffect(() => {
+    console.log(id)
+
+    db.collection("FACULTIES").doc(id).get().then((doc) => {
+      if (doc.exists) {
+        setTeacherData(doc.data() as FacultyType)
+      } else {
+        enqueueSnackbar("Error while fetching teacher!", { variant: "error" })
+      }
+    })
+
+  }, [])
 
   return (
     <>
@@ -31,7 +44,7 @@ function FacultyDetail() {
             style={{
               padding: "10px",
               borderRadius: "5px",
-            
+
             }}
           >
           </Paper>
@@ -87,12 +100,12 @@ function FacultyDetail() {
                 </div>
               </div>
             </div>
-            <div>
+            {/* <div>
               <Button variant="outlined" startIcon={<IconEdit />}>
                 Edit
               </Button>
-              <Delete/>
-            </div>
+              <Delete />
+            </div> */}
           </div>
           <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
 
