@@ -60,7 +60,7 @@ function UpdateResults() {
     useState<boolean>(false);
   const [examsList, setExamList] = useState<examType[]>([]);
   const [paperList, setPaperList] = useState<paperType[]>([]);
-  const [selectedPaper, setSelectedPaper] = useState<any | null>(null);
+  const [selectedPapers, setSelectedPapers] = useState<string[]>([]);
   const [studentList, setStudentList] = useState<StudentDetailsType[]>([]);
   const [selectedClass, setSelectedClass] = useState<any | null>(null);
   const [selectedRoll, setSelectedRoll] = useState<any | null>(null);
@@ -222,29 +222,32 @@ function UpdateResults() {
   };
 
   const handleAddPaperBtn = () => {
-    console.log(selectedPaper);
-    const paper = paperList
-      .filter((paper) => paper.paperId === selectedPaper)
-      .at(0);
-    if (paper) {
-      const paperWithMarks: paperMarksType = {
-        paperId: paper.paperId,
-        paperTitle: paper.paperTitle,
-        paperMarkObtained: 0,
-        paperMarkTheory: 80,
-        paperMarkPassing: 33,
-        paperMarkPractical: 20,
-      };
+    console.log(selectedPapers);
 
-      const isPaperAlreadyExising = studentSelectedMarkList.filter(
-        (item) => item.paperId === paperWithMarks.paperId
-      );
-      if (isPaperAlreadyExising.length > 0) {
-        return;
-      } else {
-        setStudentSelectedMarkList((prev) => [...prev, paperWithMarks]);
+    selectedPapers.map((selectedPaper) => {
+      const paper = paperList
+        .filter((paper) => paper.paperId === selectedPaper)
+        .at(0);
+      if (paper) {
+        const paperWithMarks: paperMarksType = {
+          paperId: paper.paperId,
+          paperTitle: paper.paperTitle,
+          paperMarkObtained: 0,
+          paperMarkTheory: 80,
+          paperMarkPassing: 33,
+          paperMarkPractical: 20,
+        };
+
+        const isPaperAlreadyExising = studentSelectedMarkList.filter(
+          (item) => item.paperId === paperWithMarks.paperId
+        );
+        if (isPaperAlreadyExising.length > 0) {
+          return;
+        } else {
+          setStudentSelectedMarkList((prev) => [...prev, paperWithMarks]);
+        }
       }
-    }
+    })
   };
 
   const handlePaperDeleteBtn = (paper: paperMarksType) => {
@@ -409,7 +412,7 @@ function UpdateResults() {
 
   const printStudentMarksheet = async (result: resultType) => {
     const pdfUrl = await MarksheetReportGenerator([
-      { student: currentSelectedStudent!, result: result.result },
+      { student: currentSelectedStudent!, result: result.result, examTitle: result.examTitle },
     ]);
     const createPDFWindow =
       "width=600,height=400,toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes";
@@ -622,7 +625,7 @@ function UpdateResults() {
           <ModalDialog
             variant="outlined"
             role="alertdialog"
-            sx={{ minWidth: "480px", minHeight: "90%" }}
+            sx={{ minWidth: "580px", minHeight: "90%" }}
           >
             <DialogTitle>
               <UpdateIcon />
@@ -659,8 +662,20 @@ function UpdateResults() {
                   <Typography>Add Paper</Typography>
                   <Stack direction={"row"} gap={2}>
                     <Select
+                      multiple
                       placeholder="select paper..."
-                      onChange={(e, val) => setSelectedPaper(val)}
+                      onChange={(e, val) => {
+                        setSelectedPapers(val as string[])
+                      }}
+                      renderValue={(selected) => (
+                        <Box sx={{ display: 'flex', gap: '0.25rem' }}>
+                          {selected.map((selectedOption) => (
+                            <Chip variant="soft" color="primary">
+                              {selectedOption.label}
+                            </Chip>
+                          ))}
+                        </Box>
+                      )}
                     >
                       {paperList.map((item) => {
                         return (
@@ -706,29 +721,29 @@ function UpdateResults() {
                       </Typography>
                       <Stack direction={"row"} gap={2}>
                         <Input
-                          type="number"
+                          type="text"
                           sx={{ width: "90px" }}
                           onChange={(e) =>
                             handleMarkUpdate(e.target.value, paper, "THEORY")
                           }
-                          value={paper.paperMarkTheory}
+                          value={paper.paperMarkTheory || 0}
                         />
                         <Input
-                          type="number"
+                          type="text"
                           sx={{ width: "90px" }}
                           onChange={(e) =>
                             handleMarkUpdate(e.target.value, paper, "PRAC")
                           }
-                          value={paper.paperMarkPractical}
+                          value={paper.paperMarkPractical || 0}
                         />
                         <Divider orientation="vertical" />
                         <Input
-                          type="number"
+                          type="text"
                           sx={{ width: "90px" }}
                           onChange={(e) =>
                             handleMarkUpdate(e.target.value, paper, "OBTAINED")
                           }
-                          value={paper.paperMarkObtained}
+                          value={paper.paperMarkObtained || 0}
                         />
                         <Button
                           size="sm"

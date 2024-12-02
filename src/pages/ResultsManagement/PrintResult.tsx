@@ -122,6 +122,7 @@ function PrintResult() {
                     if (result.data().examId === selectedExam) {
                       let newMarkSheet: marksheetType = {
                         student: studentList[i],
+                        examTitle:result.data().examTitle,
                         result: result.data().result as paperMarksType[],
                       };
                       temMarkSheetList.push(newMarkSheet);
