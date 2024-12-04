@@ -3,6 +3,7 @@ import {
   POPPINS_BOLD,
   POPPINS_REGULAR,
   POPPINS_SEMIBOLD,
+  PRINCIPAL_SIGN,
 } from "utilities/Base64Url";
 import { SCHOOL_NAME } from "config/schoolConfig";
 import { jsPDF } from "jspdf";
@@ -446,6 +447,9 @@ export const MarksheetReportGenerator = async (
           startX + 35 + 2 * (cardWidth / 3),
           startY - 5
         );
+
+
+        doc.addImage(PRINCIPAL_SIGN, startX + 2 * (cardWidth / 3)-5, startY-22, 40, 15);
         doc.text("Principal Sign", startX + 2 * (cardWidth / 3), startY);
 
         doc.addPage();
