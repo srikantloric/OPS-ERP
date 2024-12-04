@@ -15,7 +15,7 @@ import { db } from "../../firebase";
 
 type paperMarksTypeLocal = {
   paperTitle: string;
-  paperMarkObtained: number;
+  paperMarkObtained: number|string;
   paperMarkPractical: number;
   paperMarkTheory: number;
   paperMarkPassing: number;
@@ -80,7 +80,7 @@ export const MarksheetReportGenerator = async (
             paperMarkTheory: item.paperMarkTheory,
             paperMarkPractical: item.paperMarkPractical,
             paperMarkPassing: 33,
-            paperMarkObtained: item.paperMarkObtained,
+            paperMarkObtained: item.paperMarkObtained===0?"AB":item.paperMarkObtained,
           };
           resDataTable.push(res);
         });
